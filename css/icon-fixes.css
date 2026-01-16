@@ -1,0 +1,28 @@
+/* Icon Style Fixes */
+
+/* Ensure Font Awesome icons display properly */
+.search-btn i,
+.icon-btn i {
+    font-size: 1rem;
+    color: currentColor;
+}
+
+.search-btn i {
+    color: white;
+}
+
+.icon-btn i {
+    color: var(--text-secondary, #9ca3af);
+}
+
+.icon-btn:hover i {
+    color: var(--text-primary, #f3f4f6);
+}
+
+/* Remove emoji fallback styles if any */
+.search-btn span:not(.notification-badge),
+.icon-btn span:not(.notification-badge) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
