@@ -1,0 +1,39 @@
+{
+  "name": "voxly-pro",
+  "version": "2.0.0",
+  "description": "Advanced Social Listening & Analytics Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "test": "echo \"No tests yet\" && exit 0",
+    "lint": "echo \"No linter configured\" && exit 0"
+  },
+  "keywords": [
+    "social-listening",
+    "analytics",
+    "sentiment-analysis",
+    "dashboard",
+    "social-media",
+    "monitoring",
+    "brand-monitoring",
+    "competitor-analysis"
+  ],
+  "author": "Voxly Pro Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/voxly-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/voxly-pro/issues"
+  },
+  "homepage": "https://voxlypro.com",
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
