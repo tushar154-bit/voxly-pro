@@ -126,19 +126,11 @@
 
 .badge-dot {
     position: relative;
-    padding-left: 18px;
+    padding-left: 0;
 }
 
 .badge-dot::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
+    display: none;
 }
 
 /* ========================================

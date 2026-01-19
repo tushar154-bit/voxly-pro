@@ -838,16 +838,7 @@
 }
 
 .activity-item.new::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: -4px;
-    width: 8px;
-    height: 8px;
-    background: var(--primary, #6366f1);
-    border-radius: 50%;
-    transform: translateY(-50%);
-    animation: activityPulse 2s infinite;
+    display: none;
 }
 
 /* ========================================

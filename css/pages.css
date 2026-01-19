@@ -4,6 +4,56 @@
    =================================== */
 
 /* ===================================
+   Page Header (Shared)
+   =================================== */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.page-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.page-header .page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900, #1f2937);
+    margin: 0;
+}
+
+.page-header .page-subtitle {
+    font-size: 0.9375rem;
+    color: var(--gray-500, #64748b);
+    margin: 0;
+}
+
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header-right {
+        justify-content: flex-start;
+    }
+}
+
+/* ===================================
    Real-Time Page
    =================================== */
 
@@ -185,6 +235,18 @@
     border-radius: var(--radius-md);
     margin-bottom: 0.75rem;
     border-left: 3px solid var(--danger);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.alert-item:hover {
+    background: linear-gradient(135deg, #fdfcfb 0%, #f5f4f2 100%);
+    transform: translateY(-6px) translateZ(15px) rotateX(3deg);
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.15),
+        0 10px 20px -10px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .alert-item:last-child {
@@ -1024,6 +1086,15 @@
     gap: 2rem;
 }
 
+.trends-dual-section .trends-section {
+    background: var(--card-background, #fff);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
 .hashtags-list,
 .keywords-list {
     display: flex;
@@ -1040,13 +1111,18 @@
     background: var(--gray-50);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hashtag-item:hover,
 .keyword-item:hover {
-    background: var(--gray-100);
-    transform: translateX(4px);
+    background: linear-gradient(135deg, #fdfcfb 0%, #f5f4f2 100%);
+    transform: translateY(-6px) translateZ(15px) rotateX(3deg);
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.15),
+        0 10px 20px -10px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .item-rank {
