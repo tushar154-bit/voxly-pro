@@ -1,0 +1,1194 @@
+/**
+ * Dashboard Page Component - Enhanced Interactive Version
+ * Main dashboard with platform-aware stats, interactive charts, and dynamic filtering
+ */
+
+class DashboardPage {
+    constructor() {
+        this.charts = {};
+        this.currentBrand = 'apple'; // Default brand from APIData
+        this.currentPlatform = 'all';
+        this.platformData = null;
+        this.refreshInterval = null;
+        this.isAnimating = false;
+        this.resizeObserver = null;
+        this.zoomLevel = 1;
+        this.cardSizeMode = 'normal'; // 'compact', 'normal', 'expanded'
+        this.brandData = null;
+    }
+
+    render() {
+        return `
+            <div class="dashboard-container">
+                <!-- Platform Filter Bar with SVG Icons -->
+                <div class="filter-bar animated-fade-in">
+                    <div class="filter-group">
+                        <span class="filter-label">
+                            <span class="chip-icon platform-icon icon-all"></span>
+                            Filter by Platform:
+                        </span>
+                        <div class="filter-chips" id="platformFilters">
+                            <button class="filter-chip active" data-platform="all">
+                                <span class="chip-icon platform-icon icon-all"></span>
+                                <span class="chip-text">All Platforms</span>
+                                <span class="chip-count" id="countAll">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="twitter">
+                                <span class="chip-icon platform-icon icon-twitter"></span>
+                                <span class="chip-text">X</span>
+                                <span class="chip-count" id="countTwitter">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="reddit">
+                                <span class="chip-icon platform-icon icon-reddit"></span>
+                                <span class="chip-text">Reddit</span>
+                                <span class="chip-count" id="countReddit">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="youtube">
+                                <span class="chip-icon platform-icon icon-youtube"></span>
+                                <span class="chip-text">YouTube</span>
+                                <span class="chip-count" id="countYoutube">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="linkedin">
+                                <span class="chip-icon platform-icon icon-linkedin"></span>
+                                <span class="chip-text">LinkedIn</span>
+                                <span class="chip-count" id="countLinkedin">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="facebook">
+                                <span class="chip-icon platform-icon icon-facebook"></span>
+                                <span class="chip-text">Facebook</span>
+                                <span class="chip-count" id="countFacebook">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="instagram">
+                                <span class="chip-icon platform-icon icon-instagram"></span>
+                                <span class="chip-text">Instagram</span>
+                                <span class="chip-count" id="countInstagram">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="news">
+                                <span class="chip-icon platform-icon icon-news"></span>
+                                <span class="chip-text">News</span>
+                                <span class="chip-count" id="countNews">-</span>
+                            </button>
+                            <button class="filter-chip" data-platform="reviews">
+                                <span class="chip-icon platform-icon icon-reviews"></span>
+                                <span class="chip-text">Reviews</span>
+                                <span class="chip-count" id="countReviews">-</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="refresh-btn" id="refreshData" title="Refresh Data">
+                            <span class="refresh-icon">↻</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Current Platform Indicator -->
+                <div class="platform-indicator animated-fade-in" id="platformIndicator" style="display: none;">
+                    <div class="indicator-content">
+                        <span class="indicator-icon platform-icon lg" id="indicatorIcon"></span>
+                        <span class="indicator-text">Showing data for <strong id="indicatorName">Twitter</strong></span>
+                        <button class="indicator-clear" id="clearFilter">✕ Show All</button>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-grid animated-fade-in">
+                    <div class="stat-card primary interactive" data-stat="sentiment">
+                        <div class="stat-header">
+                            <span class="stat-title">Overall Sentiment</span>
+                            <div class="stat-icon"><span class="flat-icon icon-sentiment"></span></div>
+                        </div>
+                        <div class="stat-main">
+                            <div class="stat-value" id="sentimentValue">
+                                <span class="value-number">75</span>
+                                <span class="value-suffix">%</span>
+                            </div>
+                            <div class="stat-change positive" id="sentimentChange">
+                                <span class="stat-change-icon">↑</span>
+                                <span>+12% from last week</span>
+                            </div>
+                        </div>
+                        <div class="stat-trend">
+                            <canvas id="sentimentSparkline"></canvas>
+                        </div>
+                        <div class="stat-footer">
+                            <div class="stat-meta" id="sentimentBreakdown">
+                                <span class="meta-item positive">
+                                    <span class="meta-label">Positive</span>
+                                    <span class="meta-value" id="positiveCount">-</span>
+                                </span>
+                                <span class="meta-item neutral">
+                                    <span class="meta-label">Neutral</span>
+                                    <span class="meta-value" id="neutralCount">-</span>
+                                </span>
+                                <span class="meta-item negative">
+                                    <span class="meta-label">Negative</span>
+                                    <span class="meta-value" id="negativeCount">-</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card success interactive" data-stat="mentions">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Mentions</span>
+                            <div class="stat-icon"><span class="flat-icon icon-chat"></span></div>
+                        </div>
+                        <div class="stat-main">
+                            <div class="stat-value" id="mentionsValue">
+                                <span class="value-number">156.8</span>
+                                <span class="value-suffix">K</span>
+                            </div>
+                            <div class="stat-change positive" id="mentionsChange">
+                                <span class="stat-change-icon">↑</span>
+                                <span>+23% from last week</span>
+                            </div>
+                        </div>
+                        <div class="stat-trend">
+                            <canvas id="mentionsSparkline"></canvas>
+                        </div>
+                        <div class="stat-footer">
+                            <div class="stat-meta">
+                                <span class="meta-item">
+                                    <span class="meta-icon flat-icon icon-analytics"></span>
+                                    <span id="avgDaily">5.2K/day</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card warning interactive" data-stat="engagement">
+                        <div class="stat-header">
+                            <span class="stat-title">Engagement Rate</span>
+                            <div class="stat-icon"><span class="flat-icon icon-engagement"></span></div>
+                        </div>
+                        <div class="stat-main">
+                            <div class="stat-value" id="engagementValue">
+                                <span class="value-number">8.5</span>
+                                <span class="value-suffix">%</span>
+                            </div>
+                            <div class="stat-change positive" id="engagementChange">
+                                <span class="stat-change-icon">↑</span>
+                                <span>+3.2% from last week</span>
+                            </div>
+                        </div>
+                        <div class="stat-trend">
+                            <canvas id="engagementSparkline"></canvas>
+                        </div>
+                        <div class="stat-footer">
+                            <div class="stat-meta">
+                                <span class="meta-item">
+                                    <span class="meta-icon flat-icon icon-heart"></span>
+                                    <span id="totalLikes">-</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-icon flat-icon icon-chat"></span>
+                                    <span id="totalComments">-</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card info interactive" data-stat="reach">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Reach</span>
+                            <div class="stat-icon"><span class="flat-icon icon-broadcast"></span></div>
+                        </div>
+                        <div class="stat-main">
+                            <div class="stat-value" id="reachValue">
+                                <span class="value-number">12.5</span>
+                                <span class="value-suffix">M</span>
+                            </div>
+                            <div class="stat-change positive" id="reachChange">
+                                <span class="stat-change-icon">↑</span>
+                                <span>+45% from last week</span>
+                            </div>
+                        </div>
+                        <div class="stat-trend">
+                            <canvas id="reachSparkline"></canvas>
+                        </div>
+                        <div class="stat-footer">
+                            <div class="stat-meta">
+                                <span class="meta-item">
+                                    <span class="meta-icon flat-icon icon-users"></span>
+                                    <span id="uniqueUsers">-</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Charts Grid - Improved Layout -->
+                <div class="charts-section animated-fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">Analytics Overview</h2>
+                        <div class="section-actions">
+                            <select class="time-select" id="timeRange">
+                                <option value="7d">Last 7 Days</option>
+                                <option value="14d">Last 14 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="chart-grid">
+                        <!-- Sentiment Over Time - Full Width -->
+                        <div class="chart-card full-width">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Sentiment Trend</h3>
+                                    <p class="chart-subtitle">Positive, Neutral & Negative sentiment over time</p>
+                                </div>
+                                <div class="chart-actions">
+                                    <button class="chart-action-btn" data-action="download" data-chart="sentimentChart" title="Download"><span class="flat-icon icon-download"></span></button>
+                                    <button class="chart-action-btn" data-action="fullscreen" data-chart="sentimentChart" title="Fullscreen"><span class="flat-icon icon-fullscreen"></span></button>
+                                </div>
+                            </div>
+                            <div class="chart-container large">
+                                <canvas id="sentimentChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Platform Distribution & Mentions Volume -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Platform Distribution</h3>
+                                    <p class="chart-subtitle">Share of mentions by platform</p>
+                                </div>
+                                <div class="chart-actions">
+                                    <button class="chart-action-btn" data-action="download" data-chart="platformChart" title="Download"><span class="flat-icon icon-download"></span></button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="platformChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Mentions Volume</h3>
+                                    <p class="chart-subtitle">Hourly mention activity (24h)</p>
+                                </div>
+                                <div class="chart-actions">
+                                    <button class="chart-action-btn" data-action="download" data-chart="mentionsChart" title="Download"><span class="flat-icon icon-download"></span></button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="mentionsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Emotion Analysis -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title">Emotion Analysis</h3>
+                                    <p class="chart-subtitle">Breakdown by emotion type</p>
+                                </div>
+                                <div class="chart-actions">
+                                    <button class="chart-action-btn" data-action="download" data-chart="emotionChart" title="Download"><span class="flat-icon icon-download"></span></button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="emotionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Section: Activity & Top Posts -->
+                <div class="bottom-section animated-fade-in">
+                    <!-- Trending Topics & Word Cloud -->
+                    <div class="trends-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <h3 class="chart-title"><span class="flat-icon icon-trending"></span> Trending Topics</h3>
+                                    <p class="chart-subtitle">Most discussed topics this week</p>
+                                </div>
+                            </div>
+                            <div class="trending-list" id="trendingTopics">
+                                <!-- Trending items will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Feed -->
+                    <div class="activity-section">
+                        <div class="activity-feed">
+                            <div class="activity-header">
+                                <h3 class="activity-title"><span class="flat-icon icon-live"></span> Live Activity Feed</h3>
+                                <div class="activity-controls">
+                                    <span class="live-indicator">
+                                        <span class="live-dot"></span>
+                                        Live
+                                    </span>
+                                    <button class="chart-action-btn" id="pauseActivity" title="Pause"><span class="flat-icon icon-pause"></span></button>
+                                </div>
+                            </div>
+                            <div class="activity-list" id="activityList">
+                                <!-- Activity items will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Posts Table -->
+                <div class="posts-section animated-fade-in">
+                    <div class="data-table">
+                        <div class="table-header">
+                            <div class="table-title-section">
+                                <h3 class="chart-title"><span class="flat-icon icon-posts"></span> Top Performing Posts</h3>
+                                <p class="chart-subtitle">Highest engagement mentions this week</p>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn-secondary" id="exportPosts">
+                                    <span class="flat-icon icon-download"></span> Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Author</th>
+                                        <th>Platform</th>
+                                        <th>Content</th>
+                                        <th>Sentiment</th>
+                                        <th>Engagement</th>
+                                        <th>Reach</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="postsTable">
+                                    <!-- Posts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    init() {
+        console.log('🎯 Initializing Enhanced Dashboard...');
+
+        // Load initial brand data from APIData
+        this.loadBrandData();
+
+        // Load initial platform data
+        this.loadPlatformData();
+
+        // Initialize charts
+        this.initializeCharts();
+
+        // Load data
+        this.loadData();
+
+        // Set up event listeners
+        this.setupEventListeners();
+
+        // Start auto-refresh for activity feed
+        this.startAutoRefresh();
+
+        // Initialize dynamic KPI card sizing
+        this.initDynamicCardSizing();
+
+        console.log('✅ Enhanced Dashboard initialized');
+    }
+
+    /**
+     * Load brand selector chips from APIData
+     */
+    async loadBrandSelector() {
+        if (typeof APIData === 'undefined') {
+            console.warn('APIData not available');
+            return;
+        }
+
+        const brandSelector = document.getElementById('brandSelector');
+        if (!brandSelector) return;
+
+        try {
+            const response = await APIData.getBrands();
+            if (response.success) {
+                const brands = response.data;
+
+                brandSelector.innerHTML = brands.map(brand => `
+                    <button class="brand-chip ${brand.id === this.currentBrand ? 'active' : ''}"
+                            data-brand="${brand.id}"
+                            style="--brand-color: ${brand.color}">
+                        <img src="${brand.logo}" alt="${brand.name}" class="brand-chip-logo"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span class="brand-chip-fallback" style="display: none; background: ${brand.color}">
+                            ${brand.name.charAt(0)}
+                        </span>
+                        <span class="brand-chip-name">${brand.name}</span>
+                    </button>
+                `).join('');
+
+                // Update brand info panel
+                this.updateBrandInfo(this.currentBrand);
+
+                // Set up brand click handlers
+                brandSelector.querySelectorAll('.brand-chip').forEach(chip => {
+                    chip.addEventListener('click', (e) => {
+                        this.handleBrandChange(e.currentTarget.dataset.brand);
+                    });
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load brands:', error);
+        }
+    }
+
+    /**
+     * Update brand info panel
+     */
+    updateBrandInfo(brandId) {
+        if (typeof APIData === 'undefined') return;
+
+        const brand = APIData.brands[brandId];
+        if (!brand) return;
+
+        const brandLogo = document.getElementById('brandLogo');
+        const brandName = document.getElementById('selectedBrandName');
+        const brandIndustry = document.getElementById('selectedBrandIndustry');
+
+        if (brandLogo) {
+            brandLogo.innerHTML = `
+                <img src="${brand.logo}" alt="${brand.name}"
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'brand-logo-fallback\\' style=\\'background:${brand.color}\\'>${brand.name.charAt(0)}</span>';">
+            `;
+        }
+        if (brandName) brandName.textContent = brand.name;
+        if (brandIndustry) {
+            const industry = APIData.industries[brand.industry];
+            brandIndustry.textContent = industry ? industry.name : brand.industry;
+        }
+    }
+
+    /**
+     * Handle brand change
+     * @param {string} brandId - The brand ID to switch to
+     * @param {boolean} force - Force update even if same brand
+     */
+    async handleBrandChange(brandId, force = false) {
+        console.log(`📍 handleBrandChange called with brandId: ${brandId}, force: ${force}, currentBrand: ${this.currentBrand}, isAnimating: ${this.isAnimating}`);
+
+        if (this.isAnimating) {
+            console.log('⚠️ Animation in progress, skipping');
+            return;
+        }
+        if (!force && brandId === this.currentBrand) {
+            console.log('⚠️ Same brand and not forced, skipping');
+            return;
+        }
+        this.isAnimating = true;
+
+        console.log(`🔄 Switching to brand: ${brandId}`);
+
+        // Update current brand
+        this.currentBrand = brandId;
+        if (typeof APIData !== 'undefined') {
+            APIData.setActiveBrand(brandId);
+        }
+
+        // Reload all data for the new brand
+        console.log('📊 Loading brand data...');
+        await this.loadBrandData();
+        console.log('📊 Brand data loaded, brandData:', this.brandData);
+
+        this.loadPlatformData();
+        this.loadActivityFeed();
+        this.loadPostsTable();
+        await this.loadTrendingTopics();
+        console.log('✅ All data reloaded for brand:', brandId);
+
+        // Update charts with new brand data
+        if (typeof Charts !== 'undefined') {
+            Charts.updateAllChartsForPlatform(this.currentPlatform);
+            console.log('📈 Charts updated');
+        }
+
+        // Show notification
+        const brand = APIData?.brands[brandId];
+        try {
+            if (window.notificationManager) {
+                window.notificationManager.show(`Now monitoring ${brand?.name || brandId}`, 'success');
+            }
+        } catch (e) {
+            console.warn('Notification failed:', e);
+        }
+        console.log(`🎉 Brand change complete: ${brand?.name || brandId}`);
+
+        // Reset animation flag
+        this.isAnimating = false;
+    }
+
+    /**
+     * Load brand-specific data from API
+     */
+    async loadBrandData() {
+        if (typeof APIData === 'undefined') return;
+
+        try {
+            const metricsResponse = await APIData.getBrandMetrics(this.currentBrand);
+            if (metricsResponse.success) {
+                this.brandData = metricsResponse.data;
+                this.updateBrandStats();
+            }
+        } catch (error) {
+            console.error('Failed to load brand data:', error);
+        }
+    }
+
+    /**
+     * Update stats with brand-specific data
+     */
+    updateBrandStats() {
+        if (!this.brandData) return;
+
+        // Update sentiment
+        const sentimentEl = document.querySelector('#sentimentValue .value-number');
+        if (sentimentEl) {
+            this.animateValue(sentimentEl, this.brandData.sentiment);
+        }
+
+        // Update breakdown counts
+        const positiveEl = document.getElementById('positiveCount');
+        const neutralEl = document.getElementById('neutralCount');
+        const negativeEl = document.getElementById('negativeCount');
+
+        if (positiveEl) this.animateValue(positiveEl, this.brandData.positive, true);
+        if (neutralEl) this.animateValue(neutralEl, this.brandData.neutral, true);
+        if (negativeEl) this.animateValue(negativeEl, this.brandData.negative, true);
+
+        // Update mentions
+        const mentionsEl = document.querySelector('#mentionsValue .value-number');
+        const mentionsSuffix = document.querySelector('#mentionsValue .value-suffix');
+        if (mentionsEl) {
+            const formatted = Utils.formatNumber(this.brandData.mentions);
+            const match = formatted.match(/^([\d.]+)([KMB]?)$/);
+            if (match) {
+                this.animateValue(mentionsEl, parseFloat(match[1]));
+                if (mentionsSuffix) mentionsSuffix.textContent = match[2];
+            }
+        }
+
+        // Update engagement
+        const engagementEl = document.querySelector('#engagementValue .value-number');
+        if (engagementEl) {
+            this.animateValue(engagementEl, this.brandData.engagement);
+        }
+
+        // Update reach
+        const reachEl = document.querySelector('#reachValue .value-number');
+        const reachSuffix = document.querySelector('#reachValue .value-suffix');
+        if (reachEl) {
+            const formatted = Utils.formatNumber(this.brandData.reach);
+            const match = formatted.match(/^([\d.]+)([KMB]?)$/);
+            if (match) {
+                this.animateValue(reachEl, parseFloat(match[1]));
+                if (reachSuffix) reachSuffix.textContent = match[2];
+            }
+        }
+
+        // Update growth indicators
+        this.updateGrowthIndicator('sentimentChange', Math.round(this.brandData.growth));
+        this.updateGrowthIndicator('mentionsChange', Math.round(this.brandData.growth + 5));
+        this.updateGrowthIndicator('engagementChange', Math.round(this.brandData.growth - 2));
+        this.updateGrowthIndicator('reachChange', Math.round(this.brandData.growth + 15));
+    }
+
+    /**
+     * Initialize dynamic card sizing based on viewport and zoom level
+     */
+    initDynamicCardSizing() {
+        // Set up ResizeObserver for the stats grid and charts
+        this.setupResizeObserver();
+
+        // Listen for window resize (includes zoom changes)
+        this.boundHandleResize = this.handleViewportChange.bind(this);
+        window.addEventListener('resize', this.boundHandleResize);
+
+        // Listen for zoom changes via visual viewport API (modern browsers)
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', this.boundHandleResize);
+        }
+
+        // Initial resize of charts
+        this.resizeAllCharts();
+    }
+
+    /**
+     * Set up ResizeObserver for responsive components
+     */
+    setupResizeObserver() {
+        if (!window.ResizeObserver) return;
+
+        this.resizeObserver = new ResizeObserver((entries) => {
+            // Debounce resize handling
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => {
+                this.resizeAllCharts();
+            }, 50);
+        });
+
+        // Observe the stats grid container
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) {
+            this.resizeObserver.observe(statsGrid);
+        }
+
+        // Observe chart containers
+        document.querySelectorAll('.chart-container').forEach(container => {
+            this.resizeObserver.observe(container);
+        });
+    }
+
+    /**
+     * Handle viewport/zoom changes
+     */
+    handleViewportChange() {
+        // Debounce the resize handling
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = setTimeout(() => {
+            this.resizeAllCharts();
+        }, 100);
+    }
+
+    /**
+     * Resize all charts to fit their containers
+     */
+    resizeAllCharts() {
+        Object.values(this.charts).forEach(chart => {
+            if (chart && typeof chart.resize === 'function') {
+                chart.resize();
+            }
+        });
+    }
+
+    loadPlatformData() {
+        if (typeof MockData !== 'undefined') {
+            // Load counts for each platform
+            const platforms = ['twitter', 'reddit', 'youtube', 'linkedin', 'facebook', 'instagram', 'news', 'reviews'];
+
+            let totalMentions = 0;
+            platforms.forEach(platform => {
+                const stats = MockData.getPlatformStats(platform);
+                const countEl = document.getElementById(`count${platform.charAt(0).toUpperCase() + platform.slice(1)}`);
+                if (countEl && stats) {
+                    countEl.textContent = Utils.formatNumber(stats.mentions);
+                    totalMentions += stats.mentions;
+                }
+            });
+
+            // Set all platforms count
+            const countAll = document.getElementById('countAll');
+            if (countAll) {
+                countAll.textContent = Utils.formatNumber(totalMentions);
+            }
+
+            // Load current platform data
+            this.platformData = MockData.getPlatformData(this.currentPlatform);
+            this.updateStats();
+        }
+    }
+
+    setupEventListeners() {
+        // Platform filter chips
+        document.querySelectorAll('#platformFilters .filter-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                this.handlePlatformFilter(e.currentTarget);
+            });
+        });
+
+        // Clear filter button
+        const clearFilter = document.getElementById('clearFilter');
+        if (clearFilter) {
+            clearFilter.addEventListener('click', () => {
+                this.handlePlatformFilter(document.querySelector('[data-platform="all"]'));
+            });
+        }
+
+        // Refresh button
+        const refreshBtn = document.getElementById('refreshData');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.refreshAllData();
+            });
+        }
+
+        // Time range selector
+        const timeRange = document.getElementById('timeRange');
+        if (timeRange) {
+            timeRange.addEventListener('change', (e) => {
+                this.handleTimeRangeChange(e.target.value);
+            });
+        }
+
+        // Pause activity button
+        const pauseBtn = document.getElementById('pauseActivity');
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', () => {
+                this.toggleActivityFeed();
+            });
+        }
+
+        // Chart action buttons
+        document.querySelectorAll('.chart-action-btn[data-action]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.currentTarget.dataset.action;
+                const chartId = e.currentTarget.dataset.chart;
+                this.handleChartAction(action, chartId);
+            });
+        });
+
+        // Interactive stat cards
+        document.querySelectorAll('.stat-card.interactive').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('expanded');
+            });
+        });
+    }
+
+    handlePlatformFilter(chip) {
+        if (this.isAnimating) return;
+        this.isAnimating = true;
+
+        const platform = chip.dataset.platform;
+
+        // Update active state
+        document.querySelectorAll('#platformFilters .filter-chip').forEach(c => {
+            c.classList.remove('active');
+        });
+        chip.classList.add('active');
+
+        // Update current platform
+        this.currentPlatform = platform;
+
+        // Show/hide platform indicator
+        const indicator = document.getElementById('platformIndicator');
+        if (platform !== 'all') {
+            const config = MockData?.platformConfig?.[platform];
+            if (indicator && config) {
+                const iconEl = document.getElementById('indicatorIcon');
+                // Clear previous classes and add the new platform icon class
+                iconEl.className = `indicator-icon platform-icon lg icon-${platform}`;
+                document.getElementById('indicatorName').textContent = config.name;
+                indicator.style.display = 'block';
+                indicator.classList.add('slide-in');
+            }
+        } else {
+            if (indicator) {
+                indicator.style.display = 'none';
+                indicator.classList.remove('slide-in');
+            }
+        }
+
+        // Reload data for platform
+        this.platformData = MockData?.getPlatformData?.(platform);
+        this.updateStats();
+
+        // Update all charts with animation
+        if (typeof Charts !== 'undefined') {
+            Charts.updateAllChartsForPlatform(platform);
+        }
+
+        // Reload activity feed and posts
+        this.loadActivityFeed();
+        this.loadPostsTable();
+        this.loadTrendingTopics();
+
+        setTimeout(() => {
+            this.isAnimating = false;
+        }, 500);
+    }
+
+    updateStats() {
+        if (!this.platformData) return;
+
+        // Update sentiment
+        const sentimentEl = document.querySelector('#sentimentValue .value-number');
+        if (sentimentEl) {
+            this.animateValue(sentimentEl, this.platformData.sentiment);
+        }
+
+        // Update breakdown
+        document.getElementById('positiveCount')?.textContent &&
+            this.animateValue(document.getElementById('positiveCount'), this.platformData.positive, true);
+        document.getElementById('neutralCount')?.textContent &&
+            this.animateValue(document.getElementById('neutralCount'), this.platformData.neutral, true);
+        document.getElementById('negativeCount')?.textContent &&
+            this.animateValue(document.getElementById('negativeCount'), this.platformData.negative, true);
+
+        // Update mentions
+        const mentionsEl = document.querySelector('#mentionsValue .value-number');
+        const mentionsSuffix = document.querySelector('#mentionsValue .value-suffix');
+        if (mentionsEl) {
+            const formatted = Utils.formatNumber(this.platformData.mentions);
+            const match = formatted.match(/^([\d.]+)([KMB]?)$/);
+            if (match) {
+                this.animateValue(mentionsEl, parseFloat(match[1]));
+                if (mentionsSuffix) mentionsSuffix.textContent = match[2];
+            }
+        }
+
+        // Update avg daily
+        document.getElementById('avgDaily')?.textContent &&
+            (document.getElementById('avgDaily').textContent =
+                Utils.formatNumber(Math.round(this.platformData.mentions / 30)) + '/day');
+
+        // Update engagement
+        const engagementEl = document.querySelector('#engagementValue .value-number');
+        if (engagementEl) {
+            this.animateValue(engagementEl, parseFloat(this.platformData.engagement));
+        }
+
+        // Update reach
+        const reachEl = document.querySelector('#reachValue .value-number');
+        const reachSuffix = document.querySelector('#reachValue .value-suffix');
+        if (reachEl) {
+            const formatted = Utils.formatNumber(this.platformData.reach);
+            const match = formatted.match(/^([\d.]+)([KMB]?)$/);
+            if (match) {
+                this.animateValue(reachEl, parseFloat(match[1]));
+                if (reachSuffix) reachSuffix.textContent = match[2];
+            }
+        }
+
+        // Update growth indicators
+        this.updateGrowthIndicator('sentimentChange', this.platformData.growth);
+        this.updateGrowthIndicator('mentionsChange', this.platformData.growth + 5);
+        this.updateGrowthIndicator('engagementChange', this.platformData.growth - 2);
+        this.updateGrowthIndicator('reachChange', this.platformData.growth + 15);
+    }
+
+    animateValue(element, targetValue, formatAsNumber = false) {
+        const startValue = parseFloat(element.textContent) || 0;
+        const duration = 500;
+        const startTime = performance.now();
+
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+
+            const currentValue = startValue + (targetValue - startValue) * easeProgress;
+
+            if (formatAsNumber) {
+                element.textContent = Utils.formatNumber(Math.round(currentValue));
+            } else {
+                element.textContent = currentValue.toFixed(targetValue % 1 === 0 ? 0 : 1);
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        requestAnimationFrame(animate);
+    }
+
+    updateGrowthIndicator(elementId, growth) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        const isPositive = growth >= 0;
+        element.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
+        element.innerHTML = `
+            <span class="stat-change-icon">${isPositive ? '↑' : '↓'}</span>
+            <span>${isPositive ? '+' : ''}${growth}% from last week</span>
+        `;
+    }
+
+    initializeCharts() {
+        if (typeof Charts === 'undefined') return;
+
+        // Initialize all charts with current platform
+        this.charts.sentiment = Charts.createSentimentTrend('sentimentChart', this.currentPlatform);
+        this.charts.platform = Charts.createPlatformDistribution('platformChart', this.currentPlatform);
+        this.charts.mentions = Charts.createMentionVolume('mentionsChart', this.currentPlatform);
+        this.charts.emotion = Charts.createEmotionChart('emotionChart', this.currentPlatform);
+
+        // Initialize sparklines
+        this.charts.sentimentSparkline = Charts.createSparkline('sentimentSparkline', null, '#6366f1');
+        this.charts.mentionsSparkline = Charts.createSparkline('mentionsSparkline', null, '#10b981');
+        this.charts.engagementSparkline = Charts.createSparkline('engagementSparkline', null, '#f59e0b');
+        this.charts.reachSparkline = Charts.createSparkline('reachSparkline', null, '#3b82f6');
+    }
+
+    loadData() {
+        this.loadActivityFeed();
+        this.loadPostsTable();
+        this.loadTrendingTopics();
+    }
+
+    loadActivityFeed() {
+        const activityList = document.getElementById('activityList');
+        if (!activityList) return;
+
+        // Generate activities based on current platform
+        const mentions = MockData?.generateMentions?.(8, this.currentPlatform === 'all' ? null : this.currentPlatform) || [];
+
+        const activities = mentions.map(mention => ({
+            icon: mention.sentiment,
+            platform: mention.platform,
+            platformIcon: mention.platformIcon,
+            text: `${mention.author} ${mention.sentiment === 'positive' ? 'praised' :
+                mention.sentiment === 'negative' ? 'complained about' : 'mentioned'} your brand`,
+            content: Utils.truncate(mention.content, 60),
+            time: mention.timestamp,
+            engagement: mention.likes + mention.comments + mention.shares
+        }));
+
+        activityList.innerHTML = activities.map((activity, index) => `
+            <div class="activity-item ${index === 0 ? 'new' : ''}" style="animation-delay: ${index * 0.1}s">
+                <div class="activity-icon ${activity.icon}">
+                    <span class="flat-icon ${activity.icon === 'positive' ? 'icon-happy' :
+                activity.icon === 'negative' ? 'icon-sad' : 'icon-neutral'}"></span>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-text">
+                        <span class="platform-badge" style="background: ${MockData?.platformConfig?.[activity.platform]?.color}20; color: ${MockData?.platformConfig?.[activity.platform]?.color}">
+                            <span class="platform-icon sm icon-${activity.platform}"></span>
+                            ${MockData?.platformConfig?.[activity.platform]?.name || activity.platform}
+                        </span>
+                        ${activity.text}
+                    </div>
+                    <div class="activity-preview">${activity.content}</div>
+                    <div class="activity-meta">
+                        <span>${Utils.formatDate(activity.time, 'relative')}</span>
+                        <span class="meta-separator">•</span>
+                        <span class="engagement-stat"><span class="flat-icon icon-heart xs"></span> ${Utils.formatNumber(activity.engagement)}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    loadPostsTable() {
+        const postsTable = document.getElementById('postsTable');
+        if (!postsTable) return;
+
+        const posts = MockData?.generateMentions?.(10, this.currentPlatform === 'all' ? null : this.currentPlatform) || [];
+
+        // Sort by engagement
+        posts.sort((a, b) => (b.likes + b.comments + b.shares) - (a.likes + a.comments + a.shares));
+
+        postsTable.innerHTML = posts.slice(0, 8).map((post, index) => `
+            <tr class="table-row-animated" style="animation-delay: ${index * 0.05}s">
+                <td>
+                    <div class="author-cell">
+                        <div class="author-avatar" style="background: ${post.platformColor}">
+                            ${post.author.charAt(0).toUpperCase()}
+                        </div>
+                        <span class="author-name">${post.author}</span>
+                        ${post.verified ? '<span class="verified-badge" title="Verified">✓</span>' : ''}
+                    </div>
+                </td>
+                <td>
+                    <span class="platform-badge" style="background: ${post.platformColor}20; color: ${post.platformColor}">
+                        <span class="platform-icon sm icon-${post.platform}"></span>
+                        ${post.platformName}
+                    </span>
+                </td>
+                <td>
+                    <div class="content-cell" title="${post.content}">
+                        ${Utils.truncate(post.content, 50)}
+                    </div>
+                </td>
+                <td>
+                    <span class="sentiment-badge ${post.sentiment}">
+                        <span class="flat-icon ${post.sentiment === 'positive' ? 'icon-happy' : post.sentiment === 'negative' ? 'icon-sad' : 'icon-neutral'} xs"></span>
+                        ${post.sentimentScore}%
+                    </span>
+                </td>
+                <td>
+                    <div class="engagement-cell">
+                        <span title="Likes" class="eng-likes"><span class="flat-icon icon-heart xs"></span> ${Utils.formatNumber(post.likes)}</span>
+                        <span title="Comments" class="eng-comments"><span class="flat-icon icon-chat xs"></span> ${Utils.formatNumber(post.comments)}</span>
+                        <span title="Shares" class="eng-shares"><span class="flat-icon icon-share xs"></span> ${Utils.formatNumber(post.shares)}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="reach-value">${Utils.formatNumber(post.reach)}</span>
+                </td>
+                <td>
+                    <span class="time-value">${Utils.formatDate(post.timestamp, 'relative')}</span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async loadTrendingTopics() {
+        const trendingList = document.getElementById('trendingTopics');
+        if (!trendingList) return;
+
+        let topics = [];
+
+        // Try to get brand-specific trending topics from APIData
+        if (typeof APIData !== 'undefined') {
+            try {
+                const response = await APIData.getBrandTrending(this.currentBrand);
+                if (response.success) {
+                    topics = response.data;
+                }
+            } catch (error) {
+                console.warn('Failed to load brand trending, falling back to MockData');
+            }
+        }
+
+        // Fallback to MockData
+        if (topics.length === 0) {
+            topics = MockData?.trendingTopics || [];
+        }
+
+        // Filter by platform if needed
+        if (this.currentPlatform !== 'all' && topics[0]?.platforms) {
+            topics = topics.filter(t => t.platforms?.includes(this.currentPlatform));
+        }
+
+        topics = topics.slice(0, 6);
+
+        trendingList.innerHTML = topics.map((topic, index) => `
+            <div class="trending-item" style="animation-delay: ${index * 0.1}s">
+                <div class="trending-rank">${index + 1}</div>
+                <div class="trending-info">
+                    <div class="trending-name">${topic.name}</div>
+                    <div class="trending-meta">
+                        <span>${Utils.formatNumber(topic.mentions)} mentions</span>
+                        <span class="trending-change ${topic.growth >= 0 ? 'positive' : 'negative'}">
+                            ${topic.growth >= 0 ? '↑' : '↓'} ${Math.abs(topic.growth)}%
+                        </span>
+                    </div>
+                </div>
+                <div class="trending-sentiment">
+                    <div class="sentiment-bar" style="width: ${topic.sentiment}%"></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    refreshAllData() {
+        const refreshBtn = document.getElementById('refreshData');
+        if (refreshBtn) {
+            refreshBtn.classList.add('spinning');
+        }
+
+        // Reload all data
+        this.loadPlatformData();
+        this.loadActivityFeed();
+        this.loadPostsTable();
+        this.loadTrendingTopics();
+
+        // Update charts
+        if (typeof Charts !== 'undefined') {
+            Charts.updateAllChartsForPlatform(this.currentPlatform);
+        }
+
+        setTimeout(() => {
+            if (refreshBtn) {
+                refreshBtn.classList.remove('spinning');
+            }
+        }, 500);
+    }
+
+    handleTimeRangeChange(range) {
+        console.log('Time range changed to:', range);
+        // Implement time range filtering
+    }
+
+    handleChartAction(action, chartId) {
+        switch (action) {
+            case 'download':
+                this.downloadChart(chartId);
+                break;
+            case 'fullscreen':
+                this.toggleFullscreen(chartId);
+                break;
+        }
+    }
+
+    downloadChart(chartId) {
+        if (typeof Charts !== 'undefined') {
+            const imageData = Charts.exportAsImage(chartId);
+            if (imageData) {
+                const link = document.createElement('a');
+                link.download = `${chartId}-${new Date().toISOString().split('T')[0]}.png`;
+                link.href = imageData;
+                link.click();
+            }
+        }
+    }
+
+    toggleFullscreen(chartId) {
+        const chartCard = document.querySelector(`[data-chart="${chartId}"]`)?.closest('.chart-card');
+        if (chartCard) {
+            chartCard.classList.toggle('fullscreen');
+        }
+    }
+
+    toggleActivityFeed() {
+        const pauseBtn = document.getElementById('pauseActivity');
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+            if (pauseBtn) pauseBtn.innerHTML = '<span class="flat-icon icon-play"></span>';
+        } else {
+            this.startAutoRefresh();
+            if (pauseBtn) pauseBtn.innerHTML = '<span class="flat-icon icon-pause"></span>';
+        }
+    }
+
+    startAutoRefresh() {
+        // Auto-refresh activity feed every 30 seconds
+        this.refreshInterval = setInterval(() => {
+            this.loadActivityFeed();
+        }, 30000);
+    }
+
+    destroy() {
+        // Clear interval
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+
+        // Clear resize timeout
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout);
+        }
+
+        // Disconnect ResizeObserver
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+
+        // Remove event listeners
+        if (this.boundHandleResize) {
+            window.removeEventListener('resize', this.boundHandleResize);
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', this.boundHandleResize);
+            }
+        }
+
+        // Clean up charts
+        Object.values(this.charts).forEach(chart => {
+            if (chart && chart.destroy) {
+                chart.destroy();
+            }
+        });
+    }
+}
+
+// Export
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = DashboardPage;
+}
+
+console.log('🎯 Enhanced Dashboard Page Loaded');

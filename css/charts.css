@@ -1,0 +1,260 @@
+/* ===================================
+   Charts Specific Styles
+   =================================== */
+
+.chart-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 13px;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.legend-item:hover {
+    color: var(--gray-900);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-sm);
+}
+
+/* Word Cloud Container */
+.wordcloud-container {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Chart Tooltip Custom Styles */
+.chart-tooltip {
+    background: rgba(31, 41, 55, 0.95) !important;
+    border: 2px solid var(--primary) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.75rem !important;
+    box-shadow: var(--shadow-xl) !important;
+}
+
+/* Heatmap Grid */
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    gap: 4px;
+    margin-top: 1rem;
+}
+
+.heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    background: var(--gray-200);
+    transition: all var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.2);
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+.heatmap-cell.low {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.heatmap-cell.medium {
+    background: rgba(99, 102, 241, 0.5);
+}
+
+.heatmap-cell.high {
+    background: rgba(99, 102, 241, 0.8);
+}
+
+.heatmap-cell.very-high {
+    background: var(--primary);
+}
+
+/* Gauge Chart */
+.gauge-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.gauge-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.gauge-number {
+    font-size: 48px;
+    font-weight: 800;
+    background: var(--gradient-purple);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gauge-label {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-top: 0.5rem;
+}
+
+/* Network Graph */
+.network-graph {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+.network-node {
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.network-node:hover {
+    transform: scale(1.2);
+}
+
+.network-link {
+    stroke: var(--gray-300);
+    stroke-width: 2px;
+    opacity: 0.6;
+}
+
+.network-link.active {
+    stroke: var(--primary);
+    stroke-width: 3px;
+    opacity: 1;
+}
+
+/* Funnel Chart */
+.funnel-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.funnel-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.funnel-bar {
+    height: 50px;
+    background: var(--gradient-purple);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    color: white;
+    font-weight: 600;
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.funnel-bar:hover {
+    transform: translateX(8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.funnel-label {
+    font-size: 14px;
+}
+
+.funnel-value {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.funnel-rate {
+    position: absolute;
+    right: -80px;
+    font-size: 13px;
+    color: var(--gray-600);
+    font-weight: 600;
+}
+
+/* Comparison Chart */
+.comparison-chart {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.comparison-side {
+    text-align: center;
+}
+
+.comparison-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-700);
+    margin-bottom: 1rem;
+}
+
+.comparison-value {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.comparison-side.brand-a .comparison-value {
+    color: var(--primary);
+}
+
+.comparison-side.brand-b .comparison-value {
+    color: var(--accent-pink);
+}
+
+/* Scatter Plot */
+.scatter-quadrants {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    pointer-events: none;
+}
+
+.quadrant {
+    border: 1px dashed var(--gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--gray-400);
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.quadrant-label {
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow);
+}
