@@ -304,7 +304,6 @@ const Trends = {
                 document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 this.loadTrendsContent();
-                Notifications.info(`Showing trends for ${this.currentPeriod}`);
             });
         });
 
@@ -399,8 +398,8 @@ const Trends = {
                         Export
                     </button>
                 </div>
-                <div class="hashtags-grid">
-                    ${this.trendingData.hashtags.map((tag, idx) => this.renderHashtagCard(tag, idx + 1)).join('')}
+                <div class="hashtags-list full-list">
+                    ${this.trendingData.hashtags.map((tag, idx) => this.renderHashtagItem(tag, idx + 1)).join('')}
                 </div>
             </div>
         `;
@@ -416,8 +415,8 @@ const Trends = {
                         Export
                     </button>
                 </div>
-                <div class="keywords-grid">
-                    ${this.trendingData.keywords.map((kw, idx) => this.renderKeywordCard(kw, idx + 1)).join('')}
+                <div class="keywords-list full-list">
+                    ${this.trendingData.keywords.map((kw, idx) => this.renderKeywordItem(kw, idx + 1)).join('')}
                 </div>
             </div>
         `;

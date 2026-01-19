@@ -673,32 +673,48 @@ input, textarea, select {
 }
 
 .suggestion-logo-wrapper {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     flex-shrink: 0;
     position: relative;
 }
 
 .suggestion-logo-img {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius);
     object-fit: contain;
     background: white;
     padding: 4px;
     box-sizing: border-box;
+    border: 1px solid var(--gray-200);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.suggestion-logo-img.favicon-fallback {
+    padding: 6px;
+    background: var(--gray-100);
 }
 
 .suggestion-logo-fallback {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 
 .suggestion-info {

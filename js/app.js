@@ -260,11 +260,27 @@ class VoxlyApp {
         // Check if searching for a brand
         if (typeof APIData !== 'undefined') {
             const brands = Object.values(APIData.brands);
-            const matchedBrand = brands.find(brand =>
-                brand.name.toLowerCase().includes(searchTerm) ||
-                brand.id.toLowerCase().includes(searchTerm) ||
-                brand.products.some(p => p.toLowerCase().includes(searchTerm))
+
+            // Priority 1: Exact brand name or ID match
+            let matchedBrand = brands.find(brand =>
+                brand.name.toLowerCase() === searchTerm ||
+                brand.id.toLowerCase() === searchTerm
             );
+
+            // Priority 2: Partial brand name or ID match
+            if (!matchedBrand) {
+                matchedBrand = brands.find(brand =>
+                    brand.name.toLowerCase().includes(searchTerm) ||
+                    brand.id.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Priority 3: Product match (lowest priority)
+            if (!matchedBrand) {
+                matchedBrand = brands.find(brand =>
+                    brand.products.some(p => p.toLowerCase().includes(searchTerm))
+                );
+            }
 
             if (matchedBrand) {
                 console.log(`🔍 Brand matched: ${matchedBrand.name} (${matchedBrand.id})`);
@@ -332,18 +348,36 @@ class VoxlyApp {
             }
 
             const brands = Object.values(APIData.brands);
-            const matches = brands.filter(brand =>
+
+            // Prioritize brand name/id matches over product matches
+            const nameMatches = brands.filter(brand =>
                 brand.name.toLowerCase().includes(query) ||
+                brand.id.toLowerCase().includes(query)
+            );
+
+            const productMatches = brands.filter(brand =>
+                !brand.name.toLowerCase().includes(query) &&
+                !brand.id.toLowerCase().includes(query) &&
                 brand.products.some(p => p.toLowerCase().includes(query))
             );
 
+            // Combine with name matches first
+            const matches = [...nameMatches, ...productMatches];
+
             if (matches.length > 0) {
-                dropdown.innerHTML = matches.map(brand => `
+                dropdown.innerHTML = matches.map(brand => {
+                    // Use Clearbit for high-quality logos (with size parameter)
+                    const domain = brand.logo.replace('https://logo.clearbit.com/', '');
+                    const clearbitLogo = `https://logo.clearbit.com/${domain}?size=128`;
+                    const googleFavicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
+                    return `
                     <div class="search-suggestion" data-brand="${brand.id}">
                         <div class="suggestion-logo-wrapper">
-                            <img src="${brand.logo}" class="suggestion-logo-img" alt="${brand.name}"
-                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="suggestion-logo-fallback" style="background: ${brand.color}; display: none;">
+                            <img src="${clearbitLogo}" class="suggestion-logo-img" alt="${brand.name}"
+                                onerror="this.onerror=null; this.src='${googleFavicon}';"
+                                loading="eager">
+                            <div class="suggestion-logo-fallback" style="background: ${brand.color};">
                                 ${brand.name.charAt(0)}
                             </div>
                         </div>
@@ -352,7 +386,7 @@ class VoxlyApp {
                             <span class="suggestion-industry">${APIData.industries[brand.industry]?.name || brand.industry}</span>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
                 dropdown.classList.add('active');
 
                 // Add click handlers

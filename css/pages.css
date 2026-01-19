@@ -1125,36 +1125,213 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-.item-rank {
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.view-header h3 {
     font-size: 18px;
     font-weight: 700;
+}
+
+.view-header .btn-secondary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.view-header .btn-secondary .material-icons {
+    color: white;
+}
+
+.view-header .btn-secondary:hover {
+    background: var(--primary-dark);
+    color: white;
+}
+
+/* Hashtags Grid */
+.hashtags-grid,
+.keywords-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.hashtag-card,
+.keyword-card {
+    background: var(--card-background, #fff);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.hashtag-card:hover,
+.keyword-card:hover {
+    background: linear-gradient(135deg, #fdfcfb 0%, #f5f4f2 100%);
+    transform: translateY(-6px) translateZ(15px) rotateX(3deg);
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.15),
+        0 10px 20px -10px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.card-rank {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light, rgba(99, 102, 241, 0.1));
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius);
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}
+
+.card-content h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--gray-800);
+}
+
+.card-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.card-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.card-stats .stat-item .material-icons {
+    font-size: 16px;
+}
+
+.card-stats .stat-item .material-icons.rising {
+    color: var(--success);
+}
+
+.card-stats .stat-item .material-icons.declining {
+    color: var(--danger);
+}
+
+.card-stats .stat-item .material-icons.stable {
     color: var(--gray-400);
-    min-width: 30px;
+}
+
+.sentiment-bar {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.sentiment-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.sentiment-label {
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+/* Full List Layout for Hashtags/Keywords */
+.full-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--card-background, #fff);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+}
+
+.full-list .hashtag-item,
+.full-list .keyword-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.full-list .hashtag-item:hover,
+.full-list .keyword-item:hover {
+    background: linear-gradient(135deg, #fdfcfb 0%, #f5f4f2 100%);
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 24px -8px rgba(0, 0, 0, 0.12),
+        0 6px 12px -6px rgba(0, 0, 0, 0.08);
+}
+
+.item-rank {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    min-width: 40px;
+    text-align: center;
 }
 
 .item-content {
     flex: 1;
+    min-width: 0;
 }
 
 .item-name {
     font-weight: 600;
     font-size: 15px;
     margin-bottom: 0.25rem;
+    color: var(--gray-800);
 }
 
 .item-stats {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--gray-500);
     display: flex;
-    gap: 1rem;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.item-stats .contexts {
+    color: var(--gray-400);
+    font-size: 12px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .item-velocity,
 .item-change {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.35rem;
     font-weight: 600;
+    font-size: 14px;
+    min-width: 70px;
+    justify-content: flex-end;
+}
+
+.item-velocity .material-icons,
+.item-change .material-icons {
+    font-size: 18px;
 }
 
 .rising { color: var(--success); }
