@@ -357,6 +357,7 @@
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 1.25rem;
     transition: all 0.3s ease;
+    perspective: 1000px;
 }
 
 /* Explicit column overrides for different viewport sizes */
@@ -391,13 +392,14 @@
     padding: 1.25rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     border: 1px solid var(--gray-200, #e5e7eb);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     min-height: 180px;
+    transform-style: preserve-3d;
 }
 
 .stat-card::before {
@@ -417,8 +419,12 @@
 .stat-card.danger::before { background: var(--danger, #ef4444); }
 
 .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px) translateZ(15px) rotateX(3deg);
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.15),
+        0 10px 20px -10px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(99, 102, 241, 0.1);
+    background: linear-gradient(135deg, #fdfcfb 0%, #f5f4f2 100%);
 }
 
 .stat-card.interactive:hover {
@@ -1448,13 +1454,13 @@ tbody tr:hover {
 }
 
 
-/* Table row hover highlight */
-tbody tr {
+/* Table row hover highlight - EXCLUDE metrics-table */
+tbody tr:not(.metrics-row) {
     position: relative;
     transition: all 0.2s ease;
 }
 
-tbody tr::before {
+tbody tr:not(.metrics-row)::before {
     content: '';
     position: absolute;
     left: 0;
@@ -1466,11 +1472,11 @@ tbody tr::before {
     transition: transform 0.2s ease;
 }
 
-tbody tr:hover::before {
+tbody tr:not(.metrics-row):hover::before {
     transform: scaleY(1);
 }
 
-tbody tr:hover {
+tbody tr:not(.metrics-row):hover {
     background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
 }
 
