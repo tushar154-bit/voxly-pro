@@ -94,6 +94,11 @@ class DashboardPage {
                 <!-- Stats Overview -->
                 <div class="stats-grid animated-fade-in">
                     <div class="stat-card primary interactive" data-stat="sentiment">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Overall Sentiment</span>
                             <div class="stat-icon"><span class="flat-icon icon-sentiment"></span></div>
@@ -130,6 +135,11 @@ class DashboardPage {
                     </div>
 
                     <div class="stat-card success interactive" data-stat="mentions">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Total Mentions</span>
                             <div class="stat-icon"><span class="flat-icon icon-chat"></span></div>
@@ -158,6 +168,11 @@ class DashboardPage {
                     </div>
 
                     <div class="stat-card warning interactive" data-stat="engagement">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Engagement Rate</span>
                             <div class="stat-icon"><span class="flat-icon icon-engagement"></span></div>
@@ -190,6 +205,11 @@ class DashboardPage {
                     </div>
 
                     <div class="stat-card info interactive" data-stat="reach">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Total Reach</span>
                             <div class="stat-icon"><span class="flat-icon icon-broadcast"></span></div>
@@ -234,7 +254,7 @@ class DashboardPage {
 
                     <div class="chart-grid">
                         <!-- Sentiment Over Time - Full Width -->
-                        <div class="chart-card full-width">
+                        <div class="chart-card full-width sentiment-trend-card">
                             <div class="chart-header">
                                 <div>
                                     <h3 class="chart-title">Sentiment Trend</h3>
@@ -247,6 +267,25 @@ class DashboardPage {
                             </div>
                             <div class="chart-container large">
                                 <canvas id="sentimentChart"></canvas>
+                            </div>
+                            <!-- Quick Stats below chart -->
+                            <div class="chart-quick-stats">
+                                <div class="chart-quick-stat">
+                                    <span class="chart-quick-stat-value positive" id="avgPositive">78%</span>
+                                    <span class="chart-quick-stat-label">Avg Positive</span>
+                                </div>
+                                <div class="chart-quick-stat">
+                                    <span class="chart-quick-stat-value neutral" id="avgNeutral">15%</span>
+                                    <span class="chart-quick-stat-label">Avg Neutral</span>
+                                </div>
+                                <div class="chart-quick-stat">
+                                    <span class="chart-quick-stat-value negative" id="avgNegative">7%</span>
+                                    <span class="chart-quick-stat-label">Avg Negative</span>
+                                </div>
+                                <div class="chart-quick-stat">
+                                    <span class="chart-quick-stat-value" id="sentimentTrend" style="color: #10b981;">+3.2%</span>
+                                    <span class="chart-quick-stat-label">Trend (7d)</span>
+                                </div>
                             </div>
                         </div>
 
@@ -264,6 +303,39 @@ class DashboardPage {
                             <div class="chart-container">
                                 <canvas id="platformChart"></canvas>
                             </div>
+                            <!-- Platform Stats -->
+                            <div class="chart-platform-stats">
+                                <div class="platform-stat-item">
+                                    <div class="platform-stat-icon twitter">
+                                        <span class="platform-icon icon-twitter"></span>
+                                    </div>
+                                    <div class="platform-stat-info">
+                                        <span class="platform-stat-name">X (Twitter)</span>
+                                        <span class="platform-stat-value" id="twitterMentions">42.3K</span>
+                                    </div>
+                                    <span class="platform-stat-trend positive">+18%</span>
+                                </div>
+                                <div class="platform-stat-item">
+                                    <div class="platform-stat-icon reddit">
+                                        <span class="platform-icon icon-reddit"></span>
+                                    </div>
+                                    <div class="platform-stat-info">
+                                        <span class="platform-stat-name">Reddit</span>
+                                        <span class="platform-stat-value" id="redditMentions">28.1K</span>
+                                    </div>
+                                    <span class="platform-stat-trend positive">+24%</span>
+                                </div>
+                                <div class="platform-stat-item">
+                                    <div class="platform-stat-icon youtube">
+                                        <span class="platform-icon icon-youtube"></span>
+                                    </div>
+                                    <div class="platform-stat-info">
+                                        <span class="platform-stat-name">YouTube</span>
+                                        <span class="platform-stat-value" id="youtubeMentions">19.5K</span>
+                                    </div>
+                                    <span class="platform-stat-trend positive">+12%</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="chart-card">
@@ -278,6 +350,38 @@ class DashboardPage {
                             </div>
                             <div class="chart-container">
                                 <canvas id="mentionsChart"></canvas>
+                            </div>
+                            <!-- Mentions Quick Stats -->
+                            <div class="chart-mentions-stats">
+                                <div class="mentions-stats-row">
+                                    <div class="mentions-stat-card">
+                                        <div class="mentions-stat-icon peak">
+                                            <i class="fas fa-arrow-trend-up"></i>
+                                        </div>
+                                        <div class="mentions-stat-content">
+                                            <span class="mentions-stat-label">Peak Hour</span>
+                                            <span class="mentions-stat-value" id="peakHour">2:00 PM</span>
+                                        </div>
+                                    </div>
+                                    <div class="mentions-stat-card">
+                                        <div class="mentions-stat-icon avg">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="mentions-stat-content">
+                                            <span class="mentions-stat-label">Avg/Hour</span>
+                                            <span class="mentions-stat-value" id="avgHourly">6.5K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mentions-stat-card total-card">
+                                    <div class="mentions-stat-icon total">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <div class="mentions-stat-content">
+                                        <span class="mentions-stat-label">24h Total</span>
+                                        <span class="mentions-stat-value" id="total24h">156.8K</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -916,11 +1020,11 @@ class DashboardPage {
         this.charts.mentions = Charts.createMentionVolume('mentionsChart', this.currentPlatform);
         this.charts.emotion = Charts.createEmotionChart('emotionChart', this.currentPlatform);
 
-        // Initialize sparklines
-        this.charts.sentimentSparkline = Charts.createSparkline('sentimentSparkline', null, '#6366f1');
-        this.charts.mentionsSparkline = Charts.createSparkline('mentionsSparkline', null, '#10b981');
-        this.charts.engagementSparkline = Charts.createSparkline('engagementSparkline', null, '#f59e0b');
-        this.charts.reachSparkline = Charts.createSparkline('reachSparkline', null, '#3b82f6');
+        // Initialize sparklines with white color for visibility on vibrant card backgrounds
+        this.charts.sentimentSparkline = Charts.createSparkline('sentimentSparkline', null, '#ffffff');
+        this.charts.mentionsSparkline = Charts.createSparkline('mentionsSparkline', null, '#ffffff');
+        this.charts.engagementSparkline = Charts.createSparkline('engagementSparkline', null, '#ffffff');
+        this.charts.reachSparkline = Charts.createSparkline('reachSparkline', null, '#ffffff');
     }
 
     loadData() {

@@ -27,10 +27,6 @@ class AnalyticsPage {
                         <p class="page-subtitle">Deep insights for <strong>${brandName}</strong></p>
                     </div>
                     <div class="page-header-right">
-                        <button class="btn btn-primary" id="exportAnalyticsBtn">
-                            <i class="fas fa-file-export"></i>
-                            <span>Export Report</span>
-                        </button>
                         <select id="dateRangeSelect" class="form-select">
                             <option value="last7days">Last 7 Days</option>
                             <option value="last30days" selected>Last 30 Days</option>
@@ -39,6 +35,10 @@ class AnalyticsPage {
                             <option value="lastMonth">Last Month</option>
                             <option value="custom">Custom Range</option>
                         </select>
+                        <button class="btn btn-primary" id="exportAnalyticsBtn">
+                            <i class="fas fa-file-export"></i>
+                            <span>Export Report</span>
+                        </button>
                     </div>
                 </div>
 
@@ -351,12 +351,6 @@ class AnalyticsPage {
             platformFilter.addEventListener('change', (e) => {
                 const selectedPlatform = e.target.value;
                 this.loadMetricsTable(selectedPlatform);
-
-                // Show notification
-                const platformName = selectedPlatform === 'all'
-                    ? 'All Platforms'
-                    : selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1);
-                Notifications.info(`Showing data for ${platformName}`);
             });
         }
 
@@ -1886,12 +1880,29 @@ class AnalyticsPage {
             { word: 'design', count: 980, sentiment: 90 }
         ];
 
-        keywordList.innerHTML = keywords.map(kw => `
+        keywordList.innerHTML = keywords.map((kw, index) => `
             <div class="keyword-item">
-                <div class="keyword-word">#${kw.word}</div>
+                <div class="keyword-rank">${index + 1}</div>
+                <div class="keyword-info">
+                    <div class="keyword-word">#${kw.word}</div>
+                    <div class="keyword-meta">
+                        <span class="keyword-trend ${kw.sentiment >= 75 ? 'trending-up' : 'trending-down'}">
+                            <i class="fas fa-${kw.sentiment >= 75 ? 'arrow-up' : 'arrow-down'}"></i>
+                            ${kw.sentiment >= 75 ? 'Trending' : 'Stable'}
+                        </span>
+                    </div>
+                </div>
                 <div class="keyword-stats">
-                    <span class="keyword-count">${Utils.formatNumber(kw.count)}</span>
-                    <div class="keyword-sentiment" style="width: ${kw.sentiment}%; background: ${Utils.getSentimentColor(kw.sentiment)}"></div>
+                    <div class="keyword-count-wrapper">
+                        <span class="keyword-count-label">Mentions</span>
+                        <span class="keyword-count">${Utils.formatNumber(kw.count)}</span>
+                    </div>
+                    <div class="keyword-sentiment-wrapper">
+                        <span class="keyword-sentiment-label">Sentiment ${kw.sentiment}%</span>
+                        <div class="keyword-sentiment-bar">
+                            <div class="keyword-sentiment" style="width: ${kw.sentiment}%; background: ${Utils.getSentimentColor(kw.sentiment)}"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `).join('');

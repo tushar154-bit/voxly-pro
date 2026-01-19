@@ -225,10 +225,10 @@
 
 .filter-chip:hover {
     border-color: var(--gray-300, #d1d5db);
-    background: var(--card-background, #fff);
+    background: #f8f8f8;
     color: var(--gray-700, #374151);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.15), 0 3px 6px -2px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 }
 
 .filter-chip:active {
@@ -402,21 +402,173 @@
     transform-style: preserve-3d;
 }
 
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    border-radius: 16px 0 0 16px;
+/* Vibrant solid gradient backgrounds for each card type */
+.stat-card.primary {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 50%, #7c3aed 100%);
+    border: none;
 }
 
-.stat-card.primary::before { background: var(--primary, #6366f1); }
-.stat-card.success::before { background: var(--success, #10b981); }
-.stat-card.warning::before { background: var(--warning, #f59e0b); }
-.stat-card.info::before { background: var(--info, #3b82f6); }
-.stat-card.danger::before { background: var(--danger, #ef4444); }
+.stat-card.success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+    border: none;
+}
+
+.stat-card.warning {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #dc2626 100%);
+    border: none;
+}
+
+.stat-card.info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    border: none;
+}
+
+.stat-card.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+    border: none;
+}
+
+/* Remove left border accent for vibrant cards */
+.stat-card::before {
+    display: none;
+}
+
+/* White text for vibrant card backgrounds */
+.stat-card.primary .stat-title,
+.stat-card.success .stat-title,
+.stat-card.warning .stat-title,
+.stat-card.info .stat-title,
+.stat-card.danger .stat-title {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.stat-card.primary .stat-value .value-number,
+.stat-card.success .stat-value .value-number,
+.stat-card.warning .stat-value .value-number,
+.stat-card.info .stat-value .value-number,
+.stat-card.danger .stat-value .value-number {
+    color: #ffffff;
+}
+
+.stat-card.primary .stat-value .value-suffix,
+.stat-card.success .stat-value .value-suffix,
+.stat-card.warning .stat-value .value-suffix,
+.stat-card.info .stat-value .value-suffix,
+.stat-card.danger .stat-value .value-suffix {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stat-card.primary .stat-icon,
+.stat-card.success .stat-icon,
+.stat-card.warning .stat-icon,
+.stat-card.info .stat-icon,
+.stat-card.danger .stat-icon {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-card.primary .stat-change,
+.stat-card.success .stat-change,
+.stat-card.warning .stat-change,
+.stat-card.info .stat-change,
+.stat-card.danger .stat-change {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.stat-card.primary .stat-footer,
+.stat-card.success .stat-footer,
+.stat-card.warning .stat-footer,
+.stat-card.info .stat-footer,
+.stat-card.danger .stat-footer {
+    border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card.primary .meta-item,
+.stat-card.success .meta-item,
+.stat-card.warning .meta-item,
+.stat-card.info .meta-item,
+.stat-card.danger .meta-item {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stat-card.primary .meta-value,
+.stat-card.success .meta-value,
+.stat-card.warning .meta-value,
+.stat-card.info .meta-value,
+.stat-card.danger .meta-value {
+    color: #ffffff !important;
+}
+
+.stat-card.primary .meta-label,
+.stat-card.success .meta-label,
+.stat-card.warning .meta-label,
+.stat-card.info .meta-label,
+.stat-card.danger .meta-label {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* White icons for all icon types within vibrant stat cards */
+.stat-card.primary i,
+.stat-card.success i,
+.stat-card.warning i,
+.stat-card.info i,
+.stat-card.danger i,
+.stat-card.primary .fa,
+.stat-card.success .fa,
+.stat-card.warning .fa,
+.stat-card.info .fa,
+.stat-card.danger .fa,
+.stat-card.primary .fas,
+.stat-card.success .fas,
+.stat-card.warning .fas,
+.stat-card.info .fas,
+.stat-card.danger .fas,
+.stat-card.primary .far,
+.stat-card.success .far,
+.stat-card.warning .far,
+.stat-card.info .far,
+.stat-card.danger .far,
+.stat-card.primary .fab,
+.stat-card.success .fab,
+.stat-card.warning .fab,
+.stat-card.info .fab,
+.stat-card.danger .fab,
+.stat-card.primary .flat-icon,
+.stat-card.success .flat-icon,
+.stat-card.warning .flat-icon,
+.stat-card.info .flat-icon,
+.stat-card.danger .flat-icon,
+.stat-card.primary .meta-icon,
+.stat-card.success .meta-icon,
+.stat-card.warning .meta-icon,
+.stat-card.info .meta-icon,
+.stat-card.danger .meta-icon,
+.stat-card.primary .material-icons,
+.stat-card.success .material-icons,
+.stat-card.warning .material-icons,
+.stat-card.info .material-icons,
+.stat-card.danger .material-icons {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Force white SVG icons using filter - this overrides embedded SVG colors */
+.stat-card.primary .flat-icon,
+.stat-card.success .flat-icon,
+.stat-card.warning .flat-icon,
+.stat-card.info .flat-icon,
+.stat-card.danger .flat-icon,
+.stat-card.primary .stat-icon .flat-icon,
+.stat-card.success .stat-icon .flat-icon,
+.stat-card.warning .stat-icon .flat-icon,
+.stat-card.info .stat-icon .flat-icon,
+.stat-card.danger .stat-icon .flat-icon,
+.stat-card.primary .meta-icon.flat-icon,
+.stat-card.success .meta-icon.flat-icon,
+.stat-card.warning .meta-icon.flat-icon,
+.stat-card.info .meta-icon.flat-icon,
+.stat-card.danger .meta-icon.flat-icon {
+    filter: brightness(0) invert(1) !important;
+}
 
 .stat-card:hover {
     transform: translateY(-6px) translateZ(15px) rotateX(3deg);
@@ -424,7 +576,32 @@
         0 20px 40px -15px rgba(0, 0, 0, 0.15),
         0 10px 20px -10px rgba(0, 0, 0, 0.1),
         0 0 0 1px rgba(99, 102, 241, 0.1);
-    background: linear-gradient(135deg, #fdfcfb 0%, #f5f4f2 100%);
+}
+
+/* Enhanced hover backgrounds per card type - slightly lighter vibrant */
+.stat-card.primary:hover {
+    background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%);
+    box-shadow: 0 20px 40px -15px rgba(168, 85, 247, 0.4);
+}
+
+.stat-card.success:hover {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+    box-shadow: 0 20px 40px -15px rgba(34, 197, 94, 0.4);
+}
+
+.stat-card.warning:hover {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%);
+    box-shadow: 0 20px 40px -15px rgba(249, 115, 22, 0.4);
+}
+
+.stat-card.info:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+    box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.4);
+}
+
+.stat-card.danger:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
+    box-shadow: 0 20px 40px -15px rgba(239, 68, 68, 0.4);
 }
 
 .stat-card.interactive:hover {
@@ -478,6 +655,34 @@
 .meta-item.positive .meta-value { color: var(--success, #10b981); font-weight: 600; }
 .meta-item.neutral .meta-value { color: var(--warning, #f59e0b); font-weight: 600; }
 .meta-item.negative .meta-value { color: var(--danger, #ef4444); font-weight: 600; }
+
+/* Override sentiment colors for vibrant stat cards - force white */
+.stat-card.primary .meta-item.positive .meta-value,
+.stat-card.primary .meta-item.neutral .meta-value,
+.stat-card.primary .meta-item.negative .meta-value,
+.stat-card.success .meta-item.positive .meta-value,
+.stat-card.success .meta-item.neutral .meta-value,
+.stat-card.success .meta-item.negative .meta-value,
+.stat-card.warning .meta-item.positive .meta-value,
+.stat-card.warning .meta-item.neutral .meta-value,
+.stat-card.warning .meta-item.negative .meta-value,
+.stat-card.info .meta-item.positive .meta-value,
+.stat-card.info .meta-item.neutral .meta-value,
+.stat-card.info .meta-item.negative .meta-value,
+.stat-card.danger .meta-item.positive .meta-value,
+.stat-card.danger .meta-item.neutral .meta-value,
+.stat-card.danger .meta-item.negative .meta-value {
+    color: #ffffff !important;
+}
+
+/* Override meta-item colors for vibrant stat cards */
+.stat-card.primary .meta-item,
+.stat-card.success .meta-item,
+.stat-card.warning .meta-item,
+.stat-card.info .meta-item,
+.stat-card.danger .meta-item {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
 
 .meta-label {
     font-size: 0.75rem;
@@ -627,6 +832,57 @@
 
 .chart-card.full-width {
     grid-column: span 2;
+}
+
+/* Enhanced Sentiment Trend Card */
+.chart-card.sentiment-trend-card {
+    background: linear-gradient(145deg, #ffffff 0%, #fafbfc 50%, #f8fafc 100%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -2px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    padding: 1.5rem;
+}
+
+.chart-card.sentiment-trend-card:hover {
+    box-shadow:
+        0 20px 40px -12px rgba(0, 0, 0, 0.12),
+        0 8px 16px -8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+}
+
+.chart-card.sentiment-trend-card .chart-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.02em;
+}
+
+.chart-card.sentiment-trend-card .chart-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.chart-card.sentiment-trend-card .chart-container {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.chart-card.sentiment-trend-card .chart-action-btn {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.chart-card.sentiment-trend-card .chart-action-btn:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 1024px) {
@@ -1336,13 +1592,13 @@ tbody tr:hover {
     inset: 0;
     border-radius: inherit;
     opacity: 0;
-    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+    background: transparent;
     transition: opacity 0.3s ease;
     pointer-events: none;
 }
 
 .filter-chip:hover::before {
-    opacity: 1;
+    opacity: 0;
 }
 
 /* Stat card interactive effects */
@@ -1384,8 +1640,112 @@ tbody tr:hover {
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.stat-card:hover .stat-value .value-number {
-    color: var(--primary, #6366f1);
+/* Keep white text on hover for vibrant cards */
+.stat-card.primary:hover .stat-value .value-number,
+.stat-card.success:hover .stat-value .value-number,
+.stat-card.warning:hover .stat-value .value-number,
+.stat-card.info:hover .stat-value .value-number,
+.stat-card.danger:hover .stat-value .value-number {
+    color: #ffffff;
+}
+
+/* ===== Stat Card Animated Background Shapes ===== */
+.stat-card-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.stat-bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: statFloatShape 8s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.stat-bg-shape.shape-1 {
+    width: 150px;
+    height: 150px;
+    top: -55px;
+    right: -55px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.stat-bg-shape.shape-2 {
+    width: 100px;
+    height: 100px;
+    bottom: -35px;
+    left: -35px;
+    background: rgba(255, 255, 255, 0.15);
+    animation-delay: -3s;
+    animation-duration: 10s;
+}
+
+.stat-bg-shape.shape-3 {
+    width: 70px;
+    height: 70px;
+    top: 35%;
+    right: 12%;
+    background: rgba(255, 255, 255, 0.12);
+    animation-delay: -5s;
+    animation-duration: 12s;
+}
+
+/* White floating shapes for all vibrant card types */
+.stat-card.primary .stat-bg-shape,
+.stat-card.success .stat-bg-shape,
+.stat-card.warning .stat-bg-shape,
+.stat-card.info .stat-bg-shape,
+.stat-card.danger .stat-bg-shape {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-card.primary .stat-bg-shape.shape-1,
+.stat-card.success .stat-bg-shape.shape-1,
+.stat-card.warning .stat-bg-shape.shape-1,
+.stat-card.info .stat-bg-shape.shape-1,
+.stat-card.danger .stat-bg-shape.shape-1 {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card.primary .stat-bg-shape.shape-2,
+.stat-card.success .stat-bg-shape.shape-2,
+.stat-card.warning .stat-bg-shape.shape-2,
+.stat-card.info .stat-bg-shape.shape-2,
+.stat-card.danger .stat-bg-shape.shape-2 {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-card.primary .stat-bg-shape.shape-3,
+.stat-card.success .stat-bg-shape.shape-3,
+.stat-card.warning .stat-bg-shape.shape-3,
+.stat-card.info .stat-bg-shape.shape-3,
+.stat-card.danger .stat-bg-shape.shape-3 {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+@keyframes statFloatShape {
+    0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    25% {
+        transform: translate(-5px, 5px) scale(1.03) rotate(2deg);
+    }
+    50% {
+        transform: translate(-8px, 8px) scale(1.05) rotate(0deg);
+    }
+    75% {
+        transform: translate(-3px, 3px) scale(1.02) rotate(-2deg);
+    }
+}
+
+/* Ensure card content stays above animated background */
+.stat-card > *:not(.stat-card-bg) {
+    position: relative;
+    z-index: 1;
 }
 
 /* Chart card hover effects */

@@ -26,7 +26,7 @@ class ChartManager {
     }
 
     /**
-     * Create sentiment trend chart (Line chart) - Platform aware
+     * Create sentiment trend chart (Line chart) - Platform aware with enhanced visuals
      */
     createSentimentTrend(canvasId, platform = 'all') {
         const ctx = document.getElementById(canvasId);
@@ -37,6 +37,74 @@ class ChartManager {
             ? MockData.getSentimentChartData(platform, 7)
             : this.getDefaultSentimentData();
 
+        // Create beautiful gradients for each sentiment
+        const canvas = ctx.getContext('2d');
+
+        // Positive gradient (green)
+        const positiveGradient = canvas.createLinearGradient(0, 0, 0, 300);
+        positiveGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+        positiveGradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.15)');
+        positiveGradient.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+
+        // Neutral gradient (yellow/amber)
+        const neutralGradient = canvas.createLinearGradient(0, 0, 0, 300);
+        neutralGradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+        neutralGradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.1)');
+        neutralGradient.addColorStop(1, 'rgba(245, 158, 11, 0.02)');
+
+        // Negative gradient (red)
+        const negativeGradient = canvas.createLinearGradient(0, 0, 0, 300);
+        negativeGradient.addColorStop(0, 'rgba(239, 68, 68, 0.3)');
+        negativeGradient.addColorStop(0.5, 'rgba(239, 68, 68, 0.1)');
+        negativeGradient.addColorStop(1, 'rgba(239, 68, 68, 0.02)');
+
+        // Enhanced dataset styling
+        if (chartData.datasets[0]) {
+            chartData.datasets[0].backgroundColor = positiveGradient;
+            chartData.datasets[0].borderColor = '#10b981';
+            chartData.datasets[0].borderWidth = 3;
+            chartData.datasets[0].pointBackgroundColor = '#ffffff';
+            chartData.datasets[0].pointBorderColor = '#10b981';
+            chartData.datasets[0].pointBorderWidth = 3;
+            chartData.datasets[0].pointRadius = 5;
+            chartData.datasets[0].pointHoverRadius = 8;
+            chartData.datasets[0].pointHoverBackgroundColor = '#10b981';
+            chartData.datasets[0].pointHoverBorderColor = '#ffffff';
+            chartData.datasets[0].pointHoverBorderWidth = 3;
+            chartData.datasets[0].tension = 0.4;
+            chartData.datasets[0].fill = true;
+        }
+        if (chartData.datasets[1]) {
+            chartData.datasets[1].backgroundColor = neutralGradient;
+            chartData.datasets[1].borderColor = '#f59e0b';
+            chartData.datasets[1].borderWidth = 3;
+            chartData.datasets[1].pointBackgroundColor = '#ffffff';
+            chartData.datasets[1].pointBorderColor = '#f59e0b';
+            chartData.datasets[1].pointBorderWidth = 3;
+            chartData.datasets[1].pointRadius = 5;
+            chartData.datasets[1].pointHoverRadius = 8;
+            chartData.datasets[1].pointHoverBackgroundColor = '#f59e0b';
+            chartData.datasets[1].pointHoverBorderColor = '#ffffff';
+            chartData.datasets[1].pointHoverBorderWidth = 3;
+            chartData.datasets[1].tension = 0.4;
+            chartData.datasets[1].fill = true;
+        }
+        if (chartData.datasets[2]) {
+            chartData.datasets[2].backgroundColor = negativeGradient;
+            chartData.datasets[2].borderColor = '#ef4444';
+            chartData.datasets[2].borderWidth = 3;
+            chartData.datasets[2].pointBackgroundColor = '#ffffff';
+            chartData.datasets[2].pointBorderColor = '#ef4444';
+            chartData.datasets[2].pointBorderWidth = 3;
+            chartData.datasets[2].pointRadius = 5;
+            chartData.datasets[2].pointHoverRadius = 8;
+            chartData.datasets[2].pointHoverBackgroundColor = '#ef4444';
+            chartData.datasets[2].pointHoverBorderColor = '#ffffff';
+            chartData.datasets[2].pointHoverBorderWidth = 3;
+            chartData.datasets[2].tension = 0.4;
+            chartData.datasets[2].fill = true;
+        }
+
         const chart = new Chart(ctx, {
             type: 'line',
             data: chartData,
@@ -44,33 +112,69 @@ class ChartManager {
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: {
-                    duration: this.animationDuration,
-                    easing: 'easeInOutQuart'
+                    duration: 1200,
+                    easing: 'easeOutQuart',
+                    delay: (context) => {
+                        return context.dataIndex * 50 + context.datasetIndex * 100;
+                    }
                 },
                 plugins: {
                     legend: {
                         display: true,
                         position: 'top',
+                        align: 'center',
                         labels: {
                             usePointStyle: true,
-                            padding: 15,
-                            font: { size: 12, weight: '500' }
+                            pointStyle: 'circle',
+                            padding: 25,
+                            font: {
+                                size: 13,
+                                weight: '600',
+                                family: "'Inter', sans-serif"
+                            },
+                            color: '#374151',
+                            boxWidth: 12,
+                            boxHeight: 12
                         }
                     },
                     tooltip: {
+                        enabled: true,
                         mode: 'index',
                         intersect: false,
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                        titleColor: '#1f2937',
+                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                        titleColor: '#111827',
+                        titleFont: {
+                            size: 14,
+                            weight: '700',
+                            family: "'Inter', sans-serif"
+                        },
                         bodyColor: '#4b5563',
-                        borderColor: '#e5e7eb',
+                        bodyFont: {
+                            size: 13,
+                            weight: '500',
+                            family: "'Inter', sans-serif"
+                        },
+                        borderColor: 'rgba(0, 0, 0, 0.1)',
                         borderWidth: 1,
-                        padding: 12,
-                        boxPadding: 6,
+                        padding: 16,
+                        boxPadding: 8,
                         usePointStyle: true,
+                        cornerRadius: 12,
+                        displayColors: true,
+                        caretSize: 8,
+                        caretPadding: 12,
                         callbacks: {
+                            title: (tooltipItems) => {
+                                return `📅 ${tooltipItems[0].label}`;
+                            },
                             label: (context) => {
-                                return `${context.dataset.label}: ${context.parsed.y}%`;
+                                const emoji = context.datasetIndex === 0 ? '😊' :
+                                              context.datasetIndex === 1 ? '😐' : '😞';
+                                return `${emoji} ${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+                            },
+                            afterBody: (tooltipItems) => {
+                                const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
+                                return [`\n📊 Total: ${total.toFixed(1)}%`];
                             }
                         }
                     }
@@ -81,19 +185,41 @@ class ChartManager {
                         max: 100,
                         ticks: {
                             callback: (value) => value + '%',
-                            font: { size: 11 }
+                            font: {
+                                size: 12,
+                                weight: '500',
+                                family: "'Inter', sans-serif"
+                            },
+                            color: '#6b7280',
+                            padding: 10,
+                            stepSize: 20
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: false
+                            color: 'rgba(0, 0, 0, 0.06)',
+                            drawBorder: false,
+                            lineWidth: 1,
+                            tickLength: 0
+                        },
+                        border: {
+                            display: false
                         }
                     },
                     x: {
                         grid: {
-                            display: false
+                            display: false,
+                            drawBorder: false
                         },
                         ticks: {
-                            font: { size: 11 }
+                            font: {
+                                size: 12,
+                                weight: '500',
+                                family: "'Inter', sans-serif"
+                            },
+                            color: '#6b7280',
+                            padding: 10
+                        },
+                        border: {
+                            display: false
                         }
                     }
                 },
@@ -101,6 +227,23 @@ class ChartManager {
                     mode: 'nearest',
                     axis: 'x',
                     intersect: false
+                },
+                elements: {
+                    line: {
+                        capBezierPoints: true
+                    },
+                    point: {
+                        hitRadius: 10,
+                        hoverRadius: 8
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 10,
+                        right: 20,
+                        bottom: 10,
+                        left: 10
+                    }
                 }
             }
         });
@@ -927,6 +1070,9 @@ class ChartManager {
 
         const sparklineData = data || this.generateSparklineData();
 
+        // Use semi-transparent fill for white sparklines on vibrant backgrounds
+        const fillOpacity = color === '#ffffff' ? 0.2 : 0.1;
+
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -934,8 +1080,8 @@ class ChartManager {
                 datasets: [{
                     data: sparklineData,
                     borderColor: color,
-                    backgroundColor: this.hexToRgba(color, 0.1),
-                    borderWidth: 2,
+                    backgroundColor: this.hexToRgba(color, fillOpacity),
+                    borderWidth: 2.5,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 0,
