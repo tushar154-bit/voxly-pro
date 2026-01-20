@@ -39,8 +39,13 @@ class RealtimePage {
                 </div>
 
                 <!-- Live Stats -->
-                <div class="stats-grid">
-                    <div class="stat-card live-card">
+                <div class="stats-grid realtime-stats-grid">
+                    <div class="stat-card realtime-card live-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Live Mentions</span>
                             <div class="live-indicator pulse">
@@ -54,7 +59,12 @@ class RealtimePage {
                         </div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card realtime-card sentiment-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Sentiment Now</span>
                             <div class="sentiment-gauge-mini" id="sentimentGaugeMini"></div>
@@ -65,7 +75,12 @@ class RealtimePage {
                         </div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card realtime-card volume-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Volume Spike</span>
                             <div class="stat-icon"><span class="flat-icon icon-chart"></span></div>
@@ -76,7 +91,12 @@ class RealtimePage {
                         </div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card realtime-card alerts-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
                         <div class="stat-header">
                             <span class="stat-title">Active Alerts</span>
                             <div class="stat-icon"><span class="flat-icon icon-alert"></span></div>
