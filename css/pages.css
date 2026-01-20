@@ -514,7 +514,11 @@
 }
 
 .realtime-card.volume-card .stat-icon {
-    color: rgba(255, 255, 255, 0.9);
+    color: #ffffff;
+}
+
+.realtime-card.volume-card .stat-icon .flat-icon {
+    color: #ffffff;
 }
 
 .realtime-card.volume-card .stat-change {
@@ -554,7 +558,11 @@
 }
 
 .realtime-card.alerts-card .stat-icon {
-    color: rgba(255, 255, 255, 0.9);
+    color: #ffffff;
+}
+
+.realtime-card.alerts-card .stat-icon .flat-icon {
+    color: #ffffff;
 }
 
 .realtime-card.alerts-card .stat-change {
