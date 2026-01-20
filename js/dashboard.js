@@ -243,6 +243,15 @@ class DashboardPage {
                     <div class="section-header">
                         <h2 class="section-title">Analytics Overview</h2>
                         <div class="section-actions">
+                            <div class="time-range-display" id="timeRangeDisplay">
+                                <svg class="range-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span id="dateRangeText">Jan 13 - Jan 20</span>
+                            </div>
                             <select class="time-select" id="timeRange">
                                 <option value="7d">Last 7 Days</option>
                                 <option value="14d">Last 14 Days</option>
@@ -262,7 +271,6 @@ class DashboardPage {
                                 </div>
                                 <div class="chart-actions">
                                     <button class="chart-action-btn" data-action="download" data-chart="sentimentChart" title="Download"><span class="flat-icon icon-download"></span></button>
-                                    <button class="chart-action-btn" data-action="fullscreen" data-chart="sentimentChart" title="Fullscreen"><span class="flat-icon icon-fullscreen"></span></button>
                                 </div>
                             </div>
                             <div class="chart-container large">
@@ -454,8 +462,17 @@ class DashboardPage {
                                 </button>
                             </div>
                         </div>
-                        <div class="table-wrapper">
-                            <table>
+                        <div class="table-wrapper posts-table-wrapper">
+                            <table class="posts-table">
+                                <colgroup>
+                                    <col style="width: 15%;">
+                                    <col style="width: 12%;">
+                                    <col style="width: 28%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 18%;">
+                                    <col style="width: 9%;">
+                                    <col style="width: 8%;">
+                                </colgroup>
                                 <thead>
                                     <tr>
                                         <th>Author</th>
@@ -481,6 +498,9 @@ class DashboardPage {
     init() {
         console.log('🎯 Initializing Enhanced Dashboard...');
 
+        // Set default time range
+        this.currentTimeRange = '7d';
+
         // Load initial brand data from APIData
         this.loadBrandData();
 
@@ -502,7 +522,26 @@ class DashboardPage {
         // Initialize dynamic KPI card sizing
         this.initDynamicCardSizing();
 
+        // Initialize date range display
+        this.initDateRangeDisplay();
+
         console.log('✅ Enhanced Dashboard initialized');
+    }
+
+    initDateRangeDisplay() {
+        // Set initial date range display (last 7 days)
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 7);
+
+        const formatDate = (date) => {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        };
+
+        const dateRangeText = document.getElementById('dateRangeText');
+        if (dateRangeText) {
+            dateRangeText.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        }
     }
 
     /**
@@ -836,6 +875,14 @@ class DashboardPage {
             });
         }
 
+        // Posts platform filter
+        const postsFilterPlatform = document.getElementById('postsFilterPlatform');
+        if (postsFilterPlatform) {
+            postsFilterPlatform.addEventListener('change', (e) => {
+                this.handlePostsFilter(e.target.value);
+            });
+        }
+
         // Pause activity button
         const pauseBtn = document.getElementById('pauseActivity');
         if (pauseBtn) {
@@ -1076,17 +1123,27 @@ class DashboardPage {
         `).join('');
     }
 
-    loadPostsTable() {
+    loadPostsTable(filterPlatform = 'all') {
         const postsTable = document.getElementById('postsTable');
         if (!postsTable) return;
 
-        const posts = MockData?.generateMentions?.(10, this.currentPlatform === 'all' ? null : this.currentPlatform) || [];
+        // Generate posts if not cached or refresh
+        if (!this.cachedPosts || this.cachedPosts.length === 0) {
+            this.cachedPosts = MockData?.generateMentions?.(20, this.currentPlatform === 'all' ? null : this.currentPlatform) || [];
+        }
+
+        let posts = [...this.cachedPosts];
+
+        // Filter by platform if specified
+        if (filterPlatform && filterPlatform !== 'all') {
+            posts = posts.filter(post => post.platform === filterPlatform);
+        }
 
         // Sort by engagement
         posts.sort((a, b) => (b.likes + b.comments + b.shares) - (a.likes + a.comments + a.shares));
 
         postsTable.innerHTML = posts.slice(0, 8).map((post, index) => `
-            <tr class="table-row-animated" style="animation-delay: ${index * 0.05}s">
+            <tr class="post-row table-row-animated" style="animation-delay: ${index * 0.05}s" data-platform="${post.platform}">
                 <td>
                     <div class="author-cell">
                         <div class="author-avatar" style="background: ${post.platformColor}">
@@ -1128,6 +1185,22 @@ class DashboardPage {
                 </td>
             </tr>
         `).join('');
+    }
+
+    handlePostsFilter(platform) {
+        console.log('Posts filter changed to:', platform);
+
+        // Clear cached posts to regenerate with new filter
+        this.cachedPosts = null;
+
+        // Reload posts with the selected platform filter
+        this.loadPostsTable(platform);
+
+        // Show notification
+        if (window.notificationManager) {
+            const platformName = platform === 'all' ? 'All Platforms' : platform.charAt(0).toUpperCase() + platform.slice(1);
+            window.notificationManager.show(`Showing posts from ${platformName}`, 'info');
+        }
     }
 
     async loadTrendingTopics() {
@@ -1205,7 +1278,133 @@ class DashboardPage {
 
     handleTimeRangeChange(range) {
         console.log('Time range changed to:', range);
-        // Implement time range filtering
+
+        // Store current range
+        this.currentTimeRange = range;
+
+        // Calculate date range
+        const endDate = new Date();
+        const startDate = new Date();
+        let days = 7;
+
+        switch (range) {
+            case '7d':
+                days = 7;
+                break;
+            case '14d':
+                days = 14;
+                break;
+            case '30d':
+                days = 30;
+                break;
+            case '90d':
+                days = 90;
+                break;
+        }
+
+        startDate.setDate(endDate.getDate() - days);
+
+        // Update date range display
+        this.updateDateRangeDisplay(startDate, endDate, days);
+
+        // Show loading state on charts
+        this.showChartsLoading(true);
+
+        // Regenerate chart data with new date range
+        setTimeout(() => {
+            this.updateChartsForTimeRange(days);
+            this.showChartsLoading(false);
+
+            // Show notification
+            if (window.notificationManager) {
+                window.notificationManager.show(`Showing data for last ${days} days`, 'info');
+            }
+        }, 300);
+    }
+
+    updateDateRangeDisplay(startDate, endDate, days) {
+        // Format dates
+        const formatDate = (date) => {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        };
+
+        // Update the date range text
+        const dateRangeText = document.getElementById('dateRangeText');
+        if (dateRangeText) {
+            dateRangeText.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        }
+    }
+
+    showChartsLoading(show) {
+        const chartContainers = document.querySelectorAll('.chart-container');
+        chartContainers.forEach(container => {
+            if (show) {
+                container.classList.add('chart-loading');
+            } else {
+                container.classList.remove('chart-loading');
+            }
+        });
+    }
+
+    updateChartsForTimeRange(days) {
+        if (typeof Charts === 'undefined') return;
+
+        // Generate new labels based on days
+        const labels = [];
+        const endDate = new Date();
+
+        for (let i = days - 1; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(endDate.getDate() - i);
+            labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        }
+
+        // Generate random data for the new time range
+        const generateData = (min, max, count) => {
+            return Array.from({ length: count }, () => Math.floor(Math.random() * (max - min + 1)) + min);
+        };
+
+        // Update sentiment chart
+        if (this.charts.sentiment) {
+            const positiveData = generateData(55, 85, days);
+            const neutralData = generateData(8, 25, days);
+            const negativeData = generateData(5, 20, days);
+
+            this.charts.sentiment.data.labels = labels;
+            this.charts.sentiment.data.datasets[0].data = positiveData;
+            this.charts.sentiment.data.datasets[1].data = neutralData;
+            this.charts.sentiment.data.datasets[2].data = negativeData;
+            this.charts.sentiment.update('active');
+
+            // Update avg stats
+            const avgPos = Math.round(positiveData.reduce((a, b) => a + b, 0) / days);
+            const avgNeu = Math.round(neutralData.reduce((a, b) => a + b, 0) / days);
+            const avgNeg = Math.round(negativeData.reduce((a, b) => a + b, 0) / days);
+
+            const avgPosEl = document.getElementById('avgPositive');
+            const avgNeuEl = document.getElementById('avgNeutral');
+            const avgNegEl = document.getElementById('avgNegative');
+            const trendEl = document.getElementById('sentimentTrend');
+
+            if (avgPosEl) avgPosEl.textContent = `${avgPos}%`;
+            if (avgNeuEl) avgNeuEl.textContent = `${avgNeu}%`;
+            if (avgNegEl) avgNegEl.textContent = `${avgNeg}%`;
+            if (trendEl) {
+                const trend = (Math.random() * 10 - 3).toFixed(1);
+                trendEl.textContent = `${trend > 0 ? '+' : ''}${trend}%`;
+                trendEl.style.color = trend > 0 ? '#10b981' : '#ef4444';
+            }
+        }
+
+        // Update mentions chart
+        if (this.charts.mentions) {
+            const mentionsData = generateData(5000, 25000, days);
+            this.charts.mentions.data.labels = labels;
+            this.charts.mentions.data.datasets[0].data = mentionsData;
+            this.charts.mentions.update('active');
+        }
+
+        console.log(`Charts updated for ${days} days range`);
     }
 
     handleChartAction(action, chartId) {
