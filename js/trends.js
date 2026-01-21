@@ -91,72 +91,100 @@ const Trends = {
                 </div>
 
                 <!-- Stats Overview -->
-                <div class="trends-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
-                            <span class="material-icons">trending_up</span>
+                <div class="stats-grid trends-stats-grid">
+                    <div class="stat-card realtime-card live-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Trending Topics</div>
-                            <div class="stat-value">${this.trendingData.topics.length}</div>
-                            <div class="stat-change positive">+3 new today</div>
+                        <div class="stat-header">
+                            <span class="stat-title">Trending Topics</span>
+                            <div class="stat-icon"><span class="material-icons">trending_up</span></div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                            <span class="material-icons">tag</span>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Trending Hashtags</div>
-                            <div class="stat-value">${this.trendingData.hashtags.length}</div>
-                            <div class="stat-change positive">+5 rising</div>
+                        <div class="stat-value">${this.trendingData.topics.length}</div>
+                        <div class="stat-change positive">
+                            <span>+3 new today</span>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                            <span class="material-icons">rocket_launch</span>
+
+                    <div class="stat-card realtime-card sentiment-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Hot Keywords</div>
-                            <div class="stat-value">${this.trendingData.keywords.length}</div>
-                            <div class="stat-change positive">+2 emerging</div>
+                        <div class="stat-header">
+                            <span class="stat-title">Trending Hashtags</span>
+                            <div class="stat-icon"><span class="material-icons">tag</span></div>
+                        </div>
+                        <div class="stat-value">${this.trendingData.hashtags.length}</div>
+                        <div class="stat-change positive">
+                            <span>+5 rising</span>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);">
-                            <span class="material-icons">speed</span>
+
+                    <div class="stat-card realtime-card volume-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-label">Velocity Score</div>
-                            <div class="stat-value">8.7/10</div>
-                            <div class="stat-change positive">High activity</div>
+                        <div class="stat-header">
+                            <span class="stat-title">Hot Keywords</span>
+                            <div class="stat-icon"><span class="material-icons">rocket_launch</span></div>
+                        </div>
+                        <div class="stat-value">${this.trendingData.keywords.length}</div>
+                        <div class="stat-change positive">
+                            <span>+2 emerging</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card realtime-card alerts-card">
+                        <div class="stat-card-bg">
+                            <div class="stat-bg-shape shape-1"></div>
+                            <div class="stat-bg-shape shape-2"></div>
+                            <div class="stat-bg-shape shape-3"></div>
+                        </div>
+                        <div class="stat-header">
+                            <span class="stat-title">Velocity Score</span>
+                            <div class="stat-icon"><span class="material-icons">speed</span></div>
+                        </div>
+                        <div class="stat-value">8.7/10</div>
+                        <div class="stat-change positive">
+                            <span>High activity</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Category Tabs -->
-                <div class="trends-tabs">
-                    <button class="tab-btn ${this.currentCategory === 'all' ? 'active' : ''}" data-category="all">
-                        <span class="material-icons">dashboard</span>
-                        All Trends
-                    </button>
-                    <button class="tab-btn ${this.currentCategory === 'hashtags' ? 'active' : ''}" data-category="hashtags">
-                        <span class="material-icons">tag</span>
-                        Hashtags
-                    </button>
-                    <button class="tab-btn ${this.currentCategory === 'keywords' ? 'active' : ''}" data-category="keywords">
-                        <span class="material-icons">font_download</span>
-                        Keywords
-                    </button>
-                    <button class="tab-btn ${this.currentCategory === 'topics' ? 'active' : ''}" data-category="topics">
-                        <span class="material-icons">category</span>
-                        Topics
-                    </button>
-                </div>
+                <!-- Trends Container with Tabs and Content -->
+                <div class="trends-container-wrapper">
+                    <!-- Category Tabs -->
+                    <div class="trends-tabs-header">
+                        <div class="trends-tabs">
+                            <button class="tab-btn ${this.currentCategory === 'all' ? 'active' : ''}" data-category="all">
+                                <span class="material-icons">dashboard</span>
+                                All Trends
+                            </button>
+                            <button class="tab-btn ${this.currentCategory === 'hashtags' ? 'active' : ''}" data-category="hashtags">
+                                <span class="material-icons">tag</span>
+                                Hashtags
+                            </button>
+                            <button class="tab-btn ${this.currentCategory === 'keywords' ? 'active' : ''}" data-category="keywords">
+                                <span class="material-icons">manage_search</span>
+                                Keywords
+                            </button>
+                            <button class="tab-btn ${this.currentCategory === 'topics' ? 'active' : ''}" data-category="topics">
+                                <span class="material-icons">category</span>
+                                Topics
+                            </button>
+                        </div>
+                    </div>
 
-                <!-- Trends Content -->
-                <div class="trends-content" id="trendsContent">
-                    <!-- Populated by loadTrendsContent() -->
+                    <!-- Trends Content -->
+                    <div class="trends-content" id="trendsContent">
+                        <!-- Populated by loadTrendsContent() -->
+                    </div>
                 </div>
 
                 <!-- Trend Details Modal -->
@@ -303,7 +331,9 @@ const Trends = {
                 this.currentPeriod = e.target.dataset.period;
                 document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                this.loadTrendsContent();
+                // Regenerate data only when period changes
+                this.currentData = this.getAdjustedData();
+                this.loadTrendsContent(false);
             });
         });
 
@@ -313,14 +343,67 @@ const Trends = {
                 this.currentCategory = e.currentTarget.dataset.category;
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                this.loadTrendsContent();
+                // Don't regenerate data when switching categories
+                this.loadTrendsContent(false);
             });
         });
     },
 
-    loadTrendsContent() {
+    // Get multiplier based on selected period
+    getPeriodMultiplier() {
+        switch (this.currentPeriod) {
+            case '24h': return 1;
+            case '7d': return 7;
+            case '30d': return 30;
+            default: return 1;
+        }
+    },
+
+    // Get period label for display
+    getPeriodLabel() {
+        switch (this.currentPeriod) {
+            case '24h': return 'Last 24 Hours';
+            case '7d': return 'Last 7 Days';
+            case '30d': return 'Last 30 Days';
+            default: return 'Last 24 Hours';
+        }
+    },
+
+    // Get adjusted data based on period
+    getAdjustedData() {
+        const multiplier = this.getPeriodMultiplier();
+        const variance = () => 0.8 + Math.random() * 0.4; // Random variance between 0.8 and 1.2
+
+        return {
+            hashtags: this.trendingData.hashtags.map(item => ({
+                ...item,
+                mentions: Math.round(item.mentions * multiplier * variance()),
+                change: Math.round(item.change * (multiplier === 1 ? 1 : multiplier * 0.3) * variance())
+            })),
+            keywords: this.trendingData.keywords.map(item => ({
+                ...item,
+                mentions: Math.round(item.mentions * multiplier * variance()),
+                change: Math.round(item.change * (multiplier === 1 ? 1 : multiplier * 0.3) * variance())
+            })),
+            topics: this.trendingData.topics.map(item => ({
+                ...item,
+                mentions: Math.round(item.mentions * multiplier * variance()),
+                change: Math.round(item.change * (multiplier === 1 ? 1 : multiplier * 0.3) * variance())
+            }))
+        };
+    },
+
+    loadTrendsContent(regenerateData = true) {
         const content = document.getElementById('trendsContent');
         if (!content) return;
+
+        // Only regenerate data if requested (initial load or period change)
+        if (regenerateData || !this.currentData) {
+            this.currentData = this.getAdjustedData();
+        }
+
+        // Update stats cards
+        this.updateStatsCards();
 
         if (this.currentCategory === 'all') {
             content.innerHTML = this.renderAllTrends();
@@ -336,17 +419,26 @@ const Trends = {
         this.attachTrendClickEvents();
     },
 
+    updateStatsCards() {
+        // Update the period label in section headers if they exist
+        const periodLabels = document.querySelectorAll('.period-label');
+        periodLabels.forEach(label => {
+            label.textContent = this.getPeriodLabel();
+        });
+    },
+
     renderAllTrends() {
+        const data = this.currentData || this.trendingData;
         return `
             <div class="all-trends-layout">
                 <!-- Top Topics -->
                 <div class="trends-section">
                     <div class="section-header">
-                        <h3><span class="material-icons">category</span> Top Topics</h3>
+                        <h3><span class="material-icons" style="color: #8b5cf6;">category</span> Top Topics</h3>
                         <button class="btn-text" onclick="Trends.currentCategory='topics'; Trends.loadTrendsContent();">View All</button>
                     </div>
                     <div class="topics-grid">
-                        ${this.trendingData.topics.slice(0, 4).map(topic => this.renderTopicCard(topic)).join('')}
+                        ${data.topics.slice(0, 4).map((topic, index) => this.renderTopicCard(topic, index)).join('')}
                     </div>
                 </div>
 
@@ -355,33 +447,62 @@ const Trends = {
                     <!-- Hashtags -->
                     <div class="trends-section">
                         <div class="section-header">
-                            <h3><span class="material-icons">tag</span> Trending Hashtags</h3>
+                            <h3><span class="material-icons" style="color: #8b5cf6;">tag</span> Trending Hashtags</h3>
                             <button class="btn-text" onclick="Trends.currentCategory='hashtags'; Trends.loadTrendsContent();">View All</button>
                         </div>
                         <div class="hashtags-list">
-                            ${this.trendingData.hashtags.slice(0, 6).map((tag, idx) => this.renderHashtagItem(tag, idx + 1)).join('')}
+                            ${data.hashtags.slice(0, 6).map((tag, idx) => this.renderHashtagItem(tag, idx + 1)).join('')}
                         </div>
                     </div>
 
                     <!-- Keywords -->
                     <div class="trends-section">
                         <div class="section-header">
-                            <h3><span class="material-icons">font_download</span> Hot Keywords</h3>
+                            <h3><span class="material-icons" style="color: #8b5cf6;">manage_search</span> Hot Keywords</h3>
                             <button class="btn-text" onclick="Trends.currentCategory='keywords'; Trends.loadTrendsContent();">View All</button>
                         </div>
                         <div class="keywords-list">
-                            ${this.trendingData.keywords.slice(0, 6).map((kw, idx) => this.renderKeywordItem(kw, idx + 1)).join('')}
+                            ${data.keywords.slice(0, 6).map((kw, idx) => this.renderKeywordItem(kw, idx + 1)).join('')}
                         </div>
                     </div>
                 </div>
 
                 <!-- Trend Velocity Chart -->
-                <div class="trends-section">
-                    <div class="section-header">
-                        <h3><span class="material-icons">show_chart</span> Trend Velocity</h3>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="velocityChart"></canvas>
+                <div class="trends-section velocity-section">
+                    <div class="velocity-card">
+                        <div class="velocity-card-bg">
+                            <div class="velocity-bg-shape shape-1"></div>
+                            <div class="velocity-bg-shape shape-2"></div>
+                        </div>
+                        <div class="velocity-header">
+                            <div class="velocity-title-group">
+                                <h3><span class="material-icons" style="color: #8b5cf6;">show_chart</span> Trend Velocity</h3>
+                            </div>
+                            <div class="velocity-time-filter">
+                                <select id="velocityTimeFilter" class="filter-select" onchange="Trends.updateVelocityChart()">
+                                    <option value="24h">Last 24 Hours</option>
+                                    <option value="7d">Last 7 Days</option>
+                                    <option value="30d">Last 30 Days</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="velocity-chart-wrapper">
+                            <canvas id="velocityChart"></canvas>
+                        </div>
+                        <div class="velocity-legend-custom">
+                            <div class="legend-item">
+                                <span class="legend-dot purple"></span>
+                                <span class="legend-label">#Innovation</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot green"></span>
+                                <span class="legend-label">#TechTrends</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot orange"></span>
+                                <span class="legend-label">#DigitalTransformation</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -389,62 +510,72 @@ const Trends = {
     },
 
     renderHashtags() {
+        const data = this.currentData || this.trendingData;
         return `
             <div class="hashtags-full-view">
                 <div class="view-header">
-                    <h3>Trending Hashtags - ${this.currentPeriod}</h3>
+                    <h3>Trending Hashtags - ${this.getPeriodLabel()}</h3>
                     <button class="btn-secondary" onclick="Trends.exportTrends('hashtags')">
                         <span class="material-icons">download</span>
                         Export
                     </button>
                 </div>
                 <div class="hashtags-list full-list">
-                    ${this.trendingData.hashtags.map((tag, idx) => this.renderHashtagItem(tag, idx + 1)).join('')}
+                    ${data.hashtags.map((tag, idx) => this.renderHashtagItem(tag, idx + 1)).join('')}
                 </div>
             </div>
         `;
     },
 
     renderKeywords() {
+        const data = this.currentData || this.trendingData;
         return `
             <div class="keywords-full-view">
                 <div class="view-header">
-                    <h3>Hot Keywords - ${this.currentPeriod}</h3>
+                    <h3>Hot Keywords - ${this.getPeriodLabel()}</h3>
                     <button class="btn-secondary" onclick="Trends.exportTrends('keywords')">
                         <span class="material-icons">download</span>
                         Export
                     </button>
                 </div>
                 <div class="keywords-list full-list">
-                    ${this.trendingData.keywords.map((kw, idx) => this.renderKeywordItem(kw, idx + 1)).join('')}
+                    ${data.keywords.map((kw, idx) => this.renderKeywordItem(kw, idx + 1)).join('')}
                 </div>
             </div>
         `;
     },
 
     renderTopics() {
+        const data = this.currentData || this.trendingData;
         return `
             <div class="topics-full-view">
                 <div class="view-header">
-                    <h3>Trending Topics - ${this.currentPeriod}</h3>
+                    <h3>Trending Topics - ${this.getPeriodLabel()}</h3>
                     <button class="btn-secondary" onclick="Trends.exportTrends('topics')">
                         <span class="material-icons">download</span>
                         Export
                     </button>
                 </div>
                 <div class="topics-grid">
-                    ${this.trendingData.topics.map(topic => this.renderTopicCard(topic)).join('')}
+                    ${data.topics.map((topic, index) => this.renderTopicCard(topic, index)).join('')}
                 </div>
             </div>
         `;
     },
 
-    renderTopicCard(topic) {
+    renderTopicCard(topic, index = 0) {
         const changeClass = topic.change >= 0 ? 'positive' : 'negative';
         const changeIcon = topic.change >= 0 ? 'trending_up' : 'trending_down';
-        
+        const colorClasses = ['topic-purple', 'topic-cyan', 'topic-orange', 'topic-green'];
+        const colorClass = colorClasses[index % colorClasses.length];
+
         return `
-            <div class="topic-card" data-type="topic" data-name="${topic.topic}">
+            <div class="topic-card ${colorClass}" data-type="topic" data-name="${topic.topic}">
+                <div class="topic-card-bg">
+                    <div class="topic-bg-shape shape-1"></div>
+                    <div class="topic-bg-shape shape-2"></div>
+                    <div class="topic-bg-shape shape-3"></div>
+                </div>
                 <div class="topic-header">
                     <h4>${topic.topic}</h4>
                     <span class="topic-mentions">${Utils.formatNumber(topic.mentions)} mentions</span>
@@ -589,61 +720,182 @@ const Trends = {
         }
     },
 
+    velocityChart: null,
+    velocityPeriod: '24h',
+
+    updateVelocityChart() {
+        const select = document.getElementById('velocityTimeFilter');
+        if (select) {
+            this.velocityPeriod = select.value;
+        }
+        this.createVelocityChart();
+    },
+
     createVelocityChart() {
         const ctx = document.getElementById('velocityChart');
         if (!ctx) return;
 
-        const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-        const data1 = Array.from({ length: 24 }, () => Math.floor(Math.random() * 100) + 50);
-        const data2 = Array.from({ length: 24 }, () => Math.floor(Math.random() * 80) + 30);
-        const data3 = Array.from({ length: 24 }, () => Math.floor(Math.random() * 60) + 20);
+        // Destroy existing chart if it exists
+        if (this.velocityChart) {
+            this.velocityChart.destroy();
+        }
 
-        new Chart(ctx, {
+        let labels, titleText, yAxisText;
+        const period = this.velocityPeriod || '24h';
+
+        if (period === '24h') {
+            labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+            titleText = 'Trend Velocity Over Last 24 Hours';
+            yAxisText = 'Mentions per Hour';
+        } else if (period === '7d') {
+            labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            titleText = 'Trend Velocity Over Last 7 Days';
+            yAxisText = 'Mentions per Day';
+        } else {
+            labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
+            titleText = 'Trend Velocity Over Last 30 Days';
+            yAxisText = 'Mentions per Day';
+        }
+
+        const dataLength = labels.length;
+        const multiplier = period === '24h' ? 1 : period === '7d' ? 5 : 3;
+        const data1 = Array.from({ length: dataLength }, () => Math.floor(Math.random() * 100 * multiplier) + 50 * multiplier);
+        const data2 = Array.from({ length: dataLength }, () => Math.floor(Math.random() * 80 * multiplier) + 30 * multiplier);
+        const data3 = Array.from({ length: dataLength }, () => Math.floor(Math.random() * 60 * multiplier) + 20 * multiplier);
+
+        // Create gradient backgrounds
+        const ctx2d = ctx.getContext('2d');
+        const gradient1 = ctx2d.createLinearGradient(0, 0, 0, 300);
+        gradient1.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
+        gradient1.addColorStop(1, 'rgba(139, 92, 246, 0.02)');
+
+        const gradient2 = ctx2d.createLinearGradient(0, 0, 0, 300);
+        gradient2.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+        gradient2.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+
+        const gradient3 = ctx2d.createLinearGradient(0, 0, 0, 300);
+        gradient3.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
+        gradient3.addColorStop(1, 'rgba(249, 115, 22, 0.02)');
+
+        this.velocityChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: hours,
+                labels: labels,
                 datasets: [
                     {
                         label: '#Innovation',
                         data: data1,
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        tension: 0.4
+                        borderColor: '#8b5cf6',
+                        backgroundColor: gradient1,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointHoverBackgroundColor: '#8b5cf6',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
                     },
                     {
                         label: '#TechTrends',
                         data: data2,
                         borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4
+                        backgroundColor: gradient2,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointHoverBackgroundColor: '#10b981',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
                     },
                     {
                         label: '#DigitalTransformation',
                         data: data3,
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4
+                        borderColor: '#f97316',
+                        backgroundColor: gradient3,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#f97316',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointHoverBackgroundColor: '#f97316',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     legend: {
-                        position: 'top'
+                        display: false
                     },
                     title: {
-                        display: true,
-                        text: 'Trend Velocity Over Last 24 Hours'
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#e5e7eb',
+                        borderColor: 'rgba(139, 92, 246, 0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        displayColors: true,
+                        boxWidth: 12,
+                        boxHeight: 12,
+                        boxPadding: 4,
+                        usePointStyle: true
                     }
                 },
                 scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 11
+                            },
+                            maxRotation: 0
+                        }
+                    },
                     y: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Mentions per Hour'
+                        grid: {
+                            color: 'rgba(229, 231, 235, 0.5)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 11
+                            },
+                            padding: 8
                         }
                     }
                 }

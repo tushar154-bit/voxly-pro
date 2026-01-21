@@ -10,6 +10,14 @@ class RealtimePage {
         this.mentionQueue = [];
         this.currentBrand = null;
         this.isAnimating = false;
+        // Track sentiment counts for syncing cards
+        this.sentimentCounts = {
+            positive: 0,
+            neutral: 0,
+            negative: 0
+        };
+        this.totalMentions = 0;
+        this.baselineVolume = 10; // baseline for volume spike calculation
     }
 
     render() {
@@ -54,7 +62,7 @@ class RealtimePage {
                             </div>
                         </div>
                         <div class="stat-value" id="liveMentionsCount">0</div>
-                        <div class="stat-meta">
+                        <div class="stat-change">
                             <span>Last 5 minutes</span>
                         </div>
                     </div>
@@ -67,11 +75,24 @@ class RealtimePage {
                         </div>
                         <div class="stat-header">
                             <span class="stat-title">Sentiment Now</span>
-                            <div class="sentiment-gauge-mini" id="sentimentGaugeMini"></div>
+                            <div class="stat-icon"><span class="flat-icon icon-heart"></span></div>
                         </div>
-                        <div class="stat-value sentiment-value" id="currentSentiment">72%</div>
-                        <div class="stat-change positive">
-                            <span>+5% from 1h ago</span>
+                        <div class="sentiment-breakdown" id="sentimentBreakdown">
+                            <div class="sentiment-item positive">
+                                <span class="sentiment-icon"><i class="far fa-smile"></i></span>
+                                <span class="sentiment-label">Positive</span>
+                                <span class="sentiment-percent" id="positivePercent">0%</span>
+                            </div>
+                            <div class="sentiment-item neutral">
+                                <span class="sentiment-icon"><i class="far fa-meh"></i></span>
+                                <span class="sentiment-label">Neutral</span>
+                                <span class="sentiment-percent" id="neutralPercent">0%</span>
+                            </div>
+                            <div class="sentiment-item negative">
+                                <span class="sentiment-icon"><i class="far fa-frown"></i></span>
+                                <span class="sentiment-label">Negative</span>
+                                <span class="sentiment-percent" id="negativePercent">0%</span>
+                            </div>
                         </div>
                     </div>
 
@@ -85,9 +106,9 @@ class RealtimePage {
                             <span class="stat-title">Volume Spike</span>
                             <div class="stat-icon"><span class="flat-icon icon-chart"></span></div>
                         </div>
-                        <div class="stat-value">+156%</div>
-                        <div class="stat-change warning">
-                            <span><span class="flat-icon icon-trending xs"></span> High activity detected</span>
+                        <div class="stat-value" id="volumeSpikeValue">+0%</div>
+                        <div class="stat-change warning" id="volumeSpikeStatus">
+                            <span><span class="flat-icon icon-trending xs"></span> Monitoring activity</span>
                         </div>
                     </div>
 
@@ -120,11 +141,14 @@ class RealtimePage {
                             <div class="card-actions">
                                 <select id="platformFilterRealtime" class="form-select">
                                     <option value="all">All Platforms</option>
-                                    <option value="twitter">Twitter</option>
-                                    <option value="reddit">Reddit</option>
-                                    <option value="youtube">YouTube</option>
-                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="x">X</option>
+                                    <option value="instagram">Instagram</option>
                                     <option value="facebook">Facebook</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="reddit">Reddit</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="pinterest">Pinterest</option>
                                 </select>
                             </div>
                         </div>
@@ -172,8 +196,18 @@ class RealtimePage {
                             <div class="card-header">
                                 <h3 class="card-title">
                                     <i class="fas fa-chart-line"></i>
-                                    Volume (Last Hour)
+                                    <span id="volumeChartTitle">Volume (Last Hour)</span>
                                 </h3>
+                                <div class="card-actions">
+                                    <select id="volumeTimeFilter" class="form-select">
+                                        <option value="1">Last Hour</option>
+                                        <option value="6">Last 6 Hours</option>
+                                        <option value="12">Last 12 Hours</option>
+                                        <option value="24">Last 24 Hours</option>
+                                        <option value="48">Last 48 Hours</option>
+                                        <option value="168">Last 7 Days</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="chart-container" style="height: 200px;">
@@ -283,6 +317,43 @@ class RealtimePage {
                 this.filterByPlatform(e.target.value);
             });
         }
+
+        // Volume time filter
+        const volumeTimeFilter = document.getElementById('volumeTimeFilter');
+        if (volumeTimeFilter) {
+            volumeTimeFilter.addEventListener('change', (e) => {
+                this.updateVolumeChart(parseInt(e.target.value));
+            });
+        }
+    }
+
+    updateVolumeChart(hours) {
+        // Update the chart title
+        const titleEl = document.getElementById('volumeChartTitle');
+        if (titleEl) {
+            let titleText = 'Volume (Last Hour)';
+            if (hours === 1) {
+                titleText = 'Volume (Last Hour)';
+            } else if (hours === 6) {
+                titleText = 'Volume (Last 6 Hours)';
+            } else if (hours === 12) {
+                titleText = 'Volume (Last 12 Hours)';
+            } else if (hours === 24) {
+                titleText = 'Volume (Last 24 Hours)';
+            } else if (hours === 48) {
+                titleText = 'Volume (Last 48 Hours)';
+            } else if (hours === 168) {
+                titleText = 'Volume (Last 7 Days)';
+            }
+            titleEl.textContent = titleText;
+        }
+
+        // Update the chart with new data
+        if (this.volumeChart && typeof MockData !== 'undefined') {
+            const newData = MockData.getMentionsChartData('all', hours);
+            this.volumeChart.data = newData;
+            this.volumeChart.update('active');
+        }
     }
 
     startLiveUpdates() {
@@ -290,16 +361,24 @@ class RealtimePage {
             clearInterval(this.updateInterval);
         }
 
-        // Simulate new mentions every 3-8 seconds
-        this.updateInterval = setInterval(() => {
-            if (this.isLive) {
-                this.addNewMention();
+        // Function to schedule next mention with random delay
+        const scheduleNextMention = () => {
+            if (this.updateInterval) {
+                clearTimeout(this.updateInterval);
             }
-        }, Utils.random(3000, 8000));
+            this.updateInterval = setTimeout(() => {
+                if (this.isLive) {
+                    this.addNewMention();
+                }
+                scheduleNextMention();
+            }, Utils.random(3000, 6000));
+        };
+
+        scheduleNextMention();
     }
 
     addNewMention() {
-        const platforms = ['Twitter', 'Reddit', 'YouTube', 'LinkedIn', 'Facebook'];
+        const platforms = ['X', 'Instagram', 'Facebook', 'LinkedIn', 'YouTube', 'Reddit', 'TikTok', 'Pinterest'];
         const sentiments = ['positive', 'neutral', 'negative'];
 
         // Get brand-specific content
@@ -369,18 +448,111 @@ class RealtimePage {
                 counter.textContent = parseInt(counter.textContent) + 1;
             }
 
+            // Track sentiment for syncing cards
+            this.totalMentions++;
+            this.sentimentCounts[sentiment]++;
+
+            // Update all synced cards
+            this.updateSyncedCards();
+
             // Trigger animation
             setTimeout(() => mentionElement.classList.add('show'), 10);
         }
     }
 
+    updateSyncedCards() {
+        // Update Sentiment Now card
+        const total = this.sentimentCounts.positive + this.sentimentCounts.neutral + this.sentimentCounts.negative;
+        if (total > 0) {
+            const positivePercent = Math.round((this.sentimentCounts.positive / total) * 100);
+            const neutralPercent = Math.round((this.sentimentCounts.neutral / total) * 100);
+            const negativePercent = Math.round((this.sentimentCounts.negative / total) * 100);
+
+            const posEl = document.getElementById('positivePercent');
+            const neuEl = document.getElementById('neutralPercent');
+            const negEl = document.getElementById('negativePercent');
+
+            if (posEl) posEl.textContent = positivePercent + '%';
+            if (neuEl) neuEl.textContent = neutralPercent + '%';
+            if (negEl) negEl.textContent = negativePercent + '%';
+        }
+
+        // Update Volume Spike card
+        const volumeSpikeEl = document.getElementById('volumeSpikeValue');
+        const volumeStatusEl = document.getElementById('volumeSpikeStatus');
+        if (volumeSpikeEl && this.totalMentions > 0) {
+            const volumeChange = Math.round(((this.totalMentions - this.baselineVolume) / this.baselineVolume) * 100);
+            volumeSpikeEl.textContent = (volumeChange >= 0 ? '+' : '') + volumeChange + '%';
+
+            if (volumeStatusEl) {
+                if (volumeChange > 100) {
+                    volumeStatusEl.innerHTML = '<span><span class="flat-icon icon-trending xs"></span> High activity detected</span>';
+                    volumeStatusEl.className = 'stat-change warning';
+                } else if (volumeChange > 50) {
+                    volumeStatusEl.innerHTML = '<span><span class="flat-icon icon-trending xs"></span> Moderate activity</span>';
+                    volumeStatusEl.className = 'stat-change warning';
+                } else {
+                    volumeStatusEl.innerHTML = '<span><span class="flat-icon icon-trending xs"></span> Normal activity</span>';
+                    volumeStatusEl.className = 'stat-change';
+                }
+            }
+        }
+
+        // Update Active Alerts card based on negative sentiment
+        const alertsEl = document.getElementById('activeAlertsCount');
+        if (alertsEl) {
+            // Generate alerts based on negative sentiment percentage
+            const total = this.sentimentCounts.positive + this.sentimentCounts.neutral + this.sentimentCounts.negative;
+            if (total > 0) {
+                const negativePercent = (this.sentimentCounts.negative / total) * 100;
+                let alerts = 0;
+                if (negativePercent > 40) alerts = 3;
+                else if (negativePercent > 25) alerts = 2;
+                else if (negativePercent > 10) alerts = 1;
+                alertsEl.textContent = alerts;
+            }
+        }
+    }
+
+    getPlatformIcon(platform) {
+        const icons = {
+            'X': 'fab fa-x-twitter',
+            'Instagram': 'fab fa-instagram',
+            'Facebook': 'fab fa-facebook',
+            'LinkedIn': 'fab fa-linkedin',
+            'YouTube': 'fab fa-youtube',
+            'Reddit': 'fab fa-reddit',
+            'TikTok': 'fab fa-tiktok',
+            'Pinterest': 'fab fa-pinterest'
+        };
+        return icons[platform] || 'fas fa-globe';
+    }
+
+    getPlatformColor(platform) {
+        const colors = {
+            'X': '#000000',
+            'Instagram': '#E4405F',
+            'Facebook': '#1877F2',
+            'LinkedIn': '#0A66C2',
+            'YouTube': '#FF0000',
+            'Reddit': '#FF4500',
+            'TikTok': '#000000',
+            'Pinterest': '#E60023'
+        };
+        return colors[platform] || '#6b7280';
+    }
+
     createMentionElement(mention) {
         const div = document.createElement('div');
         div.className = `mention-item mention-${mention.sentiment}`;
+        const platformIcon = this.getPlatformIcon(mention.platform);
+        const platformColor = this.getPlatformColor(mention.platform);
         div.innerHTML = `
             <div class="mention-header">
                 <div class="mention-platform">
-                    <span class="platform-badge">${mention.platform}</span>
+                    <span class="platform-logo" style="color: ${platformColor};">
+                        <i class="${platformIcon}"></i>
+                    </span>
                     <strong>${mention.author}</strong>
                 </div>
                 <div class="mention-time">${Utils.formatDate(mention.timestamp, 'relative')}</div>
@@ -388,7 +560,7 @@ class RealtimePage {
             <div class="mention-content">${Utils.sanitizeHtml(mention.content)}</div>
             <div class="mention-footer">
                 <span class="badge badge-${mention.sentiment}">
-                    ${Utils.getSentimentIcon(mention.sentimentScore)}
+                    ${Utils.getSentimentIconHTML(mention.sentimentScore)}
                     ${Utils.getSentimentLabel(mention.sentimentScore)}
                 </span>
                 <span class="mention-engagement">
@@ -402,17 +574,25 @@ class RealtimePage {
     toggleLiveFeed() {
         this.isLive = !this.isLive;
         const btn = document.getElementById('pauseLiveBtn');
-        
+
+        if (!btn) return;
+
         if (this.isLive) {
+            // Feed is now running - show pause button
             btn.innerHTML = '<i class="fas fa-pause"></i><span>Pause Live Feed</span>';
-            btn.classList.remove('btn-primary');
+            btn.classList.remove('btn-success');
             btn.classList.add('btn-secondary');
-            Notifications.info('Live feed resumed');
+            if (typeof Notifications !== 'undefined') {
+                Notifications.info('Live feed resumed');
+            }
         } else {
+            // Feed is now paused - show resume button
             btn.innerHTML = '<i class="fas fa-play"></i><span>Resume Live Feed</span>';
             btn.classList.remove('btn-secondary');
-            btn.classList.add('btn-primary');
-            Notifications.warning('Live feed paused');
+            btn.classList.add('btn-success');
+            if (typeof Notifications !== 'undefined') {
+                Notifications.warning('Live feed paused');
+            }
         }
     }
 

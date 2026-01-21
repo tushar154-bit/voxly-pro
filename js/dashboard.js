@@ -301,7 +301,7 @@ class DashboardPage {
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div>
-                                    <h3 class="chart-title">Platform Distribution</h3>
+                                    <h3 class="chart-title"><span class="material-icons" style="color: #8b5cf6; font-size: 1.25rem; vertical-align: middle; margin-right: 0.5rem;">pie_chart</span>Platform Distribution</h3>
                                     <p class="chart-subtitle">Share of mentions by platform</p>
                                 </div>
                                 <div class="chart-actions">
@@ -349,7 +349,7 @@ class DashboardPage {
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div>
-                                    <h3 class="chart-title">Mentions Volume</h3>
+                                    <h3 class="chart-title"><span class="material-icons" style="color: #8b5cf6; font-size: 1.25rem; vertical-align: middle; margin-right: 0.5rem;">bar_chart</span>Mentions Volume</h3>
                                     <p class="chart-subtitle">Hourly mention activity (24h)</p>
                                 </div>
                                 <div class="chart-actions">
@@ -397,7 +397,7 @@ class DashboardPage {
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div>
-                                    <h3 class="chart-title">Emotion Analysis</h3>
+                                    <h3 class="chart-title"><span class="material-icons" style="color: #8b5cf6; font-size: 1.25rem; vertical-align: middle; margin-right: 0.5rem;">mood</span>Emotion Analysis</h3>
                                     <p class="chart-subtitle">Breakdown by emotion type</p>
                                 </div>
                                 <div class="chart-actions">
@@ -432,7 +432,7 @@ class DashboardPage {
                     <div class="activity-section">
                         <div class="activity-feed">
                             <div class="activity-header">
-                                <h3 class="activity-title"><span class="flat-icon icon-live"></span> Live Activity Feed</h3>
+                                <h3 class="activity-title"><span class="flat-icon icon-live" style="margin-right: 0.5rem;"></span>Live Activity Feed</h3>
                                 <div class="activity-controls">
                                     <span class="live-indicator">
                                         <span class="live-dot"></span>
