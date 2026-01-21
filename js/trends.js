@@ -514,7 +514,7 @@ const Trends = {
         return `
             <div class="hashtags-full-view">
                 <div class="view-header">
-                    <h3>Trending Hashtags - ${this.getPeriodLabel()}</h3>
+                    <h3><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">tag</span>Trending Hashtags - ${this.getPeriodLabel()}</h3>
                     <button class="btn-secondary" onclick="Trends.exportTrends('hashtags')">
                         <span class="material-icons">download</span>
                         Export
@@ -532,7 +532,7 @@ const Trends = {
         return `
             <div class="keywords-full-view">
                 <div class="view-header">
-                    <h3>Hot Keywords - ${this.getPeriodLabel()}</h3>
+                    <h3><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">manage_search</span>Hot Keywords - ${this.getPeriodLabel()}</h3>
                     <button class="btn-secondary" onclick="Trends.exportTrends('keywords')">
                         <span class="material-icons">download</span>
                         Export
@@ -550,7 +550,7 @@ const Trends = {
         return `
             <div class="topics-full-view">
                 <div class="view-header">
-                    <h3>Trending Topics - ${this.getPeriodLabel()}</h3>
+                    <h3><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">category</span>Trending Topics - ${this.getPeriodLabel()}</h3>
                     <button class="btn-secondary" onclick="Trends.exportTrends('topics')">
                         <span class="material-icons">download</span>
                         Export

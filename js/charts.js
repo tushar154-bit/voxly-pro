@@ -28,14 +28,24 @@ class ChartManager {
     /**
      * Create sentiment trend chart (Line chart) - Platform aware with enhanced visuals
      */
-    createSentimentTrend(canvasId, platform = 'all') {
+    createSentimentTrend(canvasId, platformOrDays = 'all', days = 7) {
         const ctx = document.getElementById(canvasId);
         if (!ctx) return null;
 
+        // Handle both old signature (platform) and new signature (days as number)
+        let platform = 'all';
+        let numDays = 7;
+        if (typeof platformOrDays === 'number') {
+            numDays = platformOrDays;
+        } else {
+            platform = platformOrDays;
+            numDays = days;
+        }
+
         // Get platform-specific data from MockData
         const chartData = typeof MockData !== 'undefined'
-            ? MockData.getSentimentChartData(platform, 7)
-            : this.getDefaultSentimentData();
+            ? MockData.getSentimentChartData(platform, numDays)
+            : this.getDefaultSentimentData(numDays);
 
         // Create beautiful gradients for each sentiment
         const canvas = ctx.getContext('2d');
@@ -165,16 +175,16 @@ class ChartManager {
                         caretPadding: 12,
                         callbacks: {
                             title: (tooltipItems) => {
-                                return `📅 ${tooltipItems[0].label}`;
+                                return `🗓 ${tooltipItems[0].label}`;
                             },
                             label: (context) => {
-                                const emoji = context.datasetIndex === 0 ? '😊' :
-                                              context.datasetIndex === 1 ? '😐' : '😞';
-                                return `${emoji} ${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+                                const smiley = context.datasetIndex === 0 ? '🙂' :
+                                              context.datasetIndex === 1 ? '😐' : '🙁';
+                                return `${smiley} ${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
                             },
                             afterBody: (tooltipItems) => {
                                 const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
-                                return [`\n📊 Total: ${total.toFixed(1)}%`];
+                                return [`\n📈 Total: ${total.toFixed(1)}%`];
                             }
                         }
                     }
@@ -782,13 +792,13 @@ class ChartManager {
     /**
      * Create engagement chart (Stacked Bar chart) - Platform aware
      */
-    createEngagementChart(canvasId, platform = 'all') {
+    createEngagementChart(canvasId, platform = 'all', days = 7) {
         const ctx = document.getElementById(canvasId);
         if (!ctx) return null;
 
         const dailyData = typeof MockData !== 'undefined'
-            ? MockData.generateDailyData(7, platform)
-            : this.getDefaultEngagementData();
+            ? MockData.generateDailyData(days, platform)
+            : this.getDefaultEngagementData(days);
 
         const platformColor = this.platformColors[platform] || this.platformColors.all;
 
@@ -1213,26 +1223,40 @@ class ChartManager {
 
     // ============ Default Data Generators ============
 
-    getDefaultSentimentData() {
+    getDefaultSentimentData(days = 7) {
+        const labels = this.getLastNDays(days);
+
+        // Generate random but realistic sentiment data
+        const generateSentimentData = (base, variance, trend) => {
+            const data = [];
+            let current = base;
+            for (let i = 0; i < days; i++) {
+                current = current + (Math.random() * variance * 2 - variance) + trend;
+                current = Math.max(5, Math.min(95, current)); // Keep within bounds
+                data.push(Math.round(current));
+            }
+            return data;
+        };
+
         return {
-            labels: this.getLast7Days(),
+            labels: labels,
             datasets: [{
                 label: 'Positive',
-                data: [65, 68, 70, 72, 75, 78, 82],
+                data: generateSentimentData(65, 5, 0.3),
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 tension: 0.4,
                 fill: true
             }, {
                 label: 'Neutral',
-                data: [25, 24, 22, 20, 18, 15, 12],
+                data: generateSentimentData(25, 3, -0.2),
                 borderColor: '#f59e0b',
                 backgroundColor: 'rgba(245, 158, 11, 0.1)',
                 tension: 0.4,
                 fill: true
             }, {
                 label: 'Negative',
-                data: [10, 8, 8, 8, 7, 7, 6],
+                data: generateSentimentData(10, 2, -0.1),
                 borderColor: '#ef4444',
                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 tension: 0.4,
@@ -1281,11 +1305,22 @@ class ChartManager {
         ];
     }
 
-    getDefaultEngagementData() {
-        return this.getLast7Days().map(date => ({
+    getDefaultEngagementData(days = 7) {
+        return this.getLastNDays(days).map(date => ({
             date,
             engagement: 1000 + Math.floor(Math.random() * 3000)
         }));
+    }
+
+    getLastNDays(n = 7) {
+        const dates = [];
+        const today = new Date();
+        for (let i = n - 1; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        }
+        return dates;
     }
 
     getDefaultTopicsData() {

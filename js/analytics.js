@@ -10,6 +10,87 @@ class AnalyticsPage {
         this.currentBrand = null;
         this.isAnimating = false;
         this.brandData = null;
+        this.currentData = null;
+
+        // Base analytics data (for 30 days as reference)
+        this.baseData = {
+            mentions: 245800,
+            sentiment: 76.2,
+            authors: 12400,
+            engagement: 9.2,
+            reach: 3200000,
+            keywords: [
+                { word: 'innovation', count: 3420, sentiment: 85 },
+                { word: 'quality', count: 2890, sentiment: 78 },
+                { word: 'support', count: 2340, sentiment: 82 },
+                { word: 'features', count: 1980, sentiment: 76 },
+                { word: 'price', count: 1560, sentiment: 65 },
+                { word: 'service', count: 1340, sentiment: 88 },
+                { word: 'update', count: 1120, sentiment: 72 },
+                { word: 'design', count: 980, sentiment: 90 }
+            ],
+            platforms: [
+                { platform: 'Twitter', mentions: 102453, sentiment: 75, engagement: 8.5, reach: 1250000, growth: 18 },
+                { platform: 'Instagram', mentions: 89720, sentiment: 81, engagement: 14.2, reach: 1180000, growth: 28 },
+                { platform: 'Reddit', mentions: 62890, sentiment: 68, engagement: 12.3, reach: 850000, growth: 24 },
+                { platform: 'YouTube', mentions: 45120, sentiment: 82, engagement: 15.7, reach: 620000, growth: 12 },
+                { platform: 'LinkedIn', mentions: 22340, sentiment: 79, engagement: 6.8, reach: 380000, growth: 31 },
+                { platform: 'Facebook', mentions: 12997, sentiment: 71, engagement: 9.2, reach: 290000, growth: 8 }
+            ]
+        };
+    }
+
+    // Get multiplier based on selected date range
+    getDateRangeMultiplier() {
+        switch (this.dateRange) {
+            case 'last7days': return 0.25;
+            case 'last30days': return 1;
+            case 'last90days': return 2.8;
+            case 'thisMonth': return 0.9;
+            case 'lastMonth': return 1.1;
+            case 'custom': return 1;
+            default: return 1;
+        }
+    }
+
+    // Get date range label for display
+    getDateRangeLabel() {
+        switch (this.dateRange) {
+            case 'last7days': return 'Last 7 Days';
+            case 'last30days': return 'Last 30 Days';
+            case 'last90days': return 'Last 90 Days';
+            case 'thisMonth': return 'This Month';
+            case 'lastMonth': return 'Last Month';
+            case 'custom': return 'Custom Range';
+            default: return 'Last 30 Days';
+        }
+    }
+
+    // Calculate adjusted data based on date range
+    getAdjustedData() {
+        const multiplier = this.getDateRangeMultiplier();
+        const variance = () => 0.9 + Math.random() * 0.2; // Add some variance
+
+        return {
+            mentions: Math.round(this.baseData.mentions * multiplier * variance()),
+            sentiment: Math.round((this.baseData.sentiment + (Math.random() - 0.5) * 8) * 10) / 10,
+            authors: Math.round(this.baseData.authors * multiplier * variance()),
+            engagement: Math.round((this.baseData.engagement + (Math.random() - 0.5) * 2) * 10) / 10,
+            reach: Math.round(this.baseData.reach * multiplier * variance()),
+            keywords: this.baseData.keywords.map(kw => ({
+                ...kw,
+                count: Math.round(kw.count * multiplier * variance()),
+                sentiment: Math.min(100, Math.max(40, Math.round(kw.sentiment + (Math.random() - 0.5) * 10)))
+            })),
+            platforms: this.baseData.platforms.map(p => ({
+                ...p,
+                mentions: Math.round(p.mentions * multiplier * variance()),
+                sentiment: Math.min(100, Math.max(40, Math.round(p.sentiment + (Math.random() - 0.5) * 8))),
+                engagement: Math.round((p.engagement + (Math.random() - 0.5) * 2) * 10) / 10,
+                reach: Math.round(p.reach * multiplier * variance()),
+                growth: Math.round(p.growth * (multiplier > 1 ? 0.7 : multiplier < 1 ? 1.5 : 1) * variance())
+            }))
+        };
     }
 
     render() {
@@ -20,63 +101,120 @@ class AnalyticsPage {
 
         return `
             <div class="analytics-container">
-                <!-- Page Header -->
-                <div class="page-header">
-                    <div class="page-header-left">
-                        <h1 class="page-title">Advanced Analytics</h1>
-                        <p class="page-subtitle">Deep insights for <strong>${brandName}</strong></p>
-                    </div>
-                    <div class="page-header-right">
-                        <select id="dateRangeSelect" class="form-select">
-                            <option value="last7days">Last 7 Days</option>
-                            <option value="last30days" selected>Last 30 Days</option>
-                            <option value="last90days">Last 90 Days</option>
-                            <option value="thisMonth">This Month</option>
-                            <option value="lastMonth">Last Month</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                        <button class="btn btn-primary" id="exportAnalyticsBtn">
-                            <i class="fas fa-file-export"></i>
-                            <span>Export Report</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Key Metrics -->
-                <div class="stats-grid stats-grid-5">
-                    <div class="stat-card gradient-purple">
-                        <div class="stat-icon-large"><span class="flat-icon lg icon-analytics"></span></div>
-                        <div class="stat-label">Total Mentions</div>
-                        <div class="stat-value">245.8K</div>
-                        <div class="stat-change positive">+18.5% vs prev period</div>
+                <!-- Combined Header & Key Metrics -->
+                <div class="analytics-hero-section">
+                    <div class="analytics-hero-header">
+                        <div class="page-header-left">
+                            <h1 class="page-title">Advanced Analytics</h1>
+                            <p class="page-subtitle">Deep insights for <strong>${brandName}</strong></p>
+                        </div>
+                        <div class="page-header-right">
+                            <select id="dateRangeSelect" class="form-select">
+                                <option value="last7days">Last 7 Days</option>
+                                <option value="last30days" selected>Last 30 Days</option>
+                                <option value="last90days">Last 90 Days</option>
+                                <option value="thisMonth">This Month</option>
+                                <option value="lastMonth">Last Month</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <button class="btn btn-primary" id="exportAnalyticsBtn">
+                                <i class="fas fa-file-export"></i>
+                                <span>Export Report</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="stat-card gradient-success">
-                        <div class="stat-icon-large"><span class="flat-icon lg icon-sentiment"></span></div>
-                        <div class="stat-label">Avg Sentiment</div>
-                        <div class="stat-value">76.2%</div>
-                        <div class="stat-change positive">+5.3% vs prev period</div>
-                    </div>
+                    <!-- Key Metrics -->
+                    <div class="stats-grid stats-grid-5">
+                        <div class="stat-card analytics-card analytics-purple">
+                            <div class="stat-card-bg">
+                                <div class="stat-bg-shape shape-1"></div>
+                                <div class="stat-bg-shape shape-2"></div>
+                                <div class="stat-bg-shape shape-3"></div>
+                            </div>
+                            <div class="stat-icon-large">
+                                <div class="icon-pulse-wrapper">
+                                    <span class="pulse-ring"></span>
+                                    <span class="pulse-ring delay-1"></span>
+                                    <span class="material-icons">analytics</span>
+                                </div>
+                            </div>
+                            <div class="stat-label">Total Mentions</div>
+                            <div class="stat-value">245.8K</div>
+                            <div class="stat-change positive">+18.5% vs prev period</div>
+                        </div>
 
-                    <div class="stat-card gradient-info">
-                        <div class="stat-icon-large"><span class="flat-icon lg icon-users"></span></div>
-                        <div class="stat-label">Unique Authors</div>
-                        <div class="stat-value">12.4K</div>
-                        <div class="stat-change positive">+22.1% vs prev period</div>
-                    </div>
+                        <div class="stat-card analytics-card analytics-green">
+                            <div class="stat-card-bg">
+                                <div class="stat-bg-shape shape-1"></div>
+                                <div class="stat-bg-shape shape-2"></div>
+                                <div class="stat-bg-shape shape-3"></div>
+                            </div>
+                            <div class="stat-icon-large">
+                                <div class="icon-pulse-wrapper">
+                                    <span class="pulse-ring"></span>
+                                    <span class="pulse-ring delay-1"></span>
+                                    <span class="material-icons">mood</span>
+                                </div>
+                            </div>
+                            <div class="stat-label">Avg Sentiment</div>
+                            <div class="stat-value">76.2%</div>
+                            <div class="stat-change positive">+5.3% vs prev period</div>
+                        </div>
 
-                    <div class="stat-card gradient-warning">
-                        <div class="stat-icon-large"><span class="flat-icon lg icon-chart"></span></div>
-                        <div class="stat-label">Engagement Rate</div>
-                        <div class="stat-value">9.2%</div>
-                        <div class="stat-change positive">+1.8% vs prev period</div>
-                    </div>
+                        <div class="stat-card analytics-card analytics-cyan">
+                            <div class="stat-card-bg">
+                                <div class="stat-bg-shape shape-1"></div>
+                                <div class="stat-bg-shape shape-2"></div>
+                                <div class="stat-bg-shape shape-3"></div>
+                            </div>
+                            <div class="stat-icon-large">
+                                <div class="icon-pulse-wrapper">
+                                    <span class="pulse-ring"></span>
+                                    <span class="pulse-ring delay-1"></span>
+                                    <span class="material-icons">groups</span>
+                                </div>
+                            </div>
+                            <div class="stat-label">Unique Authors</div>
+                            <div class="stat-value">12.4K</div>
+                            <div class="stat-change positive">+22.1% vs prev period</div>
+                        </div>
 
-                    <div class="stat-card gradient-danger">
-                        <div class="stat-icon-large"><span class="flat-icon lg icon-broadcast"></span></div>
-                        <div class="stat-label">Reach</div>
-                        <div class="stat-value">3.2M</div>
-                        <div class="stat-change positive">+45.6% vs prev period</div>
+                        <div class="stat-card analytics-card analytics-orange">
+                            <div class="stat-card-bg">
+                                <div class="stat-bg-shape shape-1"></div>
+                                <div class="stat-bg-shape shape-2"></div>
+                                <div class="stat-bg-shape shape-3"></div>
+                            </div>
+                            <div class="stat-icon-large">
+                                <div class="icon-pulse-wrapper">
+                                    <span class="pulse-ring"></span>
+                                    <span class="pulse-ring delay-1"></span>
+                                    <span class="material-icons">show_chart</span>
+                                </div>
+                            </div>
+                            <div class="stat-label">Engagement Rate</div>
+                            <div class="stat-value">9.2%</div>
+                            <div class="stat-change positive">+1.8% vs prev period</div>
+                        </div>
+
+                        <div class="stat-card analytics-card analytics-pink">
+                            <div class="stat-card-bg">
+                                <div class="stat-bg-shape shape-1"></div>
+                                <div class="stat-bg-shape shape-2"></div>
+                                <div class="stat-bg-shape shape-3"></div>
+                            </div>
+                            <div class="stat-icon-large">
+                                <div class="icon-pulse-wrapper">
+                                    <span class="pulse-ring"></span>
+                                    <span class="pulse-ring delay-1"></span>
+                                    <span class="material-icons">cell_tower</span>
+                                </div>
+                            </div>
+                            <div class="stat-label">Reach</div>
+                            <div class="stat-value">3.2M</div>
+                            <div class="stat-change positive">+45.6% vs prev period</div>
+                        </div>
                     </div>
                 </div>
 
@@ -116,10 +254,16 @@ class AnalyticsPage {
                 <!-- Charts Grid -->
                 <div class="charts-grid-2">
                     <!-- Sentiment Breakdown -->
-                    <div class="card">
+                    <div class="card sentiment-breakdown-card">
                         <div class="card-header">
-                            <h3 class="card-title">Sentiment Breakdown</h3>
+                            <h3 class="card-title"><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">pie_chart</span>Sentiment Breakdown</h3>
                             <div class="card-actions">
+                                <select class="activity-period-filter" id="sentimentPeriodFilter">
+                                    <option value="7d">Last 7 Days</option>
+                                    <option value="14d">Last 14 Days</option>
+                                    <option value="30d">Last 30 Days</option>
+                                    <option value="90d">Last 90 Days</option>
+                                </select>
                                 <button class="btn btn-sm btn-secondary">
                                     <i class="fas fa-download"></i>
                                 </button>
@@ -135,7 +279,7 @@ class AnalyticsPage {
                     <!-- Platform Performance -->
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Platform Performance</h3>
+                            <h3 class="card-title"><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">bar_chart</span>Platform Performance</h3>
                             <div class="card-actions">
                                 <button class="btn btn-sm btn-secondary">
                                     <i class="fas fa-download"></i>
@@ -150,10 +294,16 @@ class AnalyticsPage {
                     </div>
 
                     <!-- Hourly Activity -->
-                    <div class="card">
+                    <div class="card activity-by-hour-card">
                         <div class="card-header">
-                            <h3 class="card-title">Activity by Hour</h3>
+                            <h3 class="card-title"><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">schedule</span>Activity by Hour</h3>
                             <div class="card-actions">
+                                <select class="activity-period-filter" id="activityPeriodFilter">
+                                    <option value="7d">Last 7 Days</option>
+                                    <option value="14d">Last 14 Days</option>
+                                    <option value="30d">Last 30 Days</option>
+                                    <option value="90d">Last 90 Days</option>
+                                </select>
                                 <button class="btn btn-sm btn-secondary">
                                     <i class="fas fa-download"></i>
                                 </button>
@@ -163,13 +313,100 @@ class AnalyticsPage {
                             <div class="chart-container" style="height: 300px;">
                                 <canvas id="hourlyActivityChart"></canvas>
                             </div>
+
+                            <!-- Activity Stats Summary -->
+                            <div class="activity-summary-grid" id="activitySummaryGrid">
+                                <div class="activity-summary-card peak-hour">
+                                    <div class="activity-summary-icon">
+                                        <span class="material-icons">trending_up</span>
+                                    </div>
+                                    <div class="activity-summary-content">
+                                        <span class="activity-summary-label">Peak Hour</span>
+                                        <span class="activity-summary-value" id="peakHourValue">2:00 PM</span>
+                                        <span class="activity-summary-change positive">+24% engagement</span>
+                                    </div>
+                                </div>
+                                <div class="activity-summary-card total-engagement">
+                                    <div class="activity-summary-icon">
+                                        <span class="material-icons">favorite</span>
+                                    </div>
+                                    <div class="activity-summary-content">
+                                        <span class="activity-summary-label">Total Engagement</span>
+                                        <span class="activity-summary-value" id="totalEngagementValue">48.2K</span>
+                                        <span class="activity-summary-change positive">+12% vs last week</span>
+                                    </div>
+                                </div>
+                                <div class="activity-summary-card avg-activity">
+                                    <div class="activity-summary-icon">
+                                        <span class="material-icons">analytics</span>
+                                    </div>
+                                    <div class="activity-summary-content">
+                                        <span class="activity-summary-label">Avg Daily Activity</span>
+                                        <span class="activity-summary-value" id="avgActivityValue">6.9K</span>
+                                        <span class="activity-summary-change positive">+8% growth</span>
+                                    </div>
+                                </div>
+                                <div class="activity-summary-card best-day">
+                                    <div class="activity-summary-icon">
+                                        <span class="material-icons">star</span>
+                                    </div>
+                                    <div class="activity-summary-content">
+                                        <span class="activity-summary-label">Best Day</span>
+                                        <span class="activity-summary-value" id="bestDayValue">Tuesday</span>
+                                        <span class="activity-summary-change">9.2K interactions</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Engagement Breakdown -->
+                            <div class="engagement-breakdown" id="engagementBreakdown">
+                                <h4 class="breakdown-title">
+                                    <span class="material-icons" style="color: #8b5cf6; font-size: 18px; vertical-align: middle; margin-right: 6px;">donut_small</span>
+                                    Engagement Breakdown
+                                </h4>
+                                <div class="breakdown-bars">
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-label">
+                                            <span class="breakdown-dot likes"></span>
+                                            <span>Likes</span>
+                                        </div>
+                                        <div class="breakdown-bar-container">
+                                            <div class="breakdown-bar likes" style="width: 60%;"></div>
+                                        </div>
+                                        <span class="breakdown-value">28.9K</span>
+                                        <span class="breakdown-percent">60%</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-label">
+                                            <span class="breakdown-dot comments"></span>
+                                            <span>Comments</span>
+                                        </div>
+                                        <div class="breakdown-bar-container">
+                                            <div class="breakdown-bar comments" style="width: 25%;"></div>
+                                        </div>
+                                        <span class="breakdown-value">12.1K</span>
+                                        <span class="breakdown-percent">25%</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <div class="breakdown-label">
+                                            <span class="breakdown-dot shares"></span>
+                                            <span>Shares</span>
+                                        </div>
+                                        <div class="breakdown-bar-container">
+                                            <div class="breakdown-bar shares" style="width: 15%;"></div>
+                                        </div>
+                                        <span class="breakdown-value">7.2K</span>
+                                        <span class="breakdown-percent">15%</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Top Keywords -->
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Top Keywords</h3>
+                            <h3 class="card-title"><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">manage_search</span>Top Keywords</h3>
                             <div class="card-actions">
                                 <button class="btn btn-sm btn-secondary">
                                     <i class="fas fa-download"></i>
@@ -187,7 +424,7 @@ class AnalyticsPage {
                 <!-- Detailed Table -->
                 <div class="card detailed-metrics-card">
                     <div class="card-header">
-                        <h3 class="card-title">Detailed Metrics</h3>
+                        <h3 class="card-title"><span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">table_chart</span>Detailed Metrics</h3>
                         <div class="card-actions metrics-actions">
                             <select class="form-select platform-select" id="platformFilter">
                                 <option value="all">All Platforms</option>
@@ -198,7 +435,7 @@ class AnalyticsPage {
                                 <option value="linkedin">LinkedIn</option>
                                 <option value="facebook">Facebook</option>
                             </select>
-                            <button class="btn btn-sm btn-secondary" id="exportMetricsBtn">
+                            <button class="btn btn-sm btn-secondary export-metrics-btn" id="exportMetricsBtn">
                                 <i class="fas fa-download"></i> Export
                             </button>
                         </div>
@@ -238,13 +475,17 @@ class AnalyticsPage {
     init() {
         this.currentBrand = typeof APIData !== 'undefined' ? APIData.currentBrand : 'apple';
         this.loadBrandData();
+
+        // Initialize current data based on default date range
+        this.currentData = this.getAdjustedData();
+
         this.setupTabs();
         this.loadOverviewTab();
         this.initializeCharts();
-        this.loadKeywords();
-        this.loadMetricsTable();
+        this.loadKeywordsWithData();
+        this.loadMetricsTableWithData();
         this.setupEventListeners();
-        this.updateStatsCards();
+        this.updateStatsCardsWithData();
     }
 
     loadBrandData() {
@@ -332,10 +573,12 @@ class AnalyticsPage {
         // Date range selector
         const dateRange = document.getElementById('dateRangeSelect');
         if (dateRange) {
+            // Set initial value from state
+            dateRange.value = this.dateRange;
+
             dateRange.addEventListener('change', (e) => {
                 this.dateRange = e.target.value;
                 this.refreshData();
-                Notifications.info(`Date range changed to ${e.target.value}`);
             });
         }
 
@@ -350,7 +593,7 @@ class AnalyticsPage {
         if (platformFilter) {
             platformFilter.addEventListener('change', (e) => {
                 const selectedPlatform = e.target.value;
-                this.loadMetricsTable(selectedPlatform);
+                this.loadMetricsTableWithData(selectedPlatform);
             });
         }
 
@@ -366,6 +609,167 @@ class AnalyticsPage {
             searchInput.addEventListener('input', Utils.debounce((e) => {
                 this.filterMetrics(e.target.value);
             }, 300));
+        }
+
+        // Activity period filter
+        const activityPeriodFilter = document.getElementById('activityPeriodFilter');
+        if (activityPeriodFilter) {
+            activityPeriodFilter.addEventListener('change', (e) => {
+                this.updateActivityByHour(e.target.value);
+            });
+        }
+
+        // Sentiment period filter
+        const sentimentPeriodFilter = document.getElementById('sentimentPeriodFilter');
+        if (sentimentPeriodFilter) {
+            sentimentPeriodFilter.addEventListener('change', (e) => {
+                this.updateSentimentBreakdown(e.target.value);
+            });
+        }
+    }
+
+    // Activity period state
+    activityPeriod = '7d';
+
+    updateActivityByHour(period) {
+        this.activityPeriod = period;
+
+        // Destroy existing chart
+        if (this.hourlyChart) {
+            this.hourlyChart.destroy();
+            this.hourlyChart = null;
+        }
+
+        // Get days count based on period
+        const daysMap = { '7d': 7, '14d': 14, '30d': 30, '90d': 90 };
+        const days = daysMap[period] || 7;
+
+        // Recreate the chart with new data
+        if (typeof Charts !== 'undefined') {
+            this.hourlyChart = Charts.createEngagementChart('hourlyActivityChart', 'all', days);
+        }
+
+        // Update summary stats based on period
+        this.updateActivitySummaryStats(period, days);
+    }
+
+    updateActivitySummaryStats(period, days) {
+        // Generate dynamic stats based on period
+        const multiplier = days / 7; // Base multiplier for 7 days
+
+        // Peak hours data
+        const peakHours = ['2:00 PM', '3:00 PM', '11:00 AM', '4:00 PM', '1:00 PM'];
+        const peakHour = peakHours[Math.floor(Math.random() * peakHours.length)];
+
+        // Calculate values based on period
+        const baseEngagement = 48200;
+        const totalEngagement = Math.round(baseEngagement * multiplier * (0.9 + Math.random() * 0.2));
+        const avgDaily = Math.round(totalEngagement / days);
+
+        // Best days
+        const bestDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        const bestDay = bestDays[Math.floor(Math.random() * bestDays.length)];
+        const bestDayInteractions = Math.round(avgDaily * (1.2 + Math.random() * 0.3));
+
+        // Format numbers
+        const formatNum = (n) => {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n.toString();
+        };
+
+        // Update DOM elements
+        const peakHourValue = document.getElementById('peakHourValue');
+        const totalEngagementValue = document.getElementById('totalEngagementValue');
+        const avgActivityValue = document.getElementById('avgActivityValue');
+        const bestDayValue = document.getElementById('bestDayValue');
+
+        if (peakHourValue) {
+            peakHourValue.textContent = peakHour;
+            const peakChange = peakHourValue.nextElementSibling;
+            if (peakChange) {
+                const changeVal = Math.round(15 + Math.random() * 20);
+                peakChange.textContent = `+${changeVal}% engagement`;
+            }
+        }
+
+        if (totalEngagementValue) {
+            totalEngagementValue.textContent = formatNum(totalEngagement);
+            const totalChange = totalEngagementValue.nextElementSibling;
+            if (totalChange) {
+                const changeVal = Math.round(5 + Math.random() * 15);
+                totalChange.textContent = `+${changeVal}% vs prev period`;
+            }
+        }
+
+        if (avgActivityValue) {
+            avgActivityValue.textContent = formatNum(avgDaily);
+            const avgChange = avgActivityValue.nextElementSibling;
+            if (avgChange) {
+                const changeVal = Math.round(3 + Math.random() * 12);
+                avgChange.textContent = `+${changeVal}% growth`;
+            }
+        }
+
+        if (bestDayValue) {
+            bestDayValue.textContent = bestDay;
+            const bestDayChange = bestDayValue.nextElementSibling;
+            if (bestDayChange) {
+                bestDayChange.textContent = `${formatNum(bestDayInteractions)} interactions`;
+            }
+        }
+
+        // Update engagement breakdown
+        this.updateEngagementBreakdown(totalEngagement);
+    }
+
+    updateEngagementBreakdown(totalEngagement) {
+        const formatNum = (n) => {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n.toString();
+        };
+
+        // Calculate breakdown values (60% likes, 25% comments, 15% shares)
+        const likes = Math.round(totalEngagement * 0.60);
+        const comments = Math.round(totalEngagement * 0.25);
+        const shares = Math.round(totalEngagement * 0.15);
+
+        const breakdownItems = document.querySelectorAll('.breakdown-item');
+        if (breakdownItems.length >= 3) {
+            // Update likes
+            const likesValue = breakdownItems[0].querySelector('.breakdown-value');
+            if (likesValue) likesValue.textContent = formatNum(likes);
+
+            // Update comments
+            const commentsValue = breakdownItems[1].querySelector('.breakdown-value');
+            if (commentsValue) commentsValue.textContent = formatNum(comments);
+
+            // Update shares
+            const sharesValue = breakdownItems[2].querySelector('.breakdown-value');
+            if (sharesValue) sharesValue.textContent = formatNum(shares);
+        }
+    }
+
+    // Sentiment period state
+    sentimentPeriod = '7d';
+
+    updateSentimentBreakdown(period) {
+        this.sentimentPeriod = period;
+
+        // Destroy existing chart
+        if (this.sentimentChart) {
+            this.sentimentChart.destroy();
+            this.sentimentChart = null;
+        }
+
+        // Get days count based on period
+        const daysMap = { '7d': 7, '14d': 14, '30d': 30, '90d': 90 };
+        const days = daysMap[period] || 7;
+
+        // Recreate the chart with new data
+        if (typeof Charts !== 'undefined') {
+            this.sentimentChart = Charts.createSentimentTrend('sentimentBreakdownChart', days);
         }
     }
 
@@ -422,7 +826,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-clock"></i>
                                 </div>
                             </div>
@@ -449,7 +855,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fab fa-twitter"></i>
                                 </div>
                             </div>
@@ -474,7 +882,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-reply"></i>
                                 </div>
                             </div>
@@ -499,7 +909,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring fire-glow">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon fire-glow">
                                     <i class="fas fa-fire-alt"></i>
                                 </div>
                             </div>
@@ -612,7 +1024,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-smile-beam"></i>
                                 </div>
                             </div>
@@ -640,7 +1054,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-meh"></i>
                                 </div>
                             </div>
@@ -668,7 +1084,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-frown"></i>
                                 </div>
                             </div>
@@ -847,7 +1265,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-hand-pointer"></i>
                                 </div>
                             </div>
@@ -872,7 +1292,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-percentage"></i>
                                 </div>
                             </div>
@@ -897,7 +1319,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-sync-alt"></i>
                                 </div>
                             </div>
@@ -922,7 +1346,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring fire-glow">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon fire-glow">
                                     <i class="fas fa-fire-alt"></i>
                                 </div>
                             </div>
@@ -1169,7 +1595,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-users"></i>
                                 </div>
                             </div>
@@ -1194,7 +1622,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-user-clock"></i>
                                 </div>
                             </div>
@@ -1219,7 +1649,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-globe-americas"></i>
                                 </div>
                             </div>
@@ -1243,7 +1675,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-mobile-alt"></i>
                                 </div>
                             </div>
@@ -1480,7 +1914,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-tachometer-alt"></i>
                                 </div>
                             </div>
@@ -1504,7 +1940,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-bullseye"></i>
                                 </div>
                             </div>
@@ -1532,7 +1970,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon">
                                     <i class="fas fa-eye"></i>
                                 </div>
                             </div>
@@ -1557,7 +1997,9 @@ class AnalyticsPage {
                         </div>
                         <div class="hero-card-content">
                             <div class="hero-icon-wrapper">
-                                <div class="hero-icon pulse-ring fire-glow">
+                                <span class="hero-pulse-ring"></span>
+                                <span class="hero-pulse-ring delay-1"></span>
+                                <div class="hero-icon fire-glow">
                                     <i class="fas fa-mouse-pointer"></i>
                                 </div>
                             </div>
@@ -1954,9 +2396,207 @@ class AnalyticsPage {
     }
 
     refreshData() {
-        this.loadMetricsTable();
-        this.loadKeywords();
-        Notifications.success('Analytics data refreshed');
+        // Calculate new data based on selected date range
+        this.currentData = this.getAdjustedData();
+
+        // Update all components with new data
+        this.updateStatsCardsWithData();
+        this.loadMetricsTableWithData();
+        this.loadKeywordsWithData();
+        this.initializeCharts();
+
+        // Show notification with date range
+        if (typeof Notifications !== 'undefined') {
+            Notifications.success(`Data updated for ${this.getDateRangeLabel()}`);
+        }
+    }
+
+    // Update stat cards with current data
+    updateStatsCardsWithData() {
+        if (!this.currentData) return;
+
+        const formatNum = (n) => {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n.toString();
+        };
+
+        const statCards = document.querySelectorAll('.stats-grid-5 .stat-card');
+        if (statCards.length >= 5) {
+            // Total Mentions
+            const mentionsValue = statCards[0].querySelector('.stat-value');
+            const mentionsChange = statCards[0].querySelector('.stat-change');
+            if (mentionsValue) {
+                mentionsValue.textContent = formatNum(this.currentData.mentions);
+                this.animateValue(mentionsValue);
+            }
+            if (mentionsChange) {
+                const changeVal = Math.round((Math.random() * 30 - 5) * 10) / 10;
+                mentionsChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal}% vs prev period`;
+                mentionsChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
+            }
+
+            // Avg Sentiment
+            const sentimentValue = statCards[1].querySelector('.stat-value');
+            const sentimentChange = statCards[1].querySelector('.stat-change');
+            if (sentimentValue) {
+                sentimentValue.textContent = this.currentData.sentiment + '%';
+                this.animateValue(sentimentValue);
+            }
+            if (sentimentChange) {
+                const changeVal = Math.round((Math.random() * 10 - 2) * 10) / 10;
+                sentimentChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal}% vs prev period`;
+                sentimentChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
+            }
+
+            // Unique Authors
+            const authorsValue = statCards[2].querySelector('.stat-value');
+            const authorsChange = statCards[2].querySelector('.stat-change');
+            if (authorsValue) {
+                authorsValue.textContent = formatNum(this.currentData.authors);
+                this.animateValue(authorsValue);
+            }
+            if (authorsChange) {
+                const changeVal = Math.round((Math.random() * 35 - 5) * 10) / 10;
+                authorsChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal}% vs prev period`;
+                authorsChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
+            }
+
+            // Engagement Rate
+            const engagementValue = statCards[3].querySelector('.stat-value');
+            const engagementChange = statCards[3].querySelector('.stat-change');
+            if (engagementValue) {
+                engagementValue.textContent = this.currentData.engagement + '%';
+                this.animateValue(engagementValue);
+            }
+            if (engagementChange) {
+                const changeVal = Math.round((Math.random() * 5 - 1) * 10) / 10;
+                engagementChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal}% vs prev period`;
+                engagementChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
+            }
+
+            // Reach
+            const reachValue = statCards[4].querySelector('.stat-value');
+            const reachChange = statCards[4].querySelector('.stat-change');
+            if (reachValue) {
+                reachValue.textContent = formatNum(this.currentData.reach);
+                this.animateValue(reachValue);
+            }
+            if (reachChange) {
+                const changeVal = Math.round((Math.random() * 60 - 10) * 10) / 10;
+                reachChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal}% vs prev period`;
+                reachChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
+            }
+        }
+    }
+
+    // Animate value change
+    animateValue(element) {
+        element.style.transform = 'scale(1.1)';
+        element.style.transition = 'transform 0.3s ease';
+        setTimeout(() => {
+            element.style.transform = 'scale(1)';
+        }, 300);
+    }
+
+    // Load metrics table with current data
+    loadMetricsTableWithData(filter = 'all') {
+        const tbody = document.getElementById('metricsTableBody');
+        if (!tbody || !this.currentData) return;
+
+        // Get current filter from dropdown
+        const platformFilter = document.getElementById('platformFilter');
+        if (platformFilter) {
+            filter = platformFilter.value;
+        }
+
+        // Filter data based on selected platform
+        const data = filter === 'all'
+            ? this.currentData.platforms
+            : this.currentData.platforms.filter(row => row.platform.toLowerCase() === filter.toLowerCase());
+
+        if (data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        No data available for the selected platform
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = data.map(row => `
+            <tr class="metrics-row">
+                <td><strong>${row.platform}</strong></td>
+                <td>${Utils.formatNumber(row.mentions)}</td>
+                <td>
+                    <span class="badge badge-${Utils.getSentimentLabel(row.sentiment).toLowerCase()}">
+                        ${row.sentiment}%
+                    </span>
+                </td>
+                <td>${row.engagement}%</td>
+                <td>${Utils.formatNumber(row.reach)}</td>
+                <td class="${row.growth >= 0 ? 'growth-positive' : 'growth-negative'}">${row.growth >= 0 ? '+' : ''}${row.growth}%</td>
+            </tr>
+        `).join('');
+
+        // Animate table rows
+        const rows = tbody.querySelectorAll('.metrics-row');
+        rows.forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-10px)';
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 50);
+        });
+    }
+
+    // Load keywords with current data
+    loadKeywordsWithData() {
+        const keywordList = document.getElementById('keywordList');
+        if (!keywordList || !this.currentData) return;
+
+        const keywords = this.currentData.keywords;
+
+        keywordList.innerHTML = keywords.map((kw, index) => `
+            <div class="keyword-item" style="opacity: 0; transform: translateY(10px);">
+                <div class="keyword-rank">${index + 1}</div>
+                <div class="keyword-info">
+                    <div class="keyword-word">#${kw.word}</div>
+                    <div class="keyword-meta">
+                        <span class="keyword-trend ${kw.sentiment >= 75 ? 'trending-up' : 'trending-down'}">
+                            <i class="fas fa-${kw.sentiment >= 75 ? 'arrow-up' : 'arrow-down'}"></i>
+                            ${kw.sentiment >= 75 ? 'Trending' : 'Stable'}
+                        </span>
+                    </div>
+                </div>
+                <div class="keyword-stats">
+                    <div class="keyword-count-wrapper">
+                        <span class="keyword-count-label">Mentions</span>
+                        <span class="keyword-count">${Utils.formatNumber(kw.count)}</span>
+                    </div>
+                    <div class="keyword-sentiment-wrapper">
+                        <span class="keyword-sentiment-label">Sentiment ${kw.sentiment}%</span>
+                        <div class="keyword-sentiment-bar">
+                            <div class="keyword-sentiment" style="width: ${kw.sentiment}%; background: ${Utils.getSentimentColor(kw.sentiment)}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Animate keyword items
+        const items = keywordList.querySelectorAll('.keyword-item');
+        items.forEach((item, index) => {
+            setTimeout(() => {
+                item.style.transition = 'all 0.3s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 60);
+        });
     }
 
     filterMetrics(query) {
