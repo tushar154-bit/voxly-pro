@@ -127,7 +127,7 @@
 
 /* Analytics Hero Section - Combined Header & Stats */
 .analytics-hero-section {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    background: white;
     border-radius: 20px;
     padding: 1.5rem 2rem 2rem;
     border: 1px solid rgba(255, 255, 255, 0.8);
@@ -217,7 +217,18 @@
 }
 
 .analytics-hero-header .page-header-right .btn-primary {
-    box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.4);
+    background: white;
+    color: #1f2937;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.analytics-hero-header .page-header-right .btn-primary:hover {
+    background: white;
+    color: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.2);
 }
 
 .analytics-hero-section .stats-grid-5 {
