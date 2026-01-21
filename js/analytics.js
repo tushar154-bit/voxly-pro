@@ -836,12 +836,9 @@ class AnalyticsPage {
                                 <span class="hero-label">Peak Activity Time</span>
                                 <span class="hero-value">2:00 PM - 4:00 PM</span>
                                 <div class="hero-footer">
-                                    <div class="hero-indicator">
-                                        <span class="indicator-dot active"></span>
-                                        <span class="indicator-dot"></span>
-                                        <span class="indicator-dot"></span>
-                                    </div>
-                                    <span class="hero-hint">Highest engagement window</span>
+                                    <span class="hero-badge">
+                                        <i class="fas fa-bolt"></i> Highest engagement window
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -865,10 +862,9 @@ class AnalyticsPage {
                                 <span class="hero-label">Top Platform</span>
                                 <span class="hero-value">Twitter</span>
                                 <div class="hero-footer">
-                                    <div class="hero-progress-bar">
-                                        <div class="progress-fill" style="width: 42%;"></div>
-                                    </div>
-                                    <span class="hero-stat">42% of mentions</span>
+                                    <span class="hero-badge">
+                                        <i class="fab fa-twitter"></i> 42% of mentions
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -892,10 +888,9 @@ class AnalyticsPage {
                                 <span class="hero-label">Avg Response Time</span>
                                 <span class="hero-value">2.4 <span class="value-unit">hours</span></span>
                                 <div class="hero-footer">
-                                    <span class="hero-trend positive">
-                                        <i class="fas fa-arrow-up"></i> 15% faster
+                                    <span class="hero-badge">
+                                        <i class="fas fa-arrow-up"></i> 15% faster vs last period
                                     </span>
-                                    <span class="hero-hint">vs last period</span>
                                 </div>
                             </div>
                         </div>
@@ -1605,10 +1600,9 @@ class AnalyticsPage {
                                 <span class="hero-label">Total Audience</span>
                                 <span class="hero-value">245K</span>
                                 <div class="hero-footer">
-                                    <span class="hero-trend">
-                                        <i class="fas fa-arrow-up"></i> +18.5%
+                                    <span class="hero-badge">
+                                        <i class="fas fa-arrow-up"></i> +18.5% growth this month
                                     </span>
-                                    <span class="hero-hint">growth this month</span>
                                 </div>
                             </div>
                         </div>
@@ -1632,10 +1626,9 @@ class AnalyticsPage {
                                 <span class="hero-label">Primary Age Group</span>
                                 <span class="hero-value">25-34</span>
                                 <div class="hero-footer">
-                                    <div class="hero-progress-bar">
-                                        <div class="hero-progress-fill" style="width: 35%;"></div>
-                                    </div>
-                                    <span class="hero-hint">35% of audience</span>
+                                    <span class="hero-badge">
+                                        <i class="fas fa-user-clock"></i> 35% of audience
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1685,10 +1678,9 @@ class AnalyticsPage {
                                 <span class="hero-label">Primary Device</span>
                                 <span class="hero-value">Mobile</span>
                                 <div class="hero-footer">
-                                    <div class="hero-progress-bar">
-                                        <div class="hero-progress-fill" style="width: 68%;"></div>
-                                    </div>
-                                    <span class="hero-hint">68% mobile users</span>
+                                    <span class="hero-badge">
+                                        <i class="fas fa-mobile-alt"></i> 68% mobile users
+                                    </span>
                                 </div>
                             </div>
                         </div>
