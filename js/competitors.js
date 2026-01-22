@@ -20,7 +20,14 @@ class CompetitorsPage {
         return `
             <div class="competitors-container">
                 <!-- Page Header -->
-                <div class="page-header">
+                <div class="page-header" style="background: #ffffff !important; border: 1px solid #e5e7eb !important;">
+                    <style>
+                        .competitors-container .page-header::before,
+                        .competitors-container .page-header::after {
+                            display: none !important;
+                            content: none !important;
+                        }
+                    </style>
                     <div class="page-header-left">
                         <h1 class="page-title">Competitor Analysis</h1>
                         <p class="page-subtitle">Compare <strong>${brandName}</strong> with market competitors</p>
@@ -30,8 +37,11 @@ class CompetitorsPage {
                             <i class="fas fa-plus"></i>
                             <span>Add Competitor</span>
                         </button>
-                        <button class="btn btn-primary" id="exportCompetitorBtn">
-                            <i class="fas fa-download"></i>
+                        <button class="btn btn-primary" id="exportCompetitorBtn"
+                            style="background: #ffffff !important; color: #1f2937 !important; border: 1px solid #d1d5db !important;"
+                            onmouseover="this.style.color='#6366f1'; this.style.borderColor='#6366f1'; this.querySelector('i').style.color='#6366f1';"
+                            onmouseout="this.style.color='#1f2937'; this.style.borderColor='#d1d5db'; this.querySelector('i').style.color='#1f2937';">
+                            <i class="fas fa-download" style="color: #1f2937;"></i>
                             <span>Export Analysis</span>
                         </button>
                     </div>
@@ -49,42 +59,120 @@ class CompetitorsPage {
                     </div>
                 </div>
 
-                <!-- Comparison Overview -->
-                <div class="stats-grid stats-grid-4">
-                    <div class="stat-card">
-                        <div class="stat-label">Share of Voice</div>
-                        <div class="stat-value">42.3%</div>
-                        <div class="stat-change positive">
-                            <span>+5.2% Market Share</span>
+                <!-- Comparison Overview - Vibrant Hero Cards -->
+                <div class="stats-grid stats-grid-4 competitor-hero-stats">
+                    <!-- Share of Voice Card - Purple -->
+                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                        <div class="competitor-card-bg">
+                            <div class="competitor-circle circle-1"></div>
+                            <div class="competitor-circle circle-2"></div>
+                            <div class="competitor-circle circle-3"></div>
+                            <div class="competitor-circle circle-4"></div>
+                            <div class="competitor-circle circle-5"></div>
                         </div>
-                        <div class="stat-rank">#2 in category</div>
+                        <div class="competitor-card-icon-wrapper">
+                            <div class="competitor-pulse-ring"></div>
+                            <div class="competitor-pulse-ring ring-2"></div>
+                            <div class="competitor-card-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                        </div>
+                        <div class="competitor-card-label">SHARE OF VOICE</div>
+                        <div class="competitor-card-value">36.7%</div>
+                        <div class="competitor-card-badge positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+13.6% Market Share</span>
+                        </div>
+                        <div class="competitor-card-rank">#1 in category</div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-label">Sentiment Score</div>
-                        <div class="stat-value">76.8%</div>
-                        <div class="stat-change positive">
-                            <span>Above avg (68.2%)</span>
+                    <!-- Sentiment Score Card - Blue -->
+                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                        <div class="competitor-card-bg">
+                            <div class="competitor-circle circle-1"></div>
+                            <div class="competitor-circle circle-2"></div>
+                            <div class="competitor-circle circle-3"></div>
+                            <div class="competitor-circle circle-4"></div>
+                            <div class="competitor-circle circle-5"></div>
                         </div>
-                        <div class="stat-rank">#1 in category</div>
+                        <!-- Emotion Icons Row -->
+                        <div class="sentiment-emotions-row">
+                            <div class="emotion-item positive-emotion">
+                                <i class="fas fa-smile"></i>
+                                <span>72%</span>
+                            </div>
+                            <div class="emotion-item neutral-emotion">
+                                <i class="fas fa-meh"></i>
+                                <span>18%</span>
+                            </div>
+                            <div class="emotion-item negative-emotion">
+                                <i class="fas fa-frown"></i>
+                                <span>10%</span>
+                            </div>
+                        </div>
+                        <div class="competitor-card-label">SENTIMENT SCORE</div>
+                        <div class="competitor-card-value">81%</div>
+                        <!-- Sentiment Distribution Bar -->
+                        <div class="sentiment-distribution-bar">
+                            <div class="sentiment-bar-positive" style="width: 72%;"></div>
+                            <div class="sentiment-bar-neutral" style="width: 18%;"></div>
+                            <div class="sentiment-bar-negative" style="width: 10%;"></div>
+                        </div>
+                        <div class="competitor-card-badge positive">
+                            <i class="fas fa-check"></i>
+                            <span>Above avg (78.0%)</span>
+                        </div>
+                        <div class="competitor-card-rank">#1 in category</div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-label">Engagement Rate</div>
-                        <div class="stat-value">9.4%</div>
-                        <div class="stat-change negative">
-                            <span>Below avg (11.2%)</span>
+                    <!-- Engagement Rate Card - Emerald -->
+                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                        <div class="competitor-card-bg">
+                            <div class="competitor-circle circle-1"></div>
+                            <div class="competitor-circle circle-2"></div>
+                            <div class="competitor-circle circle-3"></div>
+                            <div class="competitor-circle circle-4"></div>
+                            <div class="competitor-circle circle-5"></div>
                         </div>
-                        <div class="stat-rank">#3 in category</div>
+                        <div class="competitor-card-icon-wrapper">
+                            <div class="competitor-pulse-ring"></div>
+                            <div class="competitor-pulse-ring ring-2"></div>
+                            <div class="competitor-card-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                        </div>
+                        <div class="competitor-card-label">ENGAGEMENT RATE</div>
+                        <div class="competitor-card-value">5%</div>
+                        <div class="competitor-card-badge negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Below avg (5.1%)</span>
+                        </div>
+                        <div class="competitor-card-rank">#2 in category</div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-label">Growth Rate</div>
-                        <div class="stat-value">+28.5%</div>
-                        <div class="stat-change positive">
-                            <span>Fastest growing</span>
+                    <!-- Growth Rate Card - Orange -->
+                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #f97316 0%, #fb923c 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                        <div class="competitor-card-bg">
+                            <div class="competitor-circle circle-1"></div>
+                            <div class="competitor-circle circle-2"></div>
+                            <div class="competitor-circle circle-3"></div>
+                            <div class="competitor-circle circle-4"></div>
+                            <div class="competitor-circle circle-5"></div>
                         </div>
-                        <div class="stat-rank">#1 in category</div>
+                        <div class="competitor-card-icon-wrapper">
+                            <div class="competitor-pulse-ring"></div>
+                            <div class="competitor-pulse-ring ring-2"></div>
+                            <div class="competitor-card-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                        </div>
+                        <div class="competitor-card-label">GROWTH RATE</div>
+                        <div class="competitor-card-value">+13.6%</div>
+                        <div class="competitor-card-badge neutral">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Steady growth</span>
+                        </div>
+                        <div class="competitor-card-rank">#2 in category</div>
                     </div>
                 </div>
 
@@ -227,18 +315,257 @@ class CompetitorsPage {
         // Add competitor
         const addBtn = document.getElementById('addCompetitorBtn');
         if (addBtn) {
-            addBtn.addEventListener('click', () => {
-                if (window.notificationManager) {
-                    window.notificationManager.show('Add competitor feature coming soon', 'info');
-                }
-            });
+            addBtn.addEventListener('click', () => this.showAddCompetitorModal());
         }
 
         // Export
         const exportBtn = document.getElementById('exportCompetitorBtn');
         if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportAnalysis());
+            exportBtn.addEventListener('click', () => this.showExportOptions());
         }
+
+        // Close modal on outside click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-competitor-modal')) {
+                this.closeAddCompetitorModal();
+            }
+        });
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeAddCompetitorModal();
+            }
+        });
+    }
+
+    showAddCompetitorModal() {
+        // Remove existing modal if any
+        const existingModal = document.querySelector('.add-competitor-modal');
+        if (existingModal) existingModal.remove();
+
+        // Get suggested competitors (brands not already in competitors list)
+        const currentBrandId = this.currentBrand || (typeof APIData !== 'undefined' ? APIData.currentBrand : 'apple');
+        const currentBrand = typeof APIData !== 'undefined' ? APIData.brands[currentBrandId] : null;
+        const existingCompetitorIds = currentBrand ? [currentBrandId, ...currentBrand.competitors] : [currentBrandId];
+
+        const suggestedBrands = typeof APIData !== 'undefined'
+            ? Object.entries(APIData.brands)
+                .filter(([id]) => !existingCompetitorIds.includes(id))
+                .slice(0, 5)
+            : [];
+
+        const suggestedHtml = suggestedBrands.length > 0
+            ? `
+                <div class="form-group">
+                    <label>Suggested Competitors</label>
+                    <div class="suggested-competitors">
+                        ${suggestedBrands.map(([id, brand]) => `
+                            <div class="suggested-competitor" data-brand-id="${id}">
+                                <div class="suggested-competitor-logo" style="background: ${brand.color}">${brand.name.charAt(0)}</div>
+                                <div class="suggested-competitor-info">
+                                    <div class="suggested-competitor-name">${brand.name}</div>
+                                    <div class="suggested-competitor-industry">${brand.industry || 'Technology'}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `
+            : '';
+
+        const modalHtml = `
+            <div class="add-competitor-modal">
+                <div class="add-competitor-modal-content">
+                    <div class="add-competitor-modal-header">
+                        <h3>Add Competitor</h3>
+                        <button class="add-competitor-modal-close" id="closeAddCompetitorModal">&times;</button>
+                    </div>
+                    <form class="add-competitor-form" id="addCompetitorForm">
+                        <div class="form-group">
+                            <label for="competitorName">Competitor Name</label>
+                            <input type="text" id="competitorName" name="competitorName" placeholder="Enter competitor name..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="competitorIndustry">Industry</label>
+                            <select id="competitorIndustry" name="competitorIndustry">
+                                <option value="technology">Technology</option>
+                                <option value="retail">Retail</option>
+                                <option value="finance">Finance</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="food">Food & Beverage</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        ${suggestedHtml}
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelAddCompetitor">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Competitor</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Show modal with animation
+        setTimeout(() => {
+            document.querySelector('.add-competitor-modal').classList.add('active');
+        }, 10);
+
+        // Setup modal event listeners
+        document.getElementById('closeAddCompetitorModal').addEventListener('click', () => this.closeAddCompetitorModal());
+        document.getElementById('cancelAddCompetitor').addEventListener('click', () => this.closeAddCompetitorModal());
+        document.getElementById('addCompetitorForm').addEventListener('submit', (e) => this.handleAddCompetitor(e));
+
+        // Setup suggested competitor clicks
+        document.querySelectorAll('.suggested-competitor').forEach(el => {
+            el.addEventListener('click', () => {
+                const brandId = el.dataset.brandId;
+                const brand = typeof APIData !== 'undefined' ? APIData.brands[brandId] : null;
+                if (brand) {
+                    document.getElementById('competitorName').value = brand.name;
+                }
+            });
+        });
+    }
+
+    closeAddCompetitorModal() {
+        const modal = document.querySelector('.add-competitor-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 200);
+        }
+    }
+
+    handleAddCompetitor(e) {
+        e.preventDefault();
+        const name = document.getElementById('competitorName').value.trim();
+        const industry = document.getElementById('competitorIndustry').value;
+
+        if (!name) {
+            if (window.notificationManager) {
+                window.notificationManager.show('Please enter a competitor name', 'warning');
+            }
+            return;
+        }
+
+        // Generate a random ID and add the competitor
+        const newCompetitorId = name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // Add to competitors array
+        this.competitors.push({
+            id: newCompetitorId,
+            name: name,
+            color: randomColor,
+            mentions: Math.round(5000 + Math.random() * 20000),
+            sentiment: Math.round(60 + Math.random() * 30),
+            engagement: parseFloat((5 + Math.random() * 10).toFixed(1)),
+            reach: Math.round(1000000 + Math.random() * 10000000),
+            growth: parseFloat((5 + Math.random() * 25).toFixed(1))
+        });
+
+        // Update UI
+        this.renderCompetitorChips();
+        this.initializeCharts();
+        this.loadComparisonTable();
+        this.loadInsights();
+
+        // Close modal
+        this.closeAddCompetitorModal();
+
+        if (window.notificationManager) {
+            window.notificationManager.show(`${name} added to competitor analysis`, 'success');
+        }
+    }
+
+    showExportOptions() {
+        // Remove existing dropdown if any
+        const existingDropdown = document.querySelector('.export-dropdown');
+        if (existingDropdown) {
+            existingDropdown.remove();
+            return;
+        }
+
+        const exportBtn = document.getElementById('exportCompetitorBtn');
+        if (!exportBtn) return;
+
+        const rect = exportBtn.getBoundingClientRect();
+
+        const dropdownHtml = `
+            <div class="export-dropdown" style="
+                position: fixed;
+                top: ${rect.bottom + 8}px;
+                right: ${window.innerWidth - rect.right}px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                min-width: 180px;
+                overflow: hidden;
+            ">
+                <div class="export-option" data-format="json" style="
+                    padding: 0.75rem 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    cursor: pointer;
+                    transition: background 0.2s ease;
+                " onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                    <i class="fas fa-code" style="color: #6366f1; width: 16px;"></i>
+                    <span>Export as JSON</span>
+                </div>
+                <div class="export-option" data-format="csv" style="
+                    padding: 0.75rem 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    cursor: pointer;
+                    transition: background 0.2s ease;
+                " onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                    <i class="fas fa-file-csv" style="color: #10b981; width: 16px;"></i>
+                    <span>Export as CSV</span>
+                </div>
+                <div class="export-option" data-format="pdf" style="
+                    padding: 0.75rem 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    cursor: pointer;
+                    transition: background 0.2s ease;
+                " onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                    <i class="fas fa-file-pdf" style="color: #ef4444; width: 16px;"></i>
+                    <span>Export as PDF</span>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', dropdownHtml);
+
+        // Setup click handlers
+        document.querySelectorAll('.export-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const format = option.dataset.format;
+                this.exportAnalysis(format);
+                document.querySelector('.export-dropdown').remove();
+            });
+        });
+
+        // Close on outside click
+        setTimeout(() => {
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!e.target.closest('.export-dropdown') && !e.target.closest('#exportCompetitorBtn')) {
+                    const dropdown = document.querySelector('.export-dropdown');
+                    if (dropdown) dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }, 100);
     }
 
     renderCompetitorChips() {
@@ -255,9 +582,13 @@ class CompetitorsPage {
         }
 
         // Build chips HTML - Your brand first, then competitors
+        const brandLogoHtml = brand.logo
+            ? `<img src="${brand.logo}" alt="${brand.name}" onerror="this.parentElement.innerHTML='${brand.name.charAt(0)}'; this.parentElement.style.background='${brand.color}';">`
+            : brand.name.charAt(0);
+
         let chipsHtml = `
             <button class="competitor-chip active" data-competitor="${brandId}">
-                <span class="chip-logo" style="background: ${brand.color}">${brand.name.charAt(0)}</span>
+                <span class="chip-logo" style="background: ${brand.logo ? '#ffffff' : brand.color}">${brandLogoHtml}</span>
                 <span>${brand.name}</span>
             </button>
         `;
@@ -266,9 +597,13 @@ class CompetitorsPage {
         brand.competitors.forEach(compId => {
             const comp = typeof APIData !== 'undefined' ? APIData.brands[compId] : null;
             if (comp) {
+                const compLogoHtml = comp.logo
+                    ? `<img src="${comp.logo}" alt="${comp.name}" onerror="this.parentElement.innerHTML='${comp.name.charAt(0)}'; this.parentElement.style.background='${comp.color}';">`
+                    : comp.name.charAt(0);
+
                 chipsHtml += `
                     <button class="competitor-chip" data-competitor="${compId}">
-                        <span class="chip-logo" style="background: ${comp.color}">${comp.name.charAt(0)}</span>
+                        <span class="chip-logo" style="background: ${comp.logo ? '#ffffff' : comp.color}">${compLogoHtml}</span>
                         <span>${comp.name}</span>
                     </button>
                 `;
@@ -720,24 +1055,78 @@ class CompetitorsPage {
     updateComparison() {
         const activeChips = document.querySelectorAll('.competitor-chip.active');
         this.selectedCompetitors = Array.from(activeChips).map(chip => chip.dataset.competitor);
-        
-        Notifications.info(`Comparing ${this.selectedCompetitors.length} brands`);
     }
 
-    exportAnalysis() {
-        const analysis = {
-            timestamp: new Date().toISOString(),
-            competitors: this.competitors,
-            insights: 'Competitive analysis data'
-        };
+    exportAnalysis(format = 'json') {
+        const timestamp = new Date().toISOString();
+        const dateStr = new Date().toISOString().split('T')[0];
 
-        Utils.downloadFile(
-            JSON.stringify(analysis, null, 2),
-            `competitor-analysis-${Date.now()}.json`,
-            'application/json'
-        );
+        if (format === 'json') {
+            const analysis = {
+                exportDate: timestamp,
+                brand: this.currentBrand,
+                competitors: this.competitors,
+                summary: {
+                    totalCompetitors: this.competitors.length,
+                    avgSentiment: (this.competitors.reduce((s, c) => s + c.sentiment, 0) / this.competitors.length).toFixed(1),
+                    avgEngagement: (this.competitors.reduce((s, c) => s + c.engagement, 0) / this.competitors.length).toFixed(1)
+                }
+            };
 
-        Notifications.success('Competitor analysis exported');
+            if (typeof Utils !== 'undefined' && Utils.downloadFile) {
+                Utils.downloadFile(
+                    JSON.stringify(analysis, null, 2),
+                    `competitor-analysis-${dateStr}.json`,
+                    'application/json'
+                );
+            } else {
+                this.downloadFile(JSON.stringify(analysis, null, 2), `competitor-analysis-${dateStr}.json`, 'application/json');
+            }
+        } else if (format === 'csv') {
+            // Build CSV
+            const headers = ['Name', 'Mentions', 'Sentiment', 'Engagement', 'Reach', 'Growth'];
+            const rows = this.competitors.map(c => [
+                c.name,
+                c.mentions,
+                c.sentiment + '%',
+                c.engagement + '%',
+                c.reach,
+                '+' + c.growth + '%'
+            ]);
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+            if (typeof Utils !== 'undefined' && Utils.downloadFile) {
+                Utils.downloadFile(csv, `competitor-analysis-${dateStr}.csv`, 'text/csv');
+            } else {
+                this.downloadFile(csv, `competitor-analysis-${dateStr}.csv`, 'text/csv');
+            }
+        } else if (format === 'pdf') {
+            // For PDF, we'll show a notification that it would generate a PDF report
+            if (window.notificationManager) {
+                window.notificationManager.show('PDF report generation requires server-side processing. Exporting as JSON instead.', 'info');
+            }
+            this.exportAnalysis('json');
+            return;
+        }
+
+        if (window.notificationManager) {
+            window.notificationManager.show(`Competitor analysis exported as ${format.toUpperCase()}`, 'success');
+        } else if (typeof Notifications !== 'undefined') {
+            Notifications.success(`Competitor analysis exported as ${format.toUpperCase()}`);
+        }
+    }
+
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     destroy() {

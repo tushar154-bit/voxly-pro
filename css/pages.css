@@ -2216,11 +2216,11 @@
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
 }
 
 .competitor-chip {
-    padding: 0.75rem 1.25rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
     border-radius: var(--radius-full);
     background: var(--gray-100);
     font-weight: 500;
@@ -2229,6 +2229,7 @@
     gap: 0.5rem;
     cursor: pointer;
     transition: all var(--transition);
+    border: 2px solid transparent;
 }
 
 .competitor-chip:hover {
@@ -2239,11 +2240,44 @@
 .competitor-chip.active {
     background: var(--primary);
     color: white;
+    border-color: var(--primary);
 }
 
 .competitor-chip.your-brand {
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
+}
+
+/* Chip Logo Styles */
+.chip-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: white;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.chip-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Add spacing between Select Competitors card and stats grid */
+.competitors-container .card {
+    margin-bottom: 1.5rem;
+}
+
+.competitors-container .stats-grid-4 {
+    margin-top: 0;
 }
 
 .comparison-stats {
@@ -2283,6 +2317,192 @@
 .insight-card p {
     color: var(--gray-600);
     line-height: 1.6;
+}
+
+/* Competitor Page Header - Remove gradient, plain white background */
+.competitors-container .page-header,
+.competitors-container > .page-header {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.competitors-container .page-header::before,
+.competitors-container > .page-header::before {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    height: 0 !important;
+}
+
+.competitors-container .page-header::after,
+.competitors-container > .page-header::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+/* Competitor Page Header Buttons - Export Analysis outline style */
+.competitors-container .page-header-right .btn-primary#exportCompetitorBtn,
+#exportCompetitorBtn.btn-primary {
+    background: white !important;
+    color: #1f2937 !important;
+    border: 1px solid var(--gray-300) !important;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1) !important;
+    white-space: nowrap;
+}
+
+.competitors-container .page-header-right .btn-primary#exportCompetitorBtn:hover,
+#exportCompetitorBtn.btn-primary:hover {
+    background: white !important;
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.2) !important;
+}
+
+.competitors-container .page-header-right .btn-primary#exportCompetitorBtn:hover i,
+#exportCompetitorBtn.btn-primary:hover i {
+    color: var(--primary) !important;
+}
+
+/* Add Competitor Modal Styles */
+.add-competitor-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-competitor-modal.active {
+    display: flex;
+}
+
+.add-competitor-modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.add-competitor-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.add-competitor-modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.add-competitor-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.add-competitor-modal-close:hover {
+    color: var(--gray-900);
+}
+
+.add-competitor-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.add-competitor-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--gray-700);
+}
+
+.add-competitor-form input,
+.add-competitor-form select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-competitor-form input:focus,
+.add-competitor-form select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.add-competitor-form .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.suggested-competitors {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.suggested-competitor {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggested-competitor:hover {
+    border-color: var(--primary);
+    background: var(--primary-light, #eef2ff);
+}
+
+.suggested-competitor-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+}
+
+.suggested-competitor-info {
+    flex: 1;
+}
+
+.suggested-competitor-name {
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.suggested-competitor-industry {
+    font-size: 0.8125rem;
+    color: var(--gray-500);
 }
 
 /* ===================================
@@ -8245,5 +8465,390 @@
     .demographics-insights-grid,
     .performance-insights-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   COMPETITOR PAGE - VIBRANT HERO CARDS WITH CURVED BACKGROUNDS
+   ============================================================ */
+
+/* Hero card container */
+.competitor-hero-stats {
+    margin-bottom: 1.5rem;
+}
+
+/* Vibrant card base styling */
+.competitor-vibrant-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.competitor-vibrant-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+/* Curved background shapes container */
+.competitor-card-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Floating circle background shapes */
+.competitor-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+}
+
+/* Large circle - top right */
+.competitor-circle.circle-1 {
+    width: 120px;
+    height: 120px;
+    top: -30px;
+    right: -30px;
+    background: rgba(255, 255, 255, 0.12);
+    animation: competitorFloat1 6s ease-in-out infinite;
+}
+
+/* Medium circle - bottom left */
+.competitor-circle.circle-2 {
+    width: 80px;
+    height: 80px;
+    bottom: -20px;
+    left: -20px;
+    background: rgba(255, 255, 255, 0.1);
+    animation: competitorFloat2 8s ease-in-out infinite;
+}
+
+/* Small circle - center right */
+.competitor-circle.circle-3 {
+    width: 60px;
+    height: 60px;
+    top: 50%;
+    right: 20%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.08);
+    animation: competitorFloat3 7s ease-in-out infinite;
+}
+
+/* Extra small circle - top left */
+.competitor-circle.circle-4 {
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    left: 30%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: competitorFloat4 9s ease-in-out infinite;
+}
+
+/* Medium circle - bottom right */
+.competitor-circle.circle-5 {
+    width: 70px;
+    height: 70px;
+    bottom: 10px;
+    right: 10%;
+    background: rgba(255, 255, 255, 0.08);
+    animation: competitorFloat5 10s ease-in-out infinite;
+}
+
+@keyframes competitorFloat1 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(-15px, 15px) scale(1.1);
+    }
+}
+
+@keyframes competitorFloat2 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(10px, -10px) scale(1.15);
+    }
+}
+
+@keyframes competitorFloat3 {
+    0%, 100% {
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        transform: translateY(-50%) translate(-8px, 8px) scale(1.1);
+    }
+}
+
+@keyframes competitorFloat4 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(12px, 8px) scale(1.2);
+    }
+}
+
+@keyframes competitorFloat5 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(-10px, -12px) scale(1.15);
+    }
+}
+
+/* Icon wrapper for pulse ring effect */
+.competitor-card-icon-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 1rem;
+}
+
+/* Pulse ring animation */
+.competitor-pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    animation: competitorPulseRing 2s ease-out infinite;
+}
+
+.competitor-pulse-ring.ring-2 {
+    animation-delay: 1s;
+}
+
+@keyframes competitorPulseRing {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.6);
+        opacity: 0;
+    }
+}
+
+/* Card icon with rounded square background */
+.competitor-card-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    width: 52px;
+    height: 52px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.competitor-card-icon i {
+    font-size: 1.4rem;
+    color: white;
+}
+
+/* Card label */
+.competitor-card-label {
+    position: relative;
+    z-index: 2;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+/* Card main value */
+.competitor-card-value {
+    position: relative;
+    z-index: 2;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+    line-height: 1.1;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Card badge */
+.competitor-card-badge {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    animation: badgePulse 3s ease-in-out infinite;
+}
+
+.competitor-card-badge.positive,
+.competitor-card-badge.negative,
+.competitor-card-badge.neutral {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.competitor-card-badge i {
+    font-size: 0.65rem;
+    color: #ffffff;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.12);
+    }
+}
+
+/* Card rank */
+.competitor-card-rank {
+    position: relative;
+    z-index: 2;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.75rem;
+    font-weight: 500;
+}
+
+/* Sentiment Emotions Row */
+.sentiment-emotions-row {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.emotion-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.emotion-item i {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.emotion-item span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.positive-emotion i {
+    color: #4ade80;
+}
+
+.neutral-emotion i {
+    color: #fbbf24;
+}
+
+.negative-emotion i {
+    color: #f87171;
+}
+
+/* Sentiment Distribution Bar */
+.sentiment-distribution-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0.5rem 0 0.75rem 0;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.sentiment-bar-positive {
+    background: #4ade80;
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.sentiment-bar-neutral {
+    background: #fbbf24;
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.sentiment-bar-negative {
+    background: #f87171;
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+/* Hover effect for curves */
+.competitor-vibrant-card:hover .curve-1 {
+    animation-play-state: paused;
+    transform: translate(-20px, 20px) scale(1.1);
+}
+
+.competitor-vibrant-card:hover .curve-2 {
+    animation-play-state: paused;
+    transform: translate(15px, -15px) scale(1.15);
+}
+
+.competitor-vibrant-card:hover .curve-3 {
+    animation-play-state: paused;
+    transform: translate(-12px, -18px) scale(1.2);
+}
+
+/* Pulse ring speeds up on hover */
+.competitor-vibrant-card:hover .competitor-pulse-ring {
+    animation-duration: 1.2s;
+}
+
+/* Responsive adjustments for competitor hero cards */
+@media (max-width: 1024px) {
+    .competitor-hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .competitor-hero-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .competitor-vibrant-card {
+        padding: 1.25rem !important;
+    }
+
+    .competitor-card-value {
+        font-size: 1.85rem;
+    }
+
+    .competitor-card-icon {
+        width: 46px;
+        height: 46px;
     }
 }
