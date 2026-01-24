@@ -2226,13 +2226,13 @@ tbody tr:hover {
 }
 
 
-/* Table row hover highlight - EXCLUDE metrics-table and post-row */
-tbody tr:not(.metrics-row):not(.post-row) {
+/* Table row hover highlight - EXCLUDE metrics-table, post-row, and comparison-row */
+tbody tr:not(.metrics-row):not(.post-row):not(.comparison-row) {
     position: relative;
     transition: all 0.2s ease;
 }
 
-tbody tr:not(.metrics-row):not(.post-row)::before {
+tbody tr:not(.metrics-row):not(.post-row):not(.comparison-row)::before {
     content: '';
     position: absolute;
     left: 0;
@@ -2244,11 +2244,11 @@ tbody tr:not(.metrics-row):not(.post-row)::before {
     transition: transform 0.2s ease;
 }
 
-tbody tr:not(.metrics-row):not(.post-row):hover::before {
+tbody tr:not(.metrics-row):not(.post-row):not(.comparison-row):hover::before {
     transform: scaleY(1);
 }
 
-tbody tr:not(.metrics-row):not(.post-row):hover {
+tbody tr:not(.metrics-row):not(.post-row):not(.comparison-row):hover {
     background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
 }
 

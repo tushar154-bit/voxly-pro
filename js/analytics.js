@@ -154,12 +154,12 @@ class AnalyticsPage {
                                 <div class="icon-pulse-wrapper">
                                     <span class="pulse-ring"></span>
                                     <span class="pulse-ring delay-1"></span>
-                                    <span class="material-icons">mood</span>
+                                    <span class="material-icons">visibility</span>
                                 </div>
                             </div>
-                            <div class="stat-label">Avg Sentiment</div>
-                            <div class="stat-value">76.2%</div>
-                            <div class="stat-change positive">+5.3% vs prev period</div>
+                            <div class="stat-label">Brand Awareness Score</div>
+                            <div class="stat-value">8.4<span style="font-size: 0.6em;">/10</span></div>
+                            <div class="stat-change positive">+0.6 vs prev period</div>
                         </div>
 
                         <div class="stat-card analytics-card analytics-cyan">
@@ -518,8 +518,8 @@ class AnalyticsPage {
             const values = statCards[0].querySelector('.stat-value');
             if (values) values.textContent = formatNum(this.brandData.mentions);
 
-            const sentiment = statCards[1].querySelector('.stat-value');
-            if (sentiment) sentiment.textContent = this.brandData.sentiment + '%';
+            const awareness = statCards[1].querySelector('.stat-value');
+            if (awareness) awareness.innerHTML = (this.brandData.sentiment / 10).toFixed(1) + '<span style="font-size: 0.6em;">/10</span>';
 
             const authors = statCards[2].querySelector('.stat-value');
             if (authors) authors.textContent = formatNum(Math.round(this.brandData.followers / 20));
@@ -2428,17 +2428,18 @@ class AnalyticsPage {
                 mentionsChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
             }
 
-            // Avg Sentiment
-            const sentimentValue = statCards[1].querySelector('.stat-value');
-            const sentimentChange = statCards[1].querySelector('.stat-change');
-            if (sentimentValue) {
-                sentimentValue.textContent = this.currentData.sentiment + '%';
-                this.animateValue(sentimentValue);
+            // Brand Awareness (score out of 10)
+            const awarenessValue = statCards[1].querySelector('.stat-value');
+            const awarenessChange = statCards[1].querySelector('.stat-change');
+            if (awarenessValue) {
+                const awarenessScore = (this.currentData.sentiment / 10).toFixed(1);
+                awarenessValue.innerHTML = awarenessScore + '<span style="font-size: 0.6em;">/10</span>';
+                this.animateValue(awarenessValue);
             }
-            if (sentimentChange) {
-                const changeVal = Math.round((Math.random() * 10 - 2) * 10) / 10;
-                sentimentChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal}% vs prev period`;
-                sentimentChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
+            if (awarenessChange) {
+                const changeVal = Math.round((Math.random() * 1.5 - 0.3) * 10) / 10;
+                awarenessChange.textContent = `${changeVal >= 0 ? '+' : ''}${changeVal} vs prev period`;
+                awarenessChange.className = `stat-change ${changeVal >= 0 ? 'positive' : 'negative'}`;
             }
 
             // Unique Authors

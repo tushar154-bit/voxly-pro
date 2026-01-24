@@ -92,7 +92,7 @@ const Trends = {
 
                 <!-- Stats Overview -->
                 <div class="stats-grid trends-stats-grid">
-                    <div class="stat-card realtime-card live-card">
+                    <div class="stat-card realtime-card live-card" id="topics-stat-card">
                         <div class="stat-card-bg">
                             <div class="stat-bg-shape shape-1"></div>
                             <div class="stat-bg-shape shape-2"></div>
@@ -102,13 +102,13 @@ const Trends = {
                             <span class="stat-title">Trending Topics</span>
                             <div class="stat-icon"><span class="material-icons">trending_up</span></div>
                         </div>
-                        <div class="stat-value">${this.trendingData.topics.length}</div>
+                        <div class="stat-value" id="topics-value">${this.trendingData.topics.length}</div>
                         <div class="stat-change positive">
-                            <span>+3 new today</span>
+                            <span id="topics-change">+3 new today</span>
                         </div>
                     </div>
 
-                    <div class="stat-card realtime-card sentiment-card">
+                    <div class="stat-card realtime-card sentiment-card" id="hashtags-stat-card">
                         <div class="stat-card-bg">
                             <div class="stat-bg-shape shape-1"></div>
                             <div class="stat-bg-shape shape-2"></div>
@@ -118,13 +118,13 @@ const Trends = {
                             <span class="stat-title">Trending Hashtags</span>
                             <div class="stat-icon"><span class="material-icons">tag</span></div>
                         </div>
-                        <div class="stat-value">${this.trendingData.hashtags.length}</div>
+                        <div class="stat-value" id="hashtags-value">${this.trendingData.hashtags.length}</div>
                         <div class="stat-change positive">
-                            <span>+5 rising</span>
+                            <span id="hashtags-change">+5 rising</span>
                         </div>
                     </div>
 
-                    <div class="stat-card realtime-card volume-card">
+                    <div class="stat-card realtime-card volume-card" id="keywords-stat-card">
                         <div class="stat-card-bg">
                             <div class="stat-bg-shape shape-1"></div>
                             <div class="stat-bg-shape shape-2"></div>
@@ -134,13 +134,13 @@ const Trends = {
                             <span class="stat-title">Hot Keywords</span>
                             <div class="stat-icon"><span class="material-icons">rocket_launch</span></div>
                         </div>
-                        <div class="stat-value">${this.trendingData.keywords.length}</div>
+                        <div class="stat-value" id="keywords-value">${this.trendingData.keywords.length}</div>
                         <div class="stat-change positive">
-                            <span>+2 emerging</span>
+                            <span id="keywords-change">+2 emerging</span>
                         </div>
                     </div>
 
-                    <div class="stat-card realtime-card alerts-card">
+                    <div class="stat-card realtime-card alerts-card" id="velocity-stat-card">
                         <div class="stat-card-bg">
                             <div class="stat-bg-shape shape-1"></div>
                             <div class="stat-bg-shape shape-2"></div>
@@ -150,9 +150,9 @@ const Trends = {
                             <span class="stat-title">Velocity Score</span>
                             <div class="stat-icon"><span class="material-icons">speed</span></div>
                         </div>
-                        <div class="stat-value">8.7/10</div>
+                        <div class="stat-value" id="velocity-value">8.7/10</div>
                         <div class="stat-change positive">
-                            <span>High activity</span>
+                            <span id="velocity-change">High activity</span>
                         </div>
                     </div>
                 </div>
@@ -328,10 +328,14 @@ const Trends = {
         // Period selector
         document.querySelectorAll('.period-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.currentPeriod = e.target.dataset.period;
+                const period = e.target.dataset.period || e.currentTarget.dataset.period;
+                if (!period) return;
+
+                this.currentPeriod = period;
                 document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                // Regenerate data only when period changes
+                e.currentTarget.classList.add('active');
+
+                // Regenerate data for new period
                 this.currentData = this.getAdjustedData();
                 this.loadTrendsContent(false);
             });
@@ -424,6 +428,52 @@ const Trends = {
         const periodLabels = document.querySelectorAll('.period-label');
         periodLabels.forEach(label => {
             label.textContent = this.getPeriodLabel();
+        });
+
+        // Get the adjusted data based on current period
+        const data = this.currentData || this.getAdjustedData();
+        const multiplier = this.getPeriodMultiplier();
+
+        // Calculate stats based on period
+        const topicsCount = data.topics.length + (multiplier === 1 ? 0 : multiplier === 7 ? 2 : 5);
+        const hashtagsCount = data.hashtags.length + (multiplier === 1 ? 0 : multiplier === 7 ? 4 : 10);
+        const keywordsCount = data.keywords.length + (multiplier === 1 ? 0 : multiplier === 7 ? 3 : 8);
+
+        // Calculate velocity score based on average change
+        const avgChange = data.hashtags.reduce((sum, h) => sum + Math.abs(h.change), 0) / data.hashtags.length;
+        const velocityScore = Math.min(10, Math.max(1, (avgChange / (20 * multiplier) + 5 + (multiplier * 0.3)))).toFixed(1);
+
+        // Update stat card values using IDs
+        const topicsValue = document.getElementById('topics-value');
+        const topicsChange = document.getElementById('topics-change');
+        const hashtagsValue = document.getElementById('hashtags-value');
+        const hashtagsChange = document.getElementById('hashtags-change');
+        const keywordsValue = document.getElementById('keywords-value');
+        const keywordsChange = document.getElementById('keywords-change');
+        const velocityValue = document.getElementById('velocity-value');
+        const velocityChange = document.getElementById('velocity-change');
+
+        // Trending Topics
+        if (topicsValue) topicsValue.textContent = topicsCount;
+        if (topicsChange) topicsChange.textContent = multiplier === 1 ? '+3 new today' : multiplier === 7 ? '+8 this week' : '+15 this month';
+
+        // Trending Hashtags
+        if (hashtagsValue) hashtagsValue.textContent = hashtagsCount;
+        if (hashtagsChange) hashtagsChange.textContent = multiplier === 1 ? '+5 rising' : multiplier === 7 ? '+12 rising' : '+28 rising';
+
+        // Hot Keywords
+        if (keywordsValue) keywordsValue.textContent = keywordsCount;
+        if (keywordsChange) keywordsChange.textContent = multiplier === 1 ? '+2 emerging' : multiplier === 7 ? '+7 emerging' : '+18 emerging';
+
+        // Velocity Score
+        if (velocityValue) velocityValue.textContent = `${velocityScore}/10`;
+        if (velocityChange) velocityChange.textContent = parseFloat(velocityScore) >= 7 ? 'High activity' : parseFloat(velocityScore) >= 4 ? 'Moderate activity' : 'Low activity';
+
+        // Add animation effect to cards
+        const statCards = document.querySelectorAll('.trends-stats-grid .stat-card');
+        statCards.forEach(card => {
+            card.classList.add('updating');
+            setTimeout(() => card.classList.remove('updating'), 500);
         });
     },
 

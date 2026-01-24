@@ -1439,6 +1439,71 @@
     color: #ffffff;
 }
 
+/* Analytics Card Sentiment Emotions */
+.analytics-card .sentiment-emotions-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.analytics-card .emotion-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.analytics-card .emotion-item .material-icons,
+.analytics-card .emotion-item .material-icons-outlined {
+    font-size: 1.6rem;
+}
+
+.analytics-card .emotion-item span {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.analytics-card .positive-emotion .material-icons,
+.analytics-card .neutral-emotion .material-icons,
+.analytics-card .negative-emotion .material-icons,
+.analytics-card .positive-emotion .material-icons-outlined,
+.analytics-card .neutral-emotion .material-icons-outlined,
+.analytics-card .negative-emotion .material-icons-outlined {
+    color: #ffffff;
+}
+
+/* Analytics Card Sentiment Distribution Bar */
+.analytics-card .sentiment-distribution-bar {
+    display: flex;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+    background: rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 2;
+}
+
+.analytics-card .sentiment-bar-positive {
+    background: #00ff7f;
+    height: 100%;
+}
+
+.analytics-card .sentiment-bar-neutral {
+    background: #ffff00;
+    height: 100%;
+}
+
+.analytics-card .sentiment-bar-negative {
+    background: #ff4444;
+    height: 100%;
+}
+
 .date-range-selector {
     display: flex;
     gap: 0.5rem;
@@ -2250,25 +2315,31 @@
 
 /* Chip Logo Styles */
 .chip-logo {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: white;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e5e7eb;
+    background: white;
 }
 
 .chip-logo img {
-    width: 100%;
-    height: 100%;
+    width: 22px;
+    height: 22px;
     object-fit: contain;
-    background: white;
-    border-radius: 50%;
+}
+
+.competitor-chip.active .chip-logo {
+    border-color: white;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 /* Add spacing between Select Competitors card and stats grid */
@@ -2930,6 +3001,38 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 1.5rem;
+}
+
+/* Animation when stat cards update */
+.trends-stats-grid .stat-card.updating {
+    animation: statCardPulse 0.5s ease-out;
+}
+
+.trends-stats-grid .stat-card.updating .stat-value {
+    animation: valueFlash 0.5s ease-out;
+}
+
+@keyframes statCardPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes valueFlash {
+    0% {
+        opacity: 0.5;
+        transform: translateY(-5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 1200px) {
@@ -8500,109 +8603,99 @@
     bottom: 0;
     overflow: hidden;
     pointer-events: none;
+    z-index: 0;
+}
+
+/* Make all content in competitor cards above the background */
+.competitor-vibrant-card > *:not(.competitor-card-bg) {
+    position: relative;
+    z-index: 2;
 }
 
 /* Floating circle background shapes */
-.competitor-circle {
+.competitor-vibrant-card .competitor-circle {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
+    opacity: 0.25;
+    background: rgba(255, 255, 255, 0.3);
     pointer-events: none;
 }
 
 /* Large circle - top right */
-.competitor-circle.circle-1 {
-    width: 120px;
-    height: 120px;
-    top: -30px;
-    right: -30px;
-    background: rgba(255, 255, 255, 0.12);
-    animation: competitorFloat1 6s ease-in-out infinite;
+.competitor-vibrant-card .competitor-circle.circle-1 {
+    width: 160px;
+    height: 160px;
+    top: -55px;
+    right: -55px;
+    background: rgba(255, 255, 255, 0.3);
+    animation: competitorFloatShape 5s ease-in-out infinite, competitorPulse 4s ease-in-out infinite;
 }
 
 /* Medium circle - bottom left */
-.competitor-circle.circle-2 {
-    width: 80px;
-    height: 80px;
-    bottom: -20px;
-    left: -20px;
-    background: rgba(255, 255, 255, 0.1);
-    animation: competitorFloat2 8s ease-in-out infinite;
+.competitor-vibrant-card .competitor-circle.circle-2 {
+    width: 110px;
+    height: 110px;
+    bottom: -35px;
+    left: -35px;
+    background: rgba(255, 255, 255, 0.25);
+    animation: competitorFloatShape 6s ease-in-out infinite, competitorPulse 5s ease-in-out infinite;
+    animation-delay: -2s, -1s;
 }
 
 /* Small circle - center right */
-.competitor-circle.circle-3 {
-    width: 60px;
-    height: 60px;
-    top: 50%;
-    right: 20%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.08);
-    animation: competitorFloat3 7s ease-in-out infinite;
+.competitor-vibrant-card .competitor-circle.circle-3 {
+    width: 80px;
+    height: 80px;
+    top: 32%;
+    right: 12%;
+    background: rgba(255, 255, 255, 0.22);
+    animation: competitorFloatShape 5.5s ease-in-out infinite, competitorPulse 6s ease-in-out infinite;
+    animation-delay: -3s, -2s;
 }
 
 /* Extra small circle - top left */
-.competitor-circle.circle-4 {
-    width: 40px;
-    height: 40px;
+.competitor-vibrant-card .competitor-circle.circle-4 {
+    width: 55px;
+    height: 55px;
     top: 20px;
-    left: 30%;
-    background: rgba(255, 255, 255, 0.1);
-    animation: competitorFloat4 9s ease-in-out infinite;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.2);
+    animation: competitorFloatShape 7s ease-in-out infinite, competitorPulse 5.5s ease-in-out infinite;
+    animation-delay: -1s, -0.5s;
 }
 
 /* Medium circle - bottom right */
-.competitor-circle.circle-5 {
-    width: 70px;
-    height: 70px;
-    bottom: 10px;
-    right: 10%;
-    background: rgba(255, 255, 255, 0.08);
-    animation: competitorFloat5 10s ease-in-out infinite;
+.competitor-vibrant-card .competitor-circle.circle-5 {
+    width: 90px;
+    height: 90px;
+    bottom: 0;
+    right: 5%;
+    background: rgba(255, 255, 255, 0.18);
+    animation: competitorFloatShape 8s ease-in-out infinite, competitorPulse 6.5s ease-in-out infinite;
+    animation-delay: -4s, -3s;
 }
 
-@keyframes competitorFloat1 {
+@keyframes competitorFloatShape {
     0%, 100% {
-        transform: translate(0, 0) scale(1);
+        transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    25% {
+        transform: translate(-8px, 6px) scale(1.08) rotate(4deg);
     }
     50% {
-        transform: translate(-15px, 15px) scale(1.1);
+        transform: translate(-12px, 10px) scale(1.12) rotate(0deg);
     }
-}
-
-@keyframes competitorFloat2 {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-    }
-    50% {
-        transform: translate(10px, -10px) scale(1.15);
-    }
-}
-
-@keyframes competitorFloat3 {
-    0%, 100% {
-        transform: translateY(-50%) scale(1);
-    }
-    50% {
-        transform: translateY(-50%) translate(-8px, 8px) scale(1.1);
+    75% {
+        transform: translate(-5px, 4px) scale(1.05) rotate(-4deg);
     }
 }
 
-@keyframes competitorFloat4 {
+@keyframes competitorPulse {
     0%, 100% {
-        transform: translate(0, 0) scale(1);
+        opacity: 0.25;
     }
     50% {
-        transform: translate(12px, 8px) scale(1.2);
-    }
-}
-
-@keyframes competitorFloat5 {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-    }
-    50% {
-        transform: translate(-10px, -12px) scale(1.15);
+        opacity: 0.45;
     }
 }
 
@@ -8752,27 +8845,24 @@
     gap: 0.25rem;
 }
 
-.emotion-item i {
-    font-size: 1.5rem;
-    opacity: 0.9;
+.emotion-item .material-icons,
+.emotion-item .material-icons-outlined {
+    font-size: 1.6rem;
 }
 
 .emotion-item span {
-    font-size: 0.7rem;
-    font-weight: 600;
-    opacity: 0.9;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
-.positive-emotion i {
-    color: #4ade80;
-}
-
-.neutral-emotion i {
-    color: #fbbf24;
-}
-
-.negative-emotion i {
-    color: #f87171;
+.positive-emotion .material-icons,
+.neutral-emotion .material-icons,
+.negative-emotion .material-icons,
+.positive-emotion .material-icons-outlined,
+.neutral-emotion .material-icons-outlined,
+.negative-emotion .material-icons-outlined {
+    color: #ffffff;
 }
 
 /* Sentiment Distribution Bar */
@@ -8789,21 +8879,60 @@
 }
 
 .sentiment-bar-positive {
-    background: #4ade80;
+    background: #00ff7f;
     height: 100%;
     transition: width 0.5s ease;
 }
 
 .sentiment-bar-neutral {
-    background: #fbbf24;
+    background: #ffff00;
     height: 100%;
     transition: width 0.5s ease;
 }
 
 .sentiment-bar-negative {
-    background: #f87171;
+    background: #ff4444;
     height: 100%;
     transition: width 0.5s ease;
+}
+
+/* Sentiment Breakdown Row - New Style */
+.sentiment-breakdown-row {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 0.75rem 0;
+    padding: 0.5rem 0;
+}
+
+.sentiment-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.sentiment-stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.sentiment-stat-value.positive-text {
+    color: #4ade80;
+}
+
+.sentiment-stat-value.negative-text {
+    color: #fca5a5;
+}
+
+.sentiment-stat-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Hover effect for curves */

@@ -11,7 +11,7 @@ const APIData = {
         apple: {
             id: 'apple',
             name: 'Apple',
-            logo: 'https://logo.clearbit.com/apple.com',
+            logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg',
             industry: 'technology',
             color: '#000000',
             tagline: 'Think Different',
@@ -142,7 +142,7 @@ const APIData = {
         samsung: {
             id: 'samsung',
             name: 'Samsung',
-            logo: 'https://logo.clearbit.com/samsung.com',
+            logo: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg',
             industry: 'technology',
             color: '#1428A0',
             tagline: 'Do What You Can\'t',
@@ -644,7 +644,7 @@ const APIData = {
         oneplus: {
             id: 'oneplus',
             name: 'OnePlus',
-            logo: 'https://logo.clearbit.com/oneplus.com',
+            logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/OnePlus_logo.svg',
             industry: 'technology',
             color: '#F5010C',
             tagline: 'Never Settle',
@@ -670,7 +670,7 @@ const APIData = {
         xiaomi: {
             id: 'xiaomi',
             name: 'Xiaomi',
-            logo: 'https://logo.clearbit.com/xiaomi.com',
+            logo: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Xiaomi_logo_%282021-%29.svg',
             industry: 'technology',
             color: '#FF6700',
             tagline: 'Innovation for Everyone',
