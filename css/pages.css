@@ -8612,13 +8612,14 @@
     z-index: 2;
 }
 
-/* Floating circle background shapes */
+/* Floating circle background shapes with light glow */
 .competitor-vibrant-card .competitor-circle {
     position: absolute;
     border-radius: 50%;
-    opacity: 0.25;
     background: rgba(255, 255, 255, 0.3);
     pointer-events: none;
+    filter: blur(1px);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
 }
 
 /* Large circle - top right */
@@ -8627,8 +8628,8 @@
     height: 160px;
     top: -55px;
     right: -55px;
-    background: rgba(255, 255, 255, 0.3);
-    animation: competitorFloatShape 5s ease-in-out infinite, competitorPulse 4s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.35);
+    animation: competitorFloatShape 5s ease-in-out infinite, competitorGlow 4s ease-in-out infinite;
 }
 
 /* Medium circle - bottom left */
@@ -8637,8 +8638,8 @@
     height: 110px;
     bottom: -35px;
     left: -35px;
-    background: rgba(255, 255, 255, 0.25);
-    animation: competitorFloatShape 6s ease-in-out infinite, competitorPulse 5s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.3);
+    animation: competitorFloatShape 6s ease-in-out infinite, competitorGlow 5s ease-in-out infinite;
     animation-delay: -2s, -1s;
 }
 
@@ -8648,8 +8649,8 @@
     height: 80px;
     top: 32%;
     right: 12%;
-    background: rgba(255, 255, 255, 0.22);
-    animation: competitorFloatShape 5.5s ease-in-out infinite, competitorPulse 6s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.28);
+    animation: competitorFloatShape 5.5s ease-in-out infinite, competitorGlow 6s ease-in-out infinite;
     animation-delay: -3s, -2s;
 }
 
@@ -8659,8 +8660,8 @@
     height: 55px;
     top: 20px;
     left: 20%;
-    background: rgba(255, 255, 255, 0.2);
-    animation: competitorFloatShape 7s ease-in-out infinite, competitorPulse 5.5s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.25);
+    animation: competitorFloatShape 7s ease-in-out infinite, competitorGlow 5.5s ease-in-out infinite;
     animation-delay: -1s, -0.5s;
 }
 
@@ -8670,8 +8671,8 @@
     height: 90px;
     bottom: 0;
     right: 5%;
-    background: rgba(255, 255, 255, 0.18);
-    animation: competitorFloatShape 8s ease-in-out infinite, competitorPulse 6.5s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.22);
+    animation: competitorFloatShape 8s ease-in-out infinite, competitorGlow 6.5s ease-in-out infinite;
     animation-delay: -4s, -3s;
 }
 
@@ -8680,13 +8681,24 @@
         transform: translate(0, 0) scale(1) rotate(0deg);
     }
     25% {
-        transform: translate(-8px, 6px) scale(1.08) rotate(4deg);
+        transform: translate(-10px, 8px) scale(1.1) rotate(5deg);
     }
     50% {
-        transform: translate(-12px, 10px) scale(1.12) rotate(0deg);
+        transform: translate(-15px, 12px) scale(1.15) rotate(0deg);
     }
     75% {
-        transform: translate(-5px, 4px) scale(1.05) rotate(-4deg);
+        transform: translate(-6px, 5px) scale(1.08) rotate(-5deg);
+    }
+}
+
+@keyframes competitorGlow {
+    0%, 100% {
+        opacity: 0.3;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        opacity: 0.5;
+        box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
     }
 }
 
