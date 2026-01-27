@@ -1433,16 +1433,17 @@ class CompetitorsPage {
                 type: isSentimentLeader ? 'success' : parseFloat(sentimentDiff) >= -5 ? 'warning' : 'danger',
                 icon: isSentimentLeader ? 'fa-smile-beam' : 'fa-meh',
                 iconColor: isSentimentLeader ? '#10b981' : '#f59e0b',
-                title: isSentimentLeader ? 'Sentiment Leader' : 'Sentiment Challenge',
+                title: isSentimentLeader ? 'Positive Reviews' : 'Customer Sentiment',
                 value: yourBrand.sentiment + '%',
+                valueLabel: 'positive mentions',
                 change: sentimentDiff,
                 changeType: parseFloat(sentimentDiff) >= 0 ? 'positive' : 'negative',
                 rank: sentimentRank,
                 total: this.competitors.length,
                 progress: yourBrand.sentiment,
                 description: isSentimentLeader
-                    ? `Leading with ${yourBrand.sentiment}% positive sentiment`
-                    : `${Math.abs(sentimentDiff)}% below category average`,
+                    ? `${yourBrand.sentiment}% of customers speak positively`
+                    : `${Math.abs(sentimentDiff)}% below avg · Room to improve`,
                 tips: isSentimentLeader
                     ? ['Maintain quality engagement', 'Continue monitoring trends', 'Leverage positive momentum']
                     : ['Improve response times', 'Address customer concerns', 'Enhance product quality'],
@@ -1501,16 +1502,17 @@ class CompetitorsPage {
                 type: engagementGap <= 0 ? 'success' : parseFloat(engagementGap) <= 2 ? 'warning' : 'danger',
                 icon: engagementGap <= 0 ? 'fa-fire' : 'fa-chart-bar',
                 iconColor: engagementGap <= 0 ? '#ec4899' : '#3b82f6',
-                title: engagementGap <= 0 ? 'Engagement Leader' : 'Engagement Gap',
+                title: engagementGap <= 0 ? 'High Engagement' : 'Audience Engagement',
                 value: yourBrand.engagement + '%',
+                valueLabel: 'of audience interacts',
                 change: engagementGap <= 0 ? '+' + Math.abs(engagementGap) : '-' + engagementGap,
                 changeType: engagementGap <= 0 ? 'positive' : 'negative',
                 rank: engagementRank,
                 total: this.competitors.length,
                 progress: engagementScore,
                 description: engagementGap <= 0
-                    ? `Outperforming competitors by ${Math.abs(engagementGap)}%`
-                    : `${engagementGap}% behind ${engagementLeader?.name || 'leader'}`,
+                    ? `${Math.abs(engagementGap)}% more likes & comments than avg`
+                    : `${engagementGap}% fewer interactions than ${engagementLeader?.name || 'leader'}`,
                 tips: engagementGap <= 0
                     ? ['Scale successful content types', 'Experiment with new formats', 'Optimize posting times']
                     : ['Create interactive content', 'Respond faster to comments', 'Use more visual content'],
@@ -1567,16 +1569,17 @@ class CompetitorsPage {
                 type: isGrowthLeader ? 'success' : parseFloat(growthDiff) >= -5 ? 'info' : 'warning',
                 icon: isGrowthLeader ? 'fa-rocket' : 'fa-chart-line',
                 iconColor: isGrowthLeader ? '#8b5cf6' : '#f97316',
-                title: isGrowthLeader ? 'Fastest Growing' : 'Growth Opportunity',
+                title: isGrowthLeader ? 'Fastest Growing' : 'Growth Rate',
                 value: '+' + yourBrand.growth + '%',
+                valueLabel: 'follower growth this month',
                 change: growthDiff,
                 changeType: parseFloat(growthDiff) >= 0 ? 'positive' : 'negative',
                 rank: growthRank,
                 total: this.competitors.length,
                 progress: growthScore,
                 description: isGrowthLeader
-                    ? `Leading growth at +${yourBrand.growth}% rate`
-                    : `Top competitor growing at +${maxGrowth}%`,
+                    ? `Growing faster than all competitors`
+                    : `${engagementLeader?.name || 'Leader'} growing at +${maxGrowth}%`,
                 tips: isGrowthLeader
                     ? ['Capitalize on momentum', 'Expand to new channels', 'Increase content frequency']
                     : ['Analyze competitor strategies', 'Test new approaches', 'Focus on viral content'],
@@ -1639,14 +1642,15 @@ class CompetitorsPage {
                 type: marketRank === 1 ? 'success' : marketRank <= 2 ? 'info' : 'warning',
                 icon: 'fa-globe',
                 iconColor: '#06b6d4',
-                title: 'Market Position',
+                title: 'Market Share',
                 value: marketShare + '%',
+                valueLabel: 'of total audience reach',
                 change: marketRank === 1 ? 'Leader' : '#' + marketRank,
                 changeType: marketRank <= 2 ? 'positive' : 'neutral',
                 rank: marketRank,
                 total: this.competitors.length,
                 progress: parseFloat(marketShare),
-                description: `${(yourBrand.reach / 1000000).toFixed(1)}M reach · ${(yourBrand.mentions / 1000).toFixed(1)}K mentions`,
+                description: `Reaching ${(yourBrand.reach / 1000000).toFixed(1)}M people · ${(yourBrand.mentions / 1000).toFixed(1)}K talking about you`,
                 tips: ['Expand platform presence', 'Partner with influencers', 'Run targeted campaigns'],
                 metric: 'reach',
                 modalContent: {
@@ -1728,6 +1732,7 @@ class CompetitorsPage {
                         ${typeof insight.change === 'string' ? insight.change : (parseFloat(insight.change) >= 0 ? '+' : '') + insight.change + '%'}
                     </span>
                 </div>
+                ${insight.valueLabel ? `<span class="insight-value-label">${insight.valueLabel}</span>` : ''}
                 <div class="insight-progress-bar">
                     <div class="insight-progress-fill" style="width: 0%;" data-progress="${insight.progress}"></div>
                 </div>
@@ -1978,6 +1983,20 @@ class CompetitorsPage {
                 font-weight: 700;
                 color: white;
                 text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Value label */
+            .insight-value-label {
+                display: block;
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.85);
+                margin-top: -8px;
+                margin-bottom: 12px;
+                position: relative;
+                z-index: 1;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
 
             /* Change badge */
