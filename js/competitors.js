@@ -1859,53 +1859,69 @@ class CompetitorsPage {
             /* Sentiment Card - Light Green */
             .insight-sentiment-card {
                 background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
-                animation: insightFadeIn 0.5s ease forwards !important;
+                animation: insightFadeIn 0.5s ease forwards, glowSentimentInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);
-                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
             }
             .insight-sentiment-card:hover {
-                transform: translateY(-3px) !important;
-                box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25) !important;
+                background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%) !important;
+                transform: translateY(-8px) scale(1.02) !important;
+                box-shadow: 0 20px 40px -15px rgba(34, 197, 94, 0.5), 0 0 25px rgba(34, 197, 94, 0.4) !important;
+            }
+            @keyframes glowSentimentInsight {
+                0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(34, 197, 94, 0.35); }
             }
 
             /* Engagement Card - Blue */
             .insight-engagement-card {
                 background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%) !important;
-                animation: insightFadeIn 0.5s ease forwards !important;
+                animation: insightFadeIn 0.5s ease forwards, glowEngagementInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
-                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
             }
             .insight-engagement-card:hover {
-                transform: translateY(-3px) !important;
-                box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important;
+                background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%) !important;
+                transform: translateY(-8px) scale(1.02) !important;
+                box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.5), 0 0 25px rgba(59, 130, 246, 0.4) !important;
+            }
+            @keyframes glowEngagementInsight {
+                0% { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.35); }
             }
 
             /* Growth Card - Orange */
             .insight-growth-card {
                 background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%) !important;
-                animation: insightFadeIn 0.5s ease forwards !important;
+                animation: insightFadeIn 0.5s ease forwards, glowGrowthInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
-                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
             }
             .insight-growth-card:hover {
-                transform: translateY(-3px) !important;
-                box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25) !important;
+                background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%) !important;
+                transform: translateY(-8px) scale(1.02) !important;
+                box-shadow: 0 20px 40px -15px rgba(249, 115, 22, 0.5), 0 0 25px rgba(249, 115, 22, 0.4) !important;
+            }
+            @keyframes glowGrowthInsight {
+                0% { box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(249, 115, 22, 0.35); }
             }
 
             /* Market Card - Cyan/Teal */
             .insight-market-card {
                 background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%) !important;
-                animation: insightFadeIn 0.5s ease forwards !important;
+                animation: insightFadeIn 0.5s ease forwards, glowMarketInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                box-shadow: 0 2px 8px rgba(6, 182, 212, 0.15);
-                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
             }
             .insight-market-card:hover {
-                transform: translateY(-3px) !important;
-                box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25) !important;
+                background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0891b2 100%) !important;
+                transform: translateY(-8px) scale(1.02) !important;
+                box-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.5), 0 0 25px rgba(6, 182, 212, 0.4) !important;
+            }
+            @keyframes glowMarketInsight {
+                0% { box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(6, 182, 212, 0.35); }
             }
 
             /* Card header */
