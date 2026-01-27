@@ -1403,7 +1403,29 @@ class CompetitorsPage {
 
         const totalReach = this.competitors.reduce((sum, c) => sum + c.reach, 0);
         const marketShare = ((yourBrand.reach / totalReach) * 100).toFixed(1);
-        const marketRank = [...this.competitors].sort((a, b) => b.reach - a.reach).findIndex(c => c.id === yourBrand.id) + 1;
+        const sortedByReach = [...this.competitors].sort((a, b) => b.reach - a.reach);
+        const marketRank = sortedByReach.findIndex(c => c.id === yourBrand.id) + 1;
+
+        // Generate detailed modal content for each insight
+        const sentimentBreakdown = {
+            positive: yourBrand.sentiment,
+            neutral: Math.round((100 - yourBrand.sentiment) * 0.6),
+            negative: Math.round((100 - yourBrand.sentiment) * 0.4)
+        };
+
+        const engagementByType = {
+            likes: Math.round(yourBrand.engagement * 0.45),
+            comments: Math.round(yourBrand.engagement * 0.25),
+            shares: Math.round(yourBrand.engagement * 0.20),
+            saves: Math.round(yourBrand.engagement * 0.10)
+        };
+
+        const growthByChannel = {
+            social: Math.round(yourBrand.growth * 0.4),
+            organic: Math.round(yourBrand.growth * 0.35),
+            referral: Math.round(yourBrand.growth * 0.15),
+            direct: Math.round(yourBrand.growth * 0.10)
+        };
 
         const insights = [
             {
@@ -1424,7 +1446,55 @@ class CompetitorsPage {
                 tips: isSentimentLeader
                     ? ['Maintain quality engagement', 'Continue monitoring trends', 'Leverage positive momentum']
                     : ['Improve response times', 'Address customer concerns', 'Enhance product quality'],
-                metric: 'sentiment'
+                metric: 'sentiment',
+                modalContent: {
+                    keyFindings: [
+                        {
+                            icon: 'fa-comments',
+                            label: 'Customer Feedback',
+                            value: `${Math.round(yourBrand.mentions * 0.7).toLocaleString()} reviews analyzed`,
+                            detail: 'Across all platforms'
+                        },
+                        {
+                            icon: 'fa-clock',
+                            label: 'Avg Response Time',
+                            value: isSentimentLeader ? '< 2 hours' : '4-6 hours',
+                            detail: isSentimentLeader ? 'Industry leading' : 'Room for improvement'
+                        },
+                        {
+                            icon: 'fa-star',
+                            label: 'Brand Perception',
+                            value: isSentimentLeader ? 'Excellent' : 'Good',
+                            detail: `Top ${sentimentRank} of ${this.competitors.length} brands`
+                        }
+                    ],
+                    sentimentBreakdown: sentimentBreakdown,
+                    topThemes: isSentimentLeader
+                        ? [
+                            { theme: 'Product Quality', sentiment: 'positive', mentions: Math.round(yourBrand.mentions * 0.3) },
+                            { theme: 'Customer Service', sentiment: 'positive', mentions: Math.round(yourBrand.mentions * 0.25) },
+                            { theme: 'Value for Money', sentiment: 'positive', mentions: Math.round(yourBrand.mentions * 0.2) },
+                            { theme: 'User Experience', sentiment: 'neutral', mentions: Math.round(yourBrand.mentions * 0.15) }
+                        ]
+                        : [
+                            { theme: 'Delivery Speed', sentiment: 'negative', mentions: Math.round(yourBrand.mentions * 0.25) },
+                            { theme: 'Product Quality', sentiment: 'neutral', mentions: Math.round(yourBrand.mentions * 0.2) },
+                            { theme: 'Customer Support', sentiment: 'negative', mentions: Math.round(yourBrand.mentions * 0.18) },
+                            { theme: 'Pricing', sentiment: 'positive', mentions: Math.round(yourBrand.mentions * 0.15) }
+                        ],
+                    weeklyTrend: [65, 68, 72, 70, 74, yourBrand.sentiment - 2, yourBrand.sentiment],
+                    actionItems: isSentimentLeader
+                        ? [
+                            'Continue monitoring social mentions for early warning signs',
+                            'Amplify positive customer stories through testimonials',
+                            'Maintain response time standards across all channels'
+                        ]
+                        : [
+                            'Implement automated response system for common queries',
+                            'Address top 3 negative feedback themes within 30 days',
+                            'Launch customer satisfaction survey to gather detailed insights'
+                        ]
+                }
             },
             {
                 id: 'engagement',
@@ -1444,7 +1514,53 @@ class CompetitorsPage {
                 tips: engagementGap <= 0
                     ? ['Scale successful content types', 'Experiment with new formats', 'Optimize posting times']
                     : ['Create interactive content', 'Respond faster to comments', 'Use more visual content'],
-                metric: 'engagement'
+                metric: 'engagement',
+                modalContent: {
+                    keyFindings: [
+                        {
+                            icon: 'fa-bullseye',
+                            label: 'Engagement Rate',
+                            value: yourBrand.engagement + '%',
+                            detail: engagementGap <= 0 ? 'Above industry average' : 'Below top performer'
+                        },
+                        {
+                            icon: 'fa-users',
+                            label: 'Active Audience',
+                            value: (yourBrand.reach * yourBrand.engagement / 100 / 1000000).toFixed(1) + 'M',
+                            detail: 'Monthly engaged users'
+                        },
+                        {
+                            icon: 'fa-redo',
+                            label: 'Content Frequency',
+                            value: Math.round(yourBrand.mentions / 30) + '/day',
+                            detail: 'Average posts per day'
+                        }
+                    ],
+                    engagementByType: engagementByType,
+                    topContentTypes: [
+                        { type: 'Video Content', engagement: Math.round(yourBrand.engagement * 1.4), icon: 'fa-video' },
+                        { type: 'Carousel Posts', engagement: Math.round(yourBrand.engagement * 1.2), icon: 'fa-images' },
+                        { type: 'Stories', engagement: Math.round(yourBrand.engagement * 0.9), icon: 'fa-clock' },
+                        { type: 'Static Images', engagement: Math.round(yourBrand.engagement * 0.7), icon: 'fa-image' }
+                    ],
+                    peakHours: ['9 AM', '12 PM', '6 PM', '9 PM'],
+                    audienceInsights: {
+                        mostActiveDay: 'Thursday',
+                        avgSessionTime: '4.2 mins',
+                        returnRate: '68%'
+                    },
+                    actionItems: engagementGap <= 0
+                        ? [
+                            'Double down on video content - highest engagement driver',
+                            'Test interactive polls and Q&A sessions',
+                            'Collaborate with micro-influencers for authentic reach'
+                        ]
+                        : [
+                            'Increase video content production by 50%',
+                            'Implement a consistent posting schedule during peak hours',
+                            'Add clear CTAs to boost comment and share rates'
+                        ]
+                }
             },
             {
                 id: 'growth',
@@ -1464,7 +1580,59 @@ class CompetitorsPage {
                 tips: isGrowthLeader
                     ? ['Capitalize on momentum', 'Expand to new channels', 'Increase content frequency']
                     : ['Analyze competitor strategies', 'Test new approaches', 'Focus on viral content'],
-                metric: 'growth'
+                metric: 'growth',
+                modalContent: {
+                    keyFindings: [
+                        {
+                            icon: 'fa-chart-line',
+                            label: 'Growth Velocity',
+                            value: '+' + yourBrand.growth + '%',
+                            detail: 'Month over month'
+                        },
+                        {
+                            icon: 'fa-user-plus',
+                            label: 'New Followers',
+                            value: '+' + Math.round(yourBrand.reach * yourBrand.growth / 100 / 1000).toLocaleString() + 'K',
+                            detail: 'This month'
+                        },
+                        {
+                            icon: 'fa-trophy',
+                            label: 'Growth Rank',
+                            value: '#' + growthRank,
+                            detail: `of ${this.competitors.length} competitors`
+                        }
+                    ],
+                    growthByChannel: growthByChannel,
+                    growthDrivers: isGrowthLeader
+                        ? [
+                            { driver: 'Viral Campaign', impact: 'High', contribution: '+4.2%' },
+                            { driver: 'Influencer Partnership', impact: 'High', contribution: '+3.8%' },
+                            { driver: 'SEO Improvements', impact: 'Medium', contribution: '+2.1%' },
+                            { driver: 'Paid Advertising', impact: 'Medium', contribution: '+1.9%' }
+                        ]
+                        : [
+                            { driver: 'Organic Content', impact: 'Medium', contribution: '+2.5%' },
+                            { driver: 'Word of Mouth', impact: 'Low', contribution: '+1.8%' },
+                            { driver: 'Email Marketing', impact: 'Low', contribution: '+1.2%' },
+                            { driver: 'Social Ads', impact: 'Low', contribution: '+0.9%' }
+                        ],
+                    projectedGrowth: {
+                        nextMonth: (yourBrand.growth * 1.1).toFixed(1),
+                        nextQuarter: (yourBrand.growth * 3.2).toFixed(1),
+                        confidence: isGrowthLeader ? 'High' : 'Medium'
+                    },
+                    actionItems: isGrowthLeader
+                        ? [
+                            'Secure additional budget to scale winning campaigns',
+                            'Expand to emerging platforms (TikTok, Threads)',
+                            'Document and replicate successful growth tactics'
+                        ]
+                        : [
+                            'Analyze top competitor\'s content strategy and posting patterns',
+                            'Invest in paid social to accelerate follower acquisition',
+                            'Launch a referral program to boost organic growth'
+                        ]
+                }
             },
             {
                 id: 'market',
@@ -1480,9 +1648,59 @@ class CompetitorsPage {
                 progress: parseFloat(marketShare),
                 description: `${(yourBrand.reach / 1000000).toFixed(1)}M reach · ${(yourBrand.mentions / 1000).toFixed(1)}K mentions`,
                 tips: ['Expand platform presence', 'Partner with influencers', 'Run targeted campaigns'],
-                metric: 'reach'
+                metric: 'reach',
+                modalContent: {
+                    keyFindings: [
+                        {
+                            icon: 'fa-chart-pie',
+                            label: 'Market Share',
+                            value: marketShare + '%',
+                            detail: 'Share of total reach'
+                        },
+                        {
+                            icon: 'fa-bullhorn',
+                            label: 'Share of Voice',
+                            value: ((yourBrand.mentions / this.competitors.reduce((s, c) => s + c.mentions, 0)) * 100).toFixed(1) + '%',
+                            detail: 'Of total conversations'
+                        },
+                        {
+                            icon: 'fa-eye',
+                            label: 'Brand Visibility',
+                            value: marketRank <= 2 ? 'High' : 'Medium',
+                            detail: `Rank #${marketRank} in category`
+                        }
+                    ],
+                    marketDistribution: this.competitors.map(c => ({
+                        name: c.name,
+                        share: ((c.reach / totalReach) * 100).toFixed(1),
+                        isYou: c.id === yourBrand.id
+                    })).sort((a, b) => parseFloat(b.share) - parseFloat(a.share)),
+                    channelPresence: [
+                        { channel: 'Instagram', strength: Math.round(80 + Math.random() * 15), icon: 'fa-instagram' },
+                        { channel: 'Twitter/X', strength: Math.round(60 + Math.random() * 20), icon: 'fa-twitter' },
+                        { channel: 'Facebook', strength: Math.round(50 + Math.random() * 25), icon: 'fa-facebook' },
+                        { channel: 'LinkedIn', strength: Math.round(40 + Math.random() * 20), icon: 'fa-linkedin' }
+                    ],
+                    competitiveGap: {
+                        leader: sortedByReach[0]?.name || 'N/A',
+                        leaderShare: ((sortedByReach[0]?.reach || 0) / totalReach * 100).toFixed(1),
+                        gapToLeader: marketRank === 1 ? 'You are the leader' : ((sortedByReach[0]?.reach - yourBrand.reach) / 1000000).toFixed(1) + 'M reach gap'
+                    },
+                    actionItems: marketRank === 1
+                        ? [
+                            'Defend market position with consistent brand messaging',
+                            'Monitor challenger brands for competitive threats',
+                            'Explore adjacent market opportunities'
+                        ]
+                        : [
+                            'Increase content output to boost share of voice',
+                            'Target competitor audiences with differentiated messaging',
+                            'Invest in brand awareness campaigns'
+                        ]
+                }
             }
         ];
+
 
         // Store insights for later use
         this.currentInsights = insights;
@@ -1866,11 +2084,24 @@ class CompetitorsPage {
                 background: white;
                 border-radius: 20px;
                 width: 90%;
-                max-width: 500px;
-                max-height: 85vh;
+                max-width: 560px;
+                max-height: 90vh;
                 overflow-y: auto;
                 transform: scale(0.9) translateY(20px);
                 transition: all 0.3s ease;
+                scrollbar-width: thin;
+                scrollbar-color: #8b5cf6 #f1f5f9;
+            }
+            .insight-modal-content::-webkit-scrollbar {
+                width: 6px;
+            }
+            .insight-modal-content::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 3px;
+            }
+            .insight-modal-content::-webkit-scrollbar-thumb {
+                background: #8b5cf6;
+                border-radius: 3px;
             }
             .insight-modal.active .insight-modal-content {
                 transform: scale(1) translateY(0);
@@ -2036,6 +2267,608 @@ class CompetitorsPage {
                 font-weight: 700;
                 color: #1f2937;
             }
+
+            /* ===== NEW DETAILED MODAL STYLES ===== */
+
+            /* Key Findings Section */
+            .insight-key-findings {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            .insight-finding-card {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-radius: 12px;
+                padding: 16px;
+                text-align: center;
+                border: 1px solid #e2e8f0;
+            }
+            .finding-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 10px;
+                font-size: 1rem;
+            }
+            .finding-label {
+                font-size: 0.7rem;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+            .finding-value {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 2px;
+            }
+            .finding-detail {
+                font-size: 0.7rem;
+                color: #94a3b8;
+            }
+
+            /* Sentiment Breakdown Section */
+            .insight-breakdown-section {
+                margin-bottom: 20px;
+            }
+            .sentiment-breakdown-bars {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .breakdown-bar-item {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            .breakdown-bar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .breakdown-label {
+                font-size: 0.85rem;
+                color: #374151;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .breakdown-label i {
+                font-size: 0.9rem;
+            }
+            .breakdown-label .text-success { color: #10b981; }
+            .breakdown-label .text-warning { color: #f59e0b; }
+            .breakdown-label .text-danger { color: #ef4444; }
+            .breakdown-value {
+                font-weight: 600;
+                color: #1f2937;
+            }
+            .breakdown-bar {
+                height: 8px;
+                background: #e5e7eb;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            .breakdown-bar-fill {
+                height: 100%;
+                border-radius: 4px;
+                transition: width 0.8s ease;
+            }
+            .breakdown-bar-fill.positive { background: linear-gradient(90deg, #10b981, #34d399); }
+            .breakdown-bar-fill.neutral { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+            .breakdown-bar-fill.negative { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+            /* Top Themes Section */
+            .insight-themes-section {
+                margin-bottom: 20px;
+            }
+            .themes-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .theme-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                background: #f9fafb;
+                border-radius: 10px;
+                border-left: 3px solid #e5e7eb;
+            }
+            .theme-item:has(.theme-sentiment.positive) { border-left-color: #10b981; }
+            .theme-item:has(.theme-sentiment.neutral) { border-left-color: #f59e0b; }
+            .theme-item:has(.theme-sentiment.negative) { border-left-color: #ef4444; }
+            .theme-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .theme-name {
+                font-weight: 600;
+                color: #1f2937;
+                font-size: 0.85rem;
+            }
+            .theme-sentiment {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+            .theme-sentiment.positive { background: #d1fae5; color: #059669; }
+            .theme-sentiment.neutral { background: #fef3c7; color: #d97706; }
+            .theme-sentiment.negative { background: #fee2e2; color: #dc2626; }
+            .theme-mentions {
+                font-size: 0.8rem;
+                color: #6b7280;
+            }
+
+            /* Engagement Type Grid */
+            .engagement-type-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+            .engagement-type-item {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-radius: 12px;
+                padding: 16px 12px;
+                text-align: center;
+                border: 1px solid #e2e8f0;
+            }
+            .engagement-type-item i {
+                font-size: 1.25rem;
+                color: #8b5cf6;
+                margin-bottom: 8px;
+            }
+            .engagement-type-item .type-value {
+                display: block;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #1e293b;
+            }
+            .engagement-type-item .type-label {
+                font-size: 0.7rem;
+                color: #64748b;
+            }
+
+            /* Top Content Section */
+            .insight-content-section {
+                margin-bottom: 20px;
+            }
+            .content-type-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .content-type-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 16px;
+                background: #f9fafb;
+                border-radius: 10px;
+            }
+            .content-rank {
+                width: 24px;
+                height: 24px;
+                border-radius: 6px;
+                background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+                color: white;
+                font-size: 0.75rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .content-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                background: #e0e7ff;
+                color: #6366f1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .content-info {
+                flex: 1;
+            }
+            .content-name {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #1f2937;
+                display: block;
+                margin-bottom: 4px;
+            }
+            .content-bar {
+                height: 6px;
+                background: #e5e7eb;
+                border-radius: 3px;
+                overflow: hidden;
+            }
+            .content-bar-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #8b5cf6, #a855f7);
+                border-radius: 3px;
+            }
+            .content-engagement {
+                font-weight: 700;
+                color: #8b5cf6;
+                font-size: 0.9rem;
+            }
+
+            /* Audience Insights Section */
+            .insight-audience-section {
+                margin-bottom: 20px;
+            }
+            .audience-stats-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .audience-stat {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-radius: 10px;
+                padding: 14px;
+                border: 1px solid #e2e8f0;
+            }
+            .audience-stat-label {
+                display: block;
+                font-size: 0.7rem;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+            .audience-stat-value {
+                font-size: 1rem;
+                font-weight: 700;
+                color: #1e293b;
+            }
+
+            /* Growth Channel Grid */
+            .growth-channel-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .growth-channel-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 14px;
+                background: #f9fafb;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+            }
+            .channel-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1rem;
+            }
+            .channel-icon.social { background: linear-gradient(135deg, #ec4899, #f472b6); }
+            .channel-icon.organic { background: linear-gradient(135deg, #10b981, #34d399); }
+            .channel-icon.referral { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+            .channel-icon.direct { background: linear-gradient(135deg, #f97316, #fb923c); }
+            .channel-info {
+                display: flex;
+                flex-direction: column;
+            }
+            .channel-name {
+                font-size: 0.8rem;
+                color: #64748b;
+            }
+            .channel-value {
+                font-size: 1rem;
+                font-weight: 700;
+                color: #1e293b;
+            }
+
+            /* Growth Drivers Section */
+            .insight-drivers-section {
+                margin-bottom: 20px;
+            }
+            .drivers-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .driver-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                background: #f9fafb;
+                border-radius: 10px;
+            }
+            .driver-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .driver-name {
+                font-weight: 600;
+                color: #1f2937;
+                font-size: 0.85rem;
+            }
+            .driver-impact {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-weight: 600;
+            }
+            .driver-impact.impact-high { background: #d1fae5; color: #059669; }
+            .driver-impact.impact-medium { background: #fef3c7; color: #d97706; }
+            .driver-impact.impact-low { background: #e0e7ff; color: #6366f1; }
+            .driver-contribution {
+                font-weight: 700;
+                color: #10b981;
+                font-size: 0.9rem;
+            }
+
+            /* Projection Section */
+            .insight-projection-section {
+                margin-bottom: 20px;
+            }
+            .projection-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            .projection-item {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-radius: 10px;
+                padding: 14px;
+                text-align: center;
+                border: 1px solid #e2e8f0;
+            }
+            .projection-period {
+                display: block;
+                font-size: 0.7rem;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+            .projection-value {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #10b981;
+            }
+            .projection-value.confidence-high { color: #10b981; }
+            .projection-value.confidence-medium { color: #f59e0b; }
+            .projection-value.confidence-low { color: #ef4444; }
+
+            /* Market Distribution Section */
+            .insight-market-section {
+                margin-bottom: 20px;
+            }
+            .market-distribution-list {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .market-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 14px;
+                background: #f9fafb;
+                border-radius: 8px;
+            }
+            .market-item.is-you {
+                background: linear-gradient(135deg, #8b5cf620 0%, #a855f720 100%);
+                border: 1px solid #8b5cf640;
+            }
+            .market-item-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .market-rank {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #8b5cf6;
+            }
+            .market-name {
+                font-weight: 600;
+                color: #1f2937;
+                font-size: 0.85rem;
+            }
+            .market-bar-container {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 50%;
+            }
+            .market-bar {
+                flex: 1;
+                height: 6px;
+                background: linear-gradient(90deg, #8b5cf6, #a855f7);
+                border-radius: 3px;
+            }
+            .market-share {
+                font-weight: 700;
+                color: #1f2937;
+                font-size: 0.85rem;
+                min-width: 45px;
+                text-align: right;
+            }
+
+            /* Channel Presence Section */
+            .insight-channel-section {
+                margin-bottom: 20px;
+            }
+            .channel-presence-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .channel-presence-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 14px;
+                background: #f9fafb;
+                border-radius: 10px;
+            }
+            .channel-presence-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                background: #e0e7ff;
+                color: #6366f1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.1rem;
+            }
+            .channel-presence-info {
+                flex: 1;
+            }
+            .channel-presence-name {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #1f2937;
+                display: block;
+                margin-bottom: 4px;
+            }
+            .channel-presence-bar {
+                height: 6px;
+                background: #e5e7eb;
+                border-radius: 3px;
+                overflow: hidden;
+            }
+            .channel-presence-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #6366f1, #8b5cf6);
+                border-radius: 3px;
+            }
+            .channel-presence-value {
+                font-weight: 700;
+                color: #6366f1;
+                font-size: 0.9rem;
+            }
+
+            /* Competitive Gap Section */
+            .insight-gap-section {
+                margin-bottom: 20px;
+            }
+            .competitive-gap-card {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-radius: 12px;
+                padding: 20px;
+                border: 1px solid #e2e8f0;
+            }
+            .gap-leader {
+                text-align: center;
+                margin-bottom: 16px;
+            }
+            .gap-label {
+                display: block;
+                font-size: 0.7rem;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+            .gap-value {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #1e293b;
+            }
+            .gap-share {
+                display: block;
+                font-size: 0.8rem;
+                color: #64748b;
+                margin-top: 2px;
+            }
+            .gap-divider {
+                height: 1px;
+                background: #e2e8f0;
+                margin: 16px 0;
+            }
+            .gap-info {
+                text-align: center;
+            }
+            .gap-text {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #8b5cf6;
+            }
+
+            /* Action Items Section */
+            .insight-actions-section {
+                margin-bottom: 10px;
+            }
+            .action-items-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .action-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 14px 16px;
+                background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+                border-radius: 10px;
+                border-left: 3px solid #8b5cf6;
+            }
+            .action-number {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+                color: white;
+                font-size: 0.75rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+            .action-text {
+                font-size: 0.85rem;
+                color: #374151;
+                line-height: 1.5;
+            }
+
+            /* Responsive for modal */
+            @media (max-width: 480px) {
+                .insight-key-findings {
+                    grid-template-columns: 1fr;
+                }
+                .engagement-type-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .growth-channel-grid {
+                    grid-template-columns: 1fr;
+                }
+                .projection-grid {
+                    grid-template-columns: 1fr;
+                }
+                .audience-stats-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
         `;
         document.head.appendChild(styles);
     }
@@ -2080,6 +2913,342 @@ class CompetitorsPage {
             ? (avgValue / 1000000).toFixed(1) + 'M'
             : (metricKey === 'growth' ? '+' : '') + avgValue.toFixed(1) + '%';
 
+        // Generate insight-specific detailed content
+        const modalContent = insight.modalContent || {};
+
+        // Generate Key Findings HTML
+        const keyFindingsHtml = modalContent.keyFindings ? `
+            <div class="insight-key-findings">
+                ${modalContent.keyFindings.map(finding => `
+                    <div class="insight-finding-card">
+                        <div class="finding-icon"><i class="fas ${finding.icon}"></i></div>
+                        <div class="finding-content">
+                            <div class="finding-label">${finding.label}</div>
+                            <div class="finding-value">${finding.value}</div>
+                            <div class="finding-detail">${finding.detail}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        ` : '';
+
+        // Generate Sentiment Breakdown HTML (for sentiment insight)
+        const sentimentBreakdownHtml = modalContent.sentimentBreakdown ? `
+            <div class="insight-breakdown-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Sentiment Breakdown
+                </h4>
+                <div class="sentiment-breakdown-bars">
+                    <div class="breakdown-bar-item">
+                        <div class="breakdown-bar-header">
+                            <span class="breakdown-label"><i class="fas fa-smile text-success"></i> Positive</span>
+                            <span class="breakdown-value">${modalContent.sentimentBreakdown.positive}%</span>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-bar-fill positive" style="width: ${modalContent.sentimentBreakdown.positive}%"></div>
+                        </div>
+                    </div>
+                    <div class="breakdown-bar-item">
+                        <div class="breakdown-bar-header">
+                            <span class="breakdown-label"><i class="fas fa-meh text-warning"></i> Neutral</span>
+                            <span class="breakdown-value">${modalContent.sentimentBreakdown.neutral}%</span>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-bar-fill neutral" style="width: ${modalContent.sentimentBreakdown.neutral}%"></div>
+                        </div>
+                    </div>
+                    <div class="breakdown-bar-item">
+                        <div class="breakdown-bar-header">
+                            <span class="breakdown-label"><i class="fas fa-frown text-danger"></i> Negative</span>
+                            <span class="breakdown-value">${modalContent.sentimentBreakdown.negative}%</span>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-bar-fill negative" style="width: ${modalContent.sentimentBreakdown.negative}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Top Themes HTML (for sentiment insight)
+        const topThemesHtml = modalContent.topThemes ? `
+            <div class="insight-themes-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-tags"></i>
+                    Top Discussion Themes
+                </h4>
+                <div class="themes-list">
+                    ${modalContent.topThemes.map(theme => `
+                        <div class="theme-item">
+                            <div class="theme-info">
+                                <span class="theme-name">${theme.theme}</span>
+                                <span class="theme-sentiment ${theme.sentiment}">${theme.sentiment}</span>
+                            </div>
+                            <span class="theme-mentions">${theme.mentions.toLocaleString()} mentions</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Engagement By Type HTML (for engagement insight)
+        const engagementByTypeHtml = modalContent.engagementByType ? `
+            <div class="insight-breakdown-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-hand-pointer"></i>
+                    Engagement Distribution
+                </h4>
+                <div class="engagement-type-grid">
+                    <div class="engagement-type-item">
+                        <i class="fas fa-heart"></i>
+                        <span class="type-value">${modalContent.engagementByType.likes}%</span>
+                        <span class="type-label">Likes</span>
+                    </div>
+                    <div class="engagement-type-item">
+                        <i class="fas fa-comment"></i>
+                        <span class="type-value">${modalContent.engagementByType.comments}%</span>
+                        <span class="type-label">Comments</span>
+                    </div>
+                    <div class="engagement-type-item">
+                        <i class="fas fa-share"></i>
+                        <span class="type-value">${modalContent.engagementByType.shares}%</span>
+                        <span class="type-label">Shares</span>
+                    </div>
+                    <div class="engagement-type-item">
+                        <i class="fas fa-bookmark"></i>
+                        <span class="type-value">${modalContent.engagementByType.saves}%</span>
+                        <span class="type-label">Saves</span>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Top Content Types HTML (for engagement insight)
+        const topContentHtml = modalContent.topContentTypes ? `
+            <div class="insight-content-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-star"></i>
+                    Top Performing Content
+                </h4>
+                <div class="content-type-list">
+                    ${modalContent.topContentTypes.map((content, idx) => `
+                        <div class="content-type-item">
+                            <div class="content-rank">${idx + 1}</div>
+                            <div class="content-icon"><i class="fas ${content.icon}"></i></div>
+                            <div class="content-info">
+                                <span class="content-name">${content.type}</span>
+                                <div class="content-bar">
+                                    <div class="content-bar-fill" style="width: ${Math.min(content.engagement, 100)}%"></div>
+                                </div>
+                            </div>
+                            <span class="content-engagement">${content.engagement}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Audience Insights HTML (for engagement insight)
+        const audienceInsightsHtml = modalContent.audienceInsights ? `
+            <div class="insight-audience-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-users"></i>
+                    Audience Behavior
+                </h4>
+                <div class="audience-stats-grid">
+                    <div class="audience-stat">
+                        <span class="audience-stat-label">Most Active Day</span>
+                        <span class="audience-stat-value">${modalContent.audienceInsights.mostActiveDay}</span>
+                    </div>
+                    <div class="audience-stat">
+                        <span class="audience-stat-label">Avg Session</span>
+                        <span class="audience-stat-value">${modalContent.audienceInsights.avgSessionTime}</span>
+                    </div>
+                    <div class="audience-stat">
+                        <span class="audience-stat-label">Return Rate</span>
+                        <span class="audience-stat-value">${modalContent.audienceInsights.returnRate}</span>
+                    </div>
+                    <div class="audience-stat">
+                        <span class="audience-stat-label">Peak Hours</span>
+                        <span class="audience-stat-value">${modalContent.peakHours?.slice(0, 2).join(', ')}</span>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Growth By Channel HTML (for growth insight)
+        const growthByChannelHtml = modalContent.growthByChannel ? `
+            <div class="insight-breakdown-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-sitemap"></i>
+                    Growth by Channel
+                </h4>
+                <div class="growth-channel-grid">
+                    <div class="growth-channel-item">
+                        <div class="channel-icon social"><i class="fas fa-share-alt"></i></div>
+                        <div class="channel-info">
+                            <span class="channel-name">Social</span>
+                            <span class="channel-value">+${modalContent.growthByChannel.social}%</span>
+                        </div>
+                    </div>
+                    <div class="growth-channel-item">
+                        <div class="channel-icon organic"><i class="fas fa-search"></i></div>
+                        <div class="channel-info">
+                            <span class="channel-name">Organic</span>
+                            <span class="channel-value">+${modalContent.growthByChannel.organic}%</span>
+                        </div>
+                    </div>
+                    <div class="growth-channel-item">
+                        <div class="channel-icon referral"><i class="fas fa-link"></i></div>
+                        <div class="channel-info">
+                            <span class="channel-name">Referral</span>
+                            <span class="channel-value">+${modalContent.growthByChannel.referral}%</span>
+                        </div>
+                    </div>
+                    <div class="growth-channel-item">
+                        <div class="channel-icon direct"><i class="fas fa-mouse-pointer"></i></div>
+                        <div class="channel-info">
+                            <span class="channel-name">Direct</span>
+                            <span class="channel-value">+${modalContent.growthByChannel.direct}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Growth Drivers HTML (for growth insight)
+        const growthDriversHtml = modalContent.growthDrivers ? `
+            <div class="insight-drivers-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-bolt"></i>
+                    Key Growth Drivers
+                </h4>
+                <div class="drivers-list">
+                    ${modalContent.growthDrivers.map(driver => `
+                        <div class="driver-item">
+                            <div class="driver-info">
+                                <span class="driver-name">${driver.driver}</span>
+                                <span class="driver-impact impact-${driver.impact.toLowerCase()}">${driver.impact} Impact</span>
+                            </div>
+                            <span class="driver-contribution">${driver.contribution}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Projected Growth HTML (for growth insight)
+        const projectedGrowthHtml = modalContent.projectedGrowth ? `
+            <div class="insight-projection-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-crystal-ball"></i>
+                    Growth Projection
+                </h4>
+                <div class="projection-grid">
+                    <div class="projection-item">
+                        <span class="projection-period">Next Month</span>
+                        <span class="projection-value">+${modalContent.projectedGrowth.nextMonth}%</span>
+                    </div>
+                    <div class="projection-item">
+                        <span class="projection-period">Next Quarter</span>
+                        <span class="projection-value">+${modalContent.projectedGrowth.nextQuarter}%</span>
+                    </div>
+                    <div class="projection-item confidence">
+                        <span class="projection-period">Confidence</span>
+                        <span class="projection-value confidence-${modalContent.projectedGrowth.confidence.toLowerCase()}">${modalContent.projectedGrowth.confidence}</span>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Market Distribution HTML (for market insight)
+        const marketDistributionHtml = modalContent.marketDistribution ? `
+            <div class="insight-market-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Market Share Distribution
+                </h4>
+                <div class="market-distribution-list">
+                    ${modalContent.marketDistribution.map((brand, idx) => `
+                        <div class="market-item ${brand.isYou ? 'is-you' : ''}">
+                            <div class="market-item-info">
+                                <span class="market-rank">#${idx + 1}</span>
+                                <span class="market-name">${brand.name} ${brand.isYou ? '(You)' : ''}</span>
+                            </div>
+                            <div class="market-bar-container">
+                                <div class="market-bar" style="width: ${brand.share * 2}%"></div>
+                                <span class="market-share">${brand.share}%</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Channel Presence HTML (for market insight)
+        const channelPresenceHtml = modalContent.channelPresence ? `
+            <div class="insight-channel-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-broadcast-tower"></i>
+                    Platform Presence
+                </h4>
+                <div class="channel-presence-grid">
+                    ${modalContent.channelPresence.map(channel => `
+                        <div class="channel-presence-item">
+                            <div class="channel-presence-icon"><i class="fab ${channel.icon}"></i></div>
+                            <div class="channel-presence-info">
+                                <span class="channel-presence-name">${channel.channel}</span>
+                                <div class="channel-presence-bar">
+                                    <div class="channel-presence-fill" style="width: ${channel.strength}%"></div>
+                                </div>
+                            </div>
+                            <span class="channel-presence-value">${channel.strength}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Competitive Gap HTML (for market insight)
+        const competitiveGapHtml = modalContent.competitiveGap ? `
+            <div class="insight-gap-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-balance-scale"></i>
+                    Competitive Position
+                </h4>
+                <div class="competitive-gap-card">
+                    <div class="gap-leader">
+                        <span class="gap-label">Market Leader</span>
+                        <span class="gap-value">${modalContent.competitiveGap.leader}</span>
+                        <span class="gap-share">${modalContent.competitiveGap.leaderShare}% market share</span>
+                    </div>
+                    <div class="gap-divider"></div>
+                    <div class="gap-info">
+                        <span class="gap-text">${modalContent.competitiveGap.gapToLeader}</span>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
+        // Generate Action Items HTML
+        const actionItemsHtml = modalContent.actionItems ? `
+            <div class="insight-actions-section">
+                <h4 class="insight-modal-section-title">
+                    <i class="fas fa-tasks"></i>
+                    Recommended Actions
+                </h4>
+                <ul class="action-items-list">
+                    ${modalContent.actionItems.map((item, idx) => `
+                        <li class="action-item">
+                            <span class="action-number">${idx + 1}</span>
+                            <span class="action-text">${item}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        ` : '';
+
         const modalHtml = `
             <div class="insight-modal">
                 <div class="insight-modal-content">
@@ -2111,6 +3280,23 @@ class CompetitorsPage {
                             </div>
                         </div>
 
+                        ${keyFindingsHtml}
+
+                        ${sentimentBreakdownHtml}
+                        ${topThemesHtml}
+
+                        ${engagementByTypeHtml}
+                        ${topContentHtml}
+                        ${audienceInsightsHtml}
+
+                        ${growthByChannelHtml}
+                        ${growthDriversHtml}
+                        ${projectedGrowthHtml}
+
+                        ${marketDistributionHtml}
+                        ${channelPresenceHtml}
+                        ${competitiveGapHtml}
+
                         <div class="insight-modal-section">
                             <h4 class="insight-modal-section-title">
                                 <i class="fas fa-trophy"></i>
@@ -2131,15 +3317,7 @@ class CompetitorsPage {
                             </div>
                         </div>
 
-                        <div class="insight-modal-section">
-                            <h4 class="insight-modal-section-title">
-                                <i class="fas fa-lightbulb"></i>
-                                Recommendations
-                            </h4>
-                            <ul class="insight-tips-list">
-                                ${insight.tips.map(tip => `<li>${tip}</li>`).join('')}
-                            </ul>
-                        </div>
+                        ${actionItemsHtml}
                     </div>
                 </div>
             </div>
