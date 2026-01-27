@@ -2872,6 +2872,20 @@
     transform: scale(1.1);
 }
 
+/* Influencer page action button override */
+.influencers-page .action-btn:hover,
+.influencer-card .action-btn:hover {
+    background: #f5f3ff !important;
+    color: #6366f1 !important;
+    transform: none !important;
+    border-color: #6366f1 !important;
+}
+
+.influencers-page .action-btn:hover .material-icons,
+.influencer-card .action-btn:hover .material-icons {
+    color: #6366f1 !important;
+}
+
 /* Modal Styles */
 .modal-overlay {
     position: fixed;
@@ -5054,25 +5068,33 @@
 }
 
 .influencer-actions .action-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    background: transparent;
-    border-radius: var(--radius);
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 50%;
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all 0.2s ease;
 }
 
 .influencer-actions .action-btn:hover {
-    background: var(--gray-100);
+    background: #f5f3ff !important;
+    border-color: #6366f1 !important;
+    color: #6366f1 !important;
+    transform: none !important;
 }
 
 .influencer-actions .action-btn .material-icons {
     font-size: 18px;
-    color: var(--gray-500);
+    color: #64748b !important;
+    transition: color 0.2s ease;
+}
+
+.influencer-actions .action-btn:hover .material-icons {
+    color: #6366f1 !important;
 }
 
 /* ===================================
