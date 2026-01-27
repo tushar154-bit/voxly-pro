@@ -1488,12 +1488,17 @@ class CompetitorsPage {
         this.currentInsights = insights;
 
         grid.innerHTML = insights.map((insight, index) => `
-            <div class="insight-card insight-card-dynamic insight-${insight.type}" data-insight-id="${insight.id}" style="animation-delay: ${index * 0.1}s;">
+            <div class="insight-card insight-card-dynamic insight-${insight.id}-card" data-insight-id="${insight.id}" style="animation-delay: ${index * 0.1}s;">
+                <div class="stat-card-bg">
+                    <div class="stat-bg-shape shape-1"></div>
+                    <div class="stat-bg-shape shape-2"></div>
+                    <div class="stat-bg-shape shape-3"></div>
+                </div>
                 <div class="insight-card-header">
-                    <div class="insight-icon-wrapper" style="background: linear-gradient(135deg, ${insight.iconColor}20 0%, ${insight.iconColor}10 100%);">
-                        <i class="fas ${insight.icon}" style="color: ${insight.iconColor};"></i>
+                    <div class="insight-icon-wrapper">
+                        <i class="fas ${insight.icon}"></i>
                     </div>
-                    <div class="insight-rank-badge" style="background: ${insight.type === 'success' ? '#10b981' : insight.type === 'warning' ? '#f59e0b' : insight.type === 'danger' ? '#ef4444' : '#3b82f6'};">
+                    <div class="insight-rank-badge">
                         #${insight.rank}
                     </div>
                 </div>
@@ -1506,7 +1511,7 @@ class CompetitorsPage {
                     </span>
                 </div>
                 <div class="insight-progress-bar">
-                    <div class="insight-progress-fill" style="width: 0%; background: linear-gradient(90deg, ${insight.iconColor} 0%, ${insight.iconColor}80 100%);" data-progress="${insight.progress}"></div>
+                    <div class="insight-progress-fill" style="width: 0%;" data-progress="${insight.progress}"></div>
                 </div>
                 <p class="insight-description">${insight.description}</p>
                 <button class="insight-action-btn" data-insight-id="${insight.id}">
@@ -1545,130 +1550,293 @@ class CompetitorsPage {
     }
 
     addInsightStyles() {
-        if (document.getElementById('insight-dynamic-styles')) return;
+        // Remove existing styles to allow updates
+        const existingStyles = document.getElementById('insight-dynamic-styles');
+        if (existingStyles) existingStyles.remove();
 
         const styles = document.createElement('style');
         styles.id = 'insight-dynamic-styles';
         styles.textContent = `
+            /* Base card styling */
             .insight-card-dynamic {
-                background: white;
+                position: relative;
                 border-radius: 16px;
-                padding: 20px;
-                border: 1px solid #f3f4f6;
+                padding: 24px;
+                border: none;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 animation: insightFadeIn 0.5s ease forwards;
                 opacity: 0;
                 transform: translateY(10px);
+                overflow: hidden;
+                color: white;
             }
+
             @keyframes insightFadeIn {
                 to { opacity: 1; transform: translateY(0); }
             }
-            .insight-card-dynamic:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-                border-color: #e5e7eb;
+
+            /* Background shapes container */
+            .insight-card-dynamic .stat-card-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                overflow: hidden;
+                pointer-events: none;
             }
+
+            /* Floating background shapes */
+            .insight-card-dynamic .stat-bg-shape {
+                position: absolute;
+                border-radius: 50%;
+                opacity: 0.25;
+                background: rgba(255, 255, 255, 0.2);
+            }
+            .insight-card-dynamic .stat-bg-shape.shape-1 {
+                width: 140px;
+                height: 140px;
+                top: -50px;
+                right: -50px;
+                background: rgba(255, 255, 255, 0.25);
+                animation: insightFloat 5s ease-in-out infinite, insightPulse 4s ease-in-out infinite;
+            }
+            .insight-card-dynamic .stat-bg-shape.shape-2 {
+                width: 100px;
+                height: 100px;
+                bottom: -30px;
+                left: -30px;
+                background: rgba(255, 255, 255, 0.2);
+                animation: insightFloat 6s ease-in-out infinite, insightPulse 5s ease-in-out infinite;
+                animation-delay: -2s, -1s;
+            }
+            .insight-card-dynamic .stat-bg-shape.shape-3 {
+                width: 70px;
+                height: 70px;
+                top: 35%;
+                right: 15%;
+                background: rgba(255, 255, 255, 0.18);
+                animation: insightFloat 5.5s ease-in-out infinite, insightPulse 6s ease-in-out infinite;
+                animation-delay: -3s, -2s;
+            }
+
+            @keyframes insightFloat {
+                0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+                25% { transform: translate(-8px, 6px) scale(1.08) rotate(4deg); }
+                50% { transform: translate(-12px, 10px) scale(1.12) rotate(0deg); }
+                75% { transform: translate(-5px, 4px) scale(1.05) rotate(-4deg); }
+            }
+
+            @keyframes insightPulse {
+                0%, 100% { opacity: 0.25; }
+                50% { opacity: 0.4; }
+            }
+
+            /* Sentiment Card - Light Green */
+            .insight-sentiment-card {
+                background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
+                animation: insightFadeIn 0.5s ease forwards, glowSentimentInsight 3s ease-in-out infinite alternate !important;
+                border: none !important;
+            }
+            .insight-sentiment-card:hover {
+                transform: translateY(-8px) scale(1.02) !important;
+                background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%) !important;
+                box-shadow: 0 20px 40px -15px rgba(34, 197, 94, 0.5), 0 0 30px rgba(34, 197, 94, 0.4) !important;
+            }
+            @keyframes glowSentimentInsight {
+                0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(34, 197, 94, 0.4); }
+            }
+
+            /* Engagement Card - Blue (like alerts-card style) */
+            .insight-engagement-card {
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%) !important;
+                animation: insightFadeIn 0.5s ease forwards, glowEngagementInsight 3s ease-in-out infinite alternate !important;
+                border: none !important;
+            }
+            .insight-engagement-card:hover {
+                transform: translateY(-8px) scale(1.02) !important;
+                background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%) !important;
+                box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.5), 0 0 30px rgba(59, 130, 246, 0.4) !important;
+            }
+            @keyframes glowEngagementInsight {
+                0% { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4); }
+            }
+
+            /* Growth Card - Orange (like volume-card style) */
+            .insight-growth-card {
+                background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%) !important;
+                animation: insightFadeIn 0.5s ease forwards, glowGrowthInsight 3s ease-in-out infinite alternate !important;
+                border: none !important;
+            }
+            .insight-growth-card:hover {
+                transform: translateY(-8px) scale(1.02) !important;
+                background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%) !important;
+                box-shadow: 0 20px 40px -15px rgba(249, 115, 22, 0.5), 0 0 30px rgba(249, 115, 22, 0.4) !important;
+            }
+            @keyframes glowGrowthInsight {
+                0% { box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(249, 115, 22, 0.4); }
+            }
+
+            /* Market Card - Cyan/Teal (like sentiment-card green style) */
+            .insight-market-card {
+                background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%) !important;
+                animation: insightFadeIn 0.5s ease forwards, glowMarketInsight 3s ease-in-out infinite alternate !important;
+                border: none !important;
+            }
+            .insight-market-card:hover {
+                transform: translateY(-8px) scale(1.02) !important;
+                background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0891b2 100%) !important;
+                box-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.5), 0 0 30px rgba(6, 182, 212, 0.4) !important;
+            }
+            @keyframes glowMarketInsight {
+                0% { box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
+                100% { box-shadow: 0 6px 25px rgba(6, 182, 212, 0.4); }
+            }
+
+            /* Card header */
             .insight-card-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
-                margin-bottom: 12px;
+                margin-bottom: 16px;
+                position: relative;
+                z-index: 1;
             }
+
+            /* Icon wrapper */
             .insight-icon-wrapper {
-                width: 44px;
-                height: 44px;
-                border-radius: 12px;
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.2rem;
-            }
-            .insight-rank-badge {
-                padding: 4px 10px;
-                border-radius: 20px;
+                font-size: 1.3rem;
+                background: rgba(255, 255, 255, 0.25);
                 color: white;
-                font-size: 0.7rem;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Rank badge */
+            .insight-rank-badge {
+                padding: 6px 12px;
+                border-radius: 20px;
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                font-size: 0.75rem;
                 font-weight: 700;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }
+
+            /* Title */
             .insight-card-dynamic .insight-title {
-                font-size: 0.95rem;
+                font-size: 1rem;
                 font-weight: 600;
-                color: #1f2937;
-                margin: 0 0 12px 0;
+                color: rgba(255, 255, 255, 0.95);
+                margin: 0 0 14px 0;
+                position: relative;
+                z-index: 1;
             }
+
+            /* Value row */
             .insight-value-row {
                 display: flex;
                 align-items: baseline;
-                gap: 10px;
-                margin-bottom: 12px;
+                gap: 12px;
+                margin-bottom: 14px;
+                position: relative;
+                z-index: 1;
             }
+
+            /* Main value */
             .insight-value {
-                font-size: 1.5rem;
+                font-size: 2.25rem;
                 font-weight: 700;
-                color: #1f2937;
+                color: white;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
             }
+
+            /* Change badge */
             .insight-change {
                 font-size: 0.8rem;
                 font-weight: 600;
                 display: flex;
                 align-items: center;
                 gap: 4px;
-                padding: 3px 8px;
+                padding: 4px 10px;
                 border-radius: 12px;
+                background: rgba(255, 255, 255, 0.25);
+                color: white;
+                backdrop-filter: blur(10px);
             }
-            .insight-change.positive {
-                color: #10b981;
-                background: #10b98115;
-            }
-            .insight-change.negative {
-                color: #ef4444;
-                background: #ef444415;
-            }
+            .insight-change.positive,
+            .insight-change.negative,
             .insight-change.neutral {
-                color: #6b7280;
-                background: #6b728015;
+                background: rgba(255, 255, 255, 0.25);
+                color: white;
             }
+
+            /* Progress bar */
             .insight-progress-bar {
-                height: 6px;
-                background: #f3f4f6;
-                border-radius: 3px;
-                margin-bottom: 12px;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+                margin-bottom: 14px;
                 overflow: hidden;
+                position: relative;
+                z-index: 1;
             }
             .insight-progress-fill {
                 height: 100%;
-                border-radius: 3px;
-                transition: width 1s ease;
+                border-radius: 4px;
+                transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+                background: rgba(255, 255, 255, 0.85);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             }
+
+            /* Description */
             .insight-card-dynamic .insight-description {
-                font-size: 0.8rem;
-                color: #6b7280;
-                margin: 0 0 16px 0;
-                line-height: 1.4;
+                font-size: 0.85rem;
+                color: rgba(255, 255, 255, 0.9);
+                margin: 0 0 18px 0;
+                line-height: 1.5;
+                position: relative;
+                z-index: 1;
             }
+
+            /* Action button */
             .insight-action-btn {
                 width: 100%;
-                padding: 10px 16px;
-                background: #f9fafb;
-                border: 1px solid #e5e7eb;
-                border-radius: 10px;
-                font-size: 0.8rem;
+                padding: 12px 18px;
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 12px;
+                font-size: 0.85rem;
                 font-weight: 600;
-                color: #4b5563;
+                color: white;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                transition: all 0.2s ease;
+                transition: all 0.3s ease;
+                position: relative;
+                z-index: 1;
+                backdrop-filter: blur(10px);
             }
             .insight-action-btn:hover {
-                background: #8b5cf6;
-                border-color: #8b5cf6;
-                color: white;
+                background: rgba(255, 255, 255, 0.35);
+                border-color: rgba(255, 255, 255, 0.5);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             }
             .insight-action-btn i {
-                transition: transform 0.2s ease;
+                transition: transform 0.3s ease;
             }
             .insight-action-btn:hover i {
                 transform: translateX(4px);

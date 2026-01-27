@@ -2371,7 +2371,7 @@
     margin-top: 1.5rem;
 }
 
-.insight-card {
+.insight-card:not(.insight-card-dynamic) {
     background: white;
     padding: 1.5rem;
     border-radius: var(--radius-lg);
@@ -2379,13 +2379,13 @@
     border-left: 4px solid var(--primary);
 }
 
-.insight-card h4 {
+.insight-card:not(.insight-card-dynamic) h4 {
     font-size: 16px;
     margin-bottom: 0.75rem;
     color: var(--gray-900);
 }
 
-.insight-card p {
+.insight-card:not(.insight-card-dynamic) p {
     color: var(--gray-600);
     line-height: 1.6;
 }
@@ -7422,8 +7422,8 @@
     gap: 16px;
 }
 
-/* Insight Card */
-.insight-card {
+/* Insight Card - excludes dynamic styled cards */
+.insight-card:not(.insight-card-dynamic) {
     background: white;
     border-radius: 16px;
     padding: 20px 16px;
@@ -7437,7 +7437,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.insight-card:hover {
+.insight-card:not(.insight-card-dynamic):hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     border-color: transparent;
@@ -7491,7 +7491,7 @@
     gap: 4px;
 }
 
-.insight-value {
+.insight-card:not(.insight-card-dynamic) .insight-value {
     font-size: 1.35rem;
     font-weight: 700;
     color: var(--gray-900, #111827);
@@ -7504,7 +7504,7 @@
 }
 
 /* Insight Trend */
-.insight-trend {
+.insight-card:not(.insight-card-dynamic) .insight-trend {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -7514,12 +7514,12 @@
     border-radius: 12px;
 }
 
-.insight-trend.up {
+.insight-card:not(.insight-card-dynamic) .insight-trend.up {
     background: #d1fae5;
     color: #059669;
 }
 
-.insight-trend.down {
+.insight-card:not(.insight-card-dynamic) .insight-trend.down {
     background: #fee2e2;
     color: #dc2626;
 }
