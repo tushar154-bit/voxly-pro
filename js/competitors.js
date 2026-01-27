@@ -1861,7 +1861,7 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards, glowSentimentInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
             .insight-sentiment-card:hover {
                 background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%) !important;
@@ -1878,7 +1878,7 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards, glowEngagementInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
             .insight-engagement-card:hover {
                 background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%) !important;
@@ -1895,7 +1895,7 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards, glowGrowthInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
             .insight-growth-card:hover {
                 background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%) !important;
@@ -1912,7 +1912,7 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards, glowMarketInsight 3s ease-in-out infinite alternate !important;
                 border: none !important;
-                transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease !important;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
             .insight-market-card:hover {
                 background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0891b2 100%) !important;
