@@ -427,12 +427,111 @@ class CompetitorsPage {
 
     init() {
         this.currentBrand = typeof APIData !== 'undefined' ? APIData.currentBrand : 'apple';
+        this.addCompetitorCircleStyles();
         this.loadCompetitorData();
         this.renderCompetitorChips();
         this.initializeCharts();
         this.loadComparisonTable();
         this.loadInsights();
         this.setupEventListeners();
+    }
+
+    addCompetitorCircleStyles() {
+        // Remove existing styles to allow updates
+        const existingStyles = document.getElementById('competitor-circle-styles');
+        if (existingStyles) existingStyles.remove();
+
+        const styles = document.createElement('style');
+        styles.id = 'competitor-circle-styles';
+        styles.textContent = `
+            /* Background container for circles */
+            .competitor-card-bg {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+                z-index: 1 !important;
+            }
+
+            /* Floating circle background shapes - soft bokeh style */
+            .competitor-vibrant-card .competitor-circle {
+                position: absolute !important;
+                border-radius: 50% !important;
+                pointer-events: none !important;
+                background: rgba(255, 255, 255, 0.2) !important;
+                opacity: 0.25 !important;
+            }
+
+            /* Large circle - top right */
+            .competitor-vibrant-card .competitor-circle.circle-1 {
+                width: 140px !important;
+                height: 140px !important;
+                top: -50px !important;
+                right: -50px !important;
+                background: rgba(255, 255, 255, 0.25) !important;
+                animation: competitorFloat 5s ease-in-out infinite, competitorPulse 4s ease-in-out infinite !important;
+            }
+
+            /* Medium circle - bottom left */
+            .competitor-vibrant-card .competitor-circle.circle-2 {
+                width: 100px !important;
+                height: 100px !important;
+                bottom: -30px !important;
+                left: -30px !important;
+                background: rgba(255, 255, 255, 0.2) !important;
+                animation: competitorFloat 6s ease-in-out infinite, competitorPulse 5s ease-in-out infinite !important;
+                animation-delay: -2s, -1s !important;
+            }
+
+            /* Small circle - center right */
+            .competitor-vibrant-card .competitor-circle.circle-3 {
+                width: 70px !important;
+                height: 70px !important;
+                top: 35% !important;
+                right: 15% !important;
+                background: rgba(255, 255, 255, 0.18) !important;
+                animation: competitorFloat 5.5s ease-in-out infinite, competitorPulse 6s ease-in-out infinite !important;
+                animation-delay: -3s, -2s !important;
+            }
+
+            /* Extra small circle - top left */
+            .competitor-vibrant-card .competitor-circle.circle-4 {
+                width: 50px !important;
+                height: 50px !important;
+                top: 20px !important;
+                left: 20% !important;
+                background: rgba(255, 255, 255, 0.15) !important;
+                animation: competitorFloat 7s ease-in-out infinite, competitorPulse 5.5s ease-in-out infinite !important;
+                animation-delay: -1s, -0.5s !important;
+            }
+
+            /* Medium circle - bottom right */
+            .competitor-vibrant-card .competitor-circle.circle-5 {
+                width: 80px !important;
+                height: 80px !important;
+                bottom: 0 !important;
+                right: 5% !important;
+                background: rgba(255, 255, 255, 0.12) !important;
+                animation: competitorFloat 8s ease-in-out infinite, competitorPulse 6.5s ease-in-out infinite !important;
+                animation-delay: -4s, -3s !important;
+            }
+
+            @keyframes competitorFloat {
+                0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+                25% { transform: translate(-8px, 6px) scale(1.08) rotate(4deg); }
+                50% { transform: translate(-12px, 10px) scale(1.12) rotate(0deg); }
+                75% { transform: translate(-5px, 4px) scale(1.05) rotate(-4deg); }
+            }
+
+            @keyframes competitorPulse {
+                0%, 100% { opacity: 0.25; }
+                50% { opacity: 0.45; }
+            }
+        `;
+        document.head.appendChild(styles);
     }
 
     async handleBrandChange(brandId, force = false) {
