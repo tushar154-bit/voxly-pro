@@ -1787,23 +1787,25 @@ class CompetitorsPage {
                 padding: 24px;
                 border: none;
                 cursor: pointer;
+                overflow: hidden;
+                color: white;
                 transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                             box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                             background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                animation: insightFadeIn 0.5s ease forwards;
-                opacity: 0;
-                overflow: hidden;
-                color: white;
+                animation: insightFadeIn 0.6s ease-out;
+                animation-fill-mode: backwards;
             }
 
             @keyframes insightFadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
             }
 
-            /* Hover pop-up effect for all cards */
+            /* Hover pop-up effect for all cards - smooth transition */
             .insight-card-dynamic:hover {
-                transform: translateY(-8px) scale(1.02) !important;
+                transform: translateY(-8px) scale(1.02);
             }
 
             /* Background shapes container */
