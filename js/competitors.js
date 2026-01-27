@@ -1861,11 +1861,12 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards !important;
                 border: none !important;
-                box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25);
+                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);
+                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
             }
             .insight-sentiment-card:hover {
-                transform: translateY(-6px) !important;
-                box-shadow: 0 12px 28px rgba(34, 197, 94, 0.35) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25) !important;
             }
 
             /* Engagement Card - Blue */
@@ -1873,11 +1874,12 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards !important;
                 border: none !important;
-                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
             }
             .insight-engagement-card:hover {
-                transform: translateY(-6px) !important;
-                box-shadow: 0 12px 28px rgba(59, 130, 246, 0.35) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important;
             }
 
             /* Growth Card - Orange */
@@ -1885,11 +1887,12 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards !important;
                 border: none !important;
-                box-shadow: 0 4px 15px rgba(249, 115, 22, 0.25);
+                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
             }
             .insight-growth-card:hover {
-                transform: translateY(-6px) !important;
-                box-shadow: 0 12px 28px rgba(249, 115, 22, 0.35) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25) !important;
             }
 
             /* Market Card - Cyan/Teal */
@@ -1897,11 +1900,12 @@ class CompetitorsPage {
                 background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%) !important;
                 animation: insightFadeIn 0.5s ease forwards !important;
                 border: none !important;
-                box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+                box-shadow: 0 2px 8px rgba(6, 182, 212, 0.15);
+                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
             }
             .insight-market-card:hover {
-                transform: translateY(-6px) !important;
-                box-shadow: 0 12px 28px rgba(6, 182, 212, 0.35) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25) !important;
             }
 
             /* Card header */
