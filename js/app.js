@@ -210,6 +210,15 @@ class VoxlyApp {
                     }
                     break;
 
+                case 'journey':
+                    title = 'Customer Journey';
+                    if (typeof Journey !== 'undefined') {
+                        this.currentPageInstance = Journey;
+                        content = Journey.render();
+                        setTimeout(() => Journey.init(), 100);
+                    }
+                    break;
+
                 case 'trends':
                     title = 'Trend Discovery';
                     if (typeof Trends !== 'undefined') {

@@ -9004,3 +9004,1019 @@
         height: 46px;
     }
 }
+
+/* ===================================
+   Customer Journey Page Styles
+   =================================== */
+
+.journey-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Journey Header */
+.journey-header {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
+}
+
+.journey-header .page-header-right {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* Journey Stat Cards */
+.journey-stat-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 1.5rem;
+    color: white;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+}
+
+.journey-stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.journey-stat-card.journey-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    box-shadow: 0 10px 40px -10px rgba(139, 92, 246, 0.5);
+}
+
+.journey-stat-card.journey-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.5);
+}
+
+.journey-stat-card.journey-orange {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    box-shadow: 0 10px 40px -10px rgba(249, 115, 22, 0.5);
+}
+
+.journey-stat-card.journey-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.5);
+}
+
+.journey-stat-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.journey-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: journeyFloat 6s ease-in-out infinite;
+}
+
+.journey-circle.circle-1 {
+    width: 120px;
+    height: 120px;
+    top: -30px;
+    right: -30px;
+    animation-delay: 0s;
+}
+
+.journey-circle.circle-2 {
+    width: 80px;
+    height: 80px;
+    bottom: -20px;
+    left: 20%;
+    animation-delay: -2s;
+}
+
+.journey-circle.circle-3 {
+    width: 60px;
+    height: 60px;
+    top: 50%;
+    right: 20%;
+    animation-delay: -4s;
+}
+
+@keyframes journeyFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.1;
+    }
+    50% {
+        transform: translateY(-10px) scale(1.1);
+        opacity: 0.2;
+    }
+}
+
+.journey-stat-card .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+
+.journey-stat-card .stat-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.journey-stat-card .stat-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.journey-stat-card .stat-icon .material-icons {
+    font-size: 1.25rem;
+}
+
+.journey-stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.journey-stat-card .stat-change {
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+}
+
+.journey-stat-card .stat-change .material-icons {
+    font-size: 1rem;
+}
+
+/* Journey Funnel */
+.journey-funnel-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.journey-funnel-container {
+    padding: 1.5rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.funnel-stage {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+.funnel-stage:hover {
+    transform: translateX(8px);
+}
+
+.funnel-stage:hover .stage-bar {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stage-bar {
+    height: 56px;
+    background: linear-gradient(135deg, var(--stage-color), color-mix(in srgb, var(--stage-color) 80%, black));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    min-width: 180px;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stage-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: white;
+    width: 100%;
+}
+
+.stage-content .material-icons {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.stage-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.stage-count {
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.stage-dropoff-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.dropoff-line {
+    width: 20px;
+    height: 2px;
+    background: #e5e7eb;
+}
+
+.dropoff-badge {
+    background: #fef2f2;
+    color: #ef4444;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.stage-sentiment {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-left: auto;
+    min-width: 60px;
+}
+
+/* Touchpoint Cards */
+.touchpoint-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.touchpoint-card {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.touchpoint-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--touchpoint-color);
+}
+
+.touchpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.touchpoint-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.touchpoint-icon .material-icons {
+    font-size: 1.25rem;
+}
+
+.touchpoint-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: #1f2937;
+}
+
+.touchpoint-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.touchpoint-metric {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+}
+
+.touchpoint-metric .metric-label {
+    color: #6b7280;
+}
+
+.touchpoint-metric .metric-value {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.touchpoint-attribution {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.attribution-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: block;
+    margin-bottom: 0.375rem;
+}
+
+.attribution-bar {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.attribution-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+/* Pain Points Section */
+.pain-points-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.pain-points-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.pain-point-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    background: #fef2f2;
+    border-radius: 8px;
+    border-left: 3px solid #ef4444;
+}
+
+.pain-point-stage {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: #1f2937;
+    min-width: 100px;
+}
+
+.pain-point-issue {
+    flex: 1;
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.pain-point-impact {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+}
+
+.pain-point-impact.impact-high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.pain-point-impact.impact-medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.pain-point-impact.impact-low {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* Paths List */
+.paths-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.path-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.path-item:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
+.path-item.best-path {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.03));
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.path-item.best-path:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.path-rank {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #8b5cf6;
+    min-width: 35px;
+}
+
+.path-flow {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+}
+
+.path-step {
+    padding: 0.375rem 0.625rem;
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.path-arrow {
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.path-metrics {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.path-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 70px;
+}
+
+.path-metric .metric-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.path-metric .metric-value.conversion {
+    color: #10b981;
+}
+
+.path-metric .metric-label {
+    font-size: 0.6875rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Customer Segments */
+.segments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.segment-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.segment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.segment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.segment-name {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #1f2937;
+}
+
+.segment-count {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.segment-percentage {
+    padding: 0.375rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.segment-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.segment-metric {
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.segment-metric .metric-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.segment-metric .metric-label {
+    font-size: 0.6875rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.segment-path {
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.segment-path .path-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.segment-path-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.mini-step {
+    padding: 0.25rem 0.5rem;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.mini-arrow {
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+/* Stage Detail Modal */
+.stage-detail-modal {
+    max-width: 550px;
+    width: 90%;
+}
+
+/* Journey Page Responsive */
+@media (max-width: 1024px) {
+    .path-metrics {
+        gap: 1rem;
+    }
+
+    .path-metric {
+        min-width: 55px;
+    }
+}
+
+@media (max-width: 768px) {
+    .journey-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .journey-header .page-header-right {
+        width: 100%;
+    }
+
+    .funnel-stage {
+        flex-wrap: wrap;
+    }
+
+    .stage-dropoff-indicator {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    .stage-sentiment {
+        margin-left: 0;
+    }
+
+    .path-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .path-metrics {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .segments-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .touchpoint-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ===================================
+   Advanced Competitor Intelligence Styles
+   =================================== */
+
+/* Market Position Matrix */
+.market-matrix-container {
+    position: relative;
+}
+
+.matrix-quadrant-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.quadrant-label {
+    position: absolute;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.quadrant-label.top-left {
+    top: 30px;
+    left: 60px;
+}
+
+.quadrant-label.top-right {
+    top: 30px;
+    right: 30px;
+}
+
+.quadrant-label.bottom-left {
+    bottom: 60px;
+    left: 60px;
+}
+
+.quadrant-label.bottom-right {
+    bottom: 60px;
+    right: 30px;
+}
+
+/* SWOT Grid */
+.swot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .swot-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.swot-card {
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.swot-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+.swot-strengths {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.swot-strengths .swot-header i {
+    color: #10b981;
+}
+
+.swot-weaknesses {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.05) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.swot-weaknesses .swot-header i {
+    color: #ef4444;
+}
+
+.swot-opportunities {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.swot-opportunities .swot-header i {
+    color: #3b82f6;
+}
+
+.swot-threats {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.swot-threats .swot-header i {
+    color: #f59e0b;
+}
+
+.swot-header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 1rem;
+}
+
+.swot-header i {
+    font-size: 1.125rem;
+}
+
+.swot-header h4 {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.swot-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.swot-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+}
+
+.swot-item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.swot-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.swot-item-title {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.swot-item-desc {
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    position: relative;
+    padding-left: 25px;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #8b5cf6, #06b6d4, #10b981);
+    border-radius: 2px;
+}
+
+.timeline-item {
+    position: relative;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.875rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.timeline-item:hover {
+    border-color: var(--timeline-color, #8b5cf6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 1.25rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--timeline-color, #8b5cf6);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--timeline-color, #8b5cf6);
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.timeline-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.timeline-brand-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.timeline-brand-name {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: #1f2937;
+}
+
+.timeline-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.timeline-type-badge i {
+    font-size: 0.625rem;
+}
+
+.timeline-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.625rem;
+    line-height: 1.4;
+}
+
+.timeline-metrics {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.timeline-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.timeline-metric-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.timeline-metric-label {
+    font-size: 0.625rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.timeline-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-left: auto;
+}
+
+/* Timeline Filters */
+.timeline-filters .form-select {
+    font-size: 0.8125rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border-radius: 8px;
+}
+
+/* Responsive for Competitor Intelligence */
+@media (max-width: 768px) {
+    .activity-timeline {
+        padding-left: 20px;
+    }
+
+    .timeline-item {
+        margin-left: 5px;
+    }
+
+    .timeline-item::before {
+        left: -16px;
+    }
+
+    .timeline-metrics {
+        gap: 1rem;
+    }
+
+    .timeline-time {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}

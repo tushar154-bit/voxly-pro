@@ -421,6 +421,120 @@ class CompetitorsPage {
                         </div>
                     </div>
                 </div>
+
+                <!-- Market Position Matrix -->
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-th" style="color: white; font-size: 1.1rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title" style="margin: 0;">Market Position Matrix</h3>
+                                <p class="card-subtitle" style="margin: 4px 0 0 0; font-size: 0.875rem; color: #6b7280;">Competitive positioning by Share of Voice and Sentiment</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="market-matrix-container" id="marketMatrixContainer">
+                            <div class="matrix-quadrant-labels">
+                                <span class="quadrant-label top-left">Niche Players</span>
+                                <span class="quadrant-label top-right">Leaders</span>
+                                <span class="quadrant-label bottom-left">Emerging</span>
+                                <span class="quadrant-label bottom-right">Challengers</span>
+                            </div>
+                            <div class="chart-container" style="height: 400px; position: relative;">
+                                <canvas id="marketPositionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Strategy Analysis -->
+                <div class="charts-grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="card-header-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-photo-video" style="color: white; font-size: 1.1rem;"></i>
+                                </div>
+                                <h3 class="card-title" style="margin: 0;">Content Type Distribution</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="contentTypeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="card-header-icon" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-calendar-alt" style="color: white; font-size: 1.1rem;"></i>
+                                </div>
+                                <h3 class="card-title" style="margin: 0;">Posting Frequency</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="postingFrequencyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SWOT Analysis -->
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-chess" style="color: white; font-size: 1.1rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title" style="margin: 0;">SWOT Analysis</h3>
+                                <p class="card-subtitle" style="margin: 4px 0 0 0; font-size: 0.875rem; color: #6b7280;">Auto-generated competitive analysis based on data</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" id="refreshSwotBtn" style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="swot-grid" id="swotGrid">
+                            <!-- SWOT cards populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competitor Activity Timeline -->
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-stream" style="color: white; font-size: 1.1rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title" style="margin: 0;">Competitor Activity Timeline</h3>
+                                <p class="card-subtitle" style="margin: 4px 0 0 0; font-size: 0.875rem; color: #6b7280;">Recent competitor activities and market events</p>
+                            </div>
+                        </div>
+                        <div class="timeline-filters" style="display: flex; gap: 0.75rem;">
+                            <select id="timelineTypeFilter" class="form-select" style="min-width: 150px;">
+                                <option value="all">All Activities</option>
+                                <option value="product_launch">Product Launches</option>
+                                <option value="campaign">Campaigns</option>
+                                <option value="viral_content">Viral Content</option>
+                                <option value="partnership">Partnerships</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-timeline" id="activityTimeline">
+                            <!-- Timeline populated by JS -->
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -433,6 +547,12 @@ class CompetitorsPage {
         this.initializeCharts();
         this.loadComparisonTable();
         this.loadInsights();
+        // Advanced Competitor Intelligence
+        this.initMarketPositionChart();
+        this.initContentTypeChart();
+        this.initPostingFrequencyChart();
+        this.loadSWOTAnalysis();
+        this.loadActivityTimeline();
         this.setupEventListeners();
     }
 
@@ -3947,8 +4067,540 @@ class CompetitorsPage {
         URL.revokeObjectURL(url);
     }
 
+    // ===================================
+    // Advanced Competitor Intelligence
+    // ===================================
+
+    getBrandSeed(brandId) {
+        let hash = 0;
+        const str = brandId || 'default';
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Math.abs(hash);
+    }
+
+    seededRandom(seed) {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+    }
+
+    getMarketPositionData() {
+        const seed = this.getBrandSeed(this.currentBrand);
+        return this.competitors.map((comp, idx) => ({
+            name: comp.name,
+            color: comp.color || ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'][idx % 5],
+            shareOfVoice: 15 + this.seededRandom(seed + idx * 10) * 35,
+            sentiment: comp.sentiment,
+            engagementRate: comp.engagement || (3 + this.seededRandom(seed + idx * 11) * 7),
+            quadrant: this.calculateQuadrant(15 + this.seededRandom(seed + idx * 10) * 35, comp.sentiment)
+        }));
+    }
+
+    calculateQuadrant(sov, sentiment) {
+        if (sov >= 25 && sentiment >= 65) return 'Leaders';
+        if (sov < 25 && sentiment >= 65) return 'Niche Players';
+        if (sov >= 25 && sentiment < 65) return 'Challengers';
+        return 'Emerging';
+    }
+
+    initMarketPositionChart() {
+        const ctx = document.getElementById('marketPositionChart');
+        if (!ctx) return;
+
+        if (this.marketPositionChart) {
+            this.marketPositionChart.destroy();
+        }
+
+        const matrixData = this.getMarketPositionData();
+
+        this.marketPositionChart = new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: matrixData.map((comp) => ({
+                    label: comp.name,
+                    data: [{
+                        x: comp.shareOfVoice,
+                        y: comp.sentiment,
+                        r: Math.max(10, comp.engagementRate * 2.5)
+                    }],
+                    backgroundColor: this.hexToRgba(comp.color, 0.6),
+                    borderColor: comp.color,
+                    borderWidth: 2
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 15 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                const data = matrixData[context.datasetIndex];
+                                return [
+                                    `${data.name}`,
+                                    `Share of Voice: ${data.shareOfVoice.toFixed(1)}%`,
+                                    `Sentiment: ${data.sentiment}%`,
+                                    `Engagement: ${data.engagementRate.toFixed(1)}%`,
+                                    `Quadrant: ${data.quadrant}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Share of Voice (%)', font: { weight: '600' } },
+                        min: 0, max: 55,
+                        grid: { color: 'rgba(0, 0, 0, 0.04)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Sentiment Score (%)', font: { weight: '600' } },
+                        min: 40, max: 100,
+                        grid: { color: 'rgba(0, 0, 0, 0.04)' }
+                    }
+                }
+            }
+        });
+    }
+
+    hexToRgba(hex, alpha = 1) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    getContentTypeData() {
+        const seed = this.getBrandSeed(this.currentBrand);
+        return this.competitors.map((comp, idx) => ({
+            brand: comp.name,
+            color: comp.color || ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'][idx % 5],
+            video: Math.round(15 + this.seededRandom(seed + idx * 20) * 25),
+            image: Math.round(25 + this.seededRandom(seed + idx * 21) * 30),
+            text: Math.round(15 + this.seededRandom(seed + idx * 22) * 20),
+            stories: Math.round(10 + this.seededRandom(seed + idx * 23) * 15),
+            reels: Math.round(5 + this.seededRandom(seed + idx * 24) * 15)
+        }));
+    }
+
+    initContentTypeChart() {
+        const ctx = document.getElementById('contentTypeChart');
+        if (!ctx) return;
+
+        if (this.contentTypeChart) {
+            this.contentTypeChart.destroy();
+        }
+
+        const contentData = this.getContentTypeData();
+        const contentTypes = ['Video', 'Image', 'Text', 'Stories', 'Reels'];
+        const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'];
+
+        this.contentTypeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: contentData.map(c => c.brand),
+                datasets: contentTypes.map((type, idx) => ({
+                    label: type,
+                    data: contentData.map(c => c[type.toLowerCase()]),
+                    backgroundColor: colors[idx],
+                    borderRadius: 4
+                }))
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        max: 100,
+                        title: { display: true, text: 'Content Mix (%)' }
+                    },
+                    y: { stacked: true }
+                }
+            }
+        });
+    }
+
+    getPostingFrequencyData() {
+        const seed = this.getBrandSeed(this.currentBrand);
+        return this.competitors.map((comp, idx) => ({
+            brand: comp.name,
+            color: comp.color || ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'][idx % 5],
+            postsPerDay: (1.5 + this.seededRandom(seed + idx * 30) * 4).toFixed(1),
+            postsPerWeek: Math.round(10 + this.seededRandom(seed + idx * 31) * 18)
+        }));
+    }
+
+    initPostingFrequencyChart() {
+        const ctx = document.getElementById('postingFrequencyChart');
+        if (!ctx) return;
+
+        if (this.postingFrequencyChart) {
+            this.postingFrequencyChart.destroy();
+        }
+
+        const freqData = this.getPostingFrequencyData();
+
+        this.postingFrequencyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: freqData.map(c => c.brand),
+                datasets: [{
+                    label: 'Posts per Week',
+                    data: freqData.map(c => c.postsPerWeek),
+                    backgroundColor: freqData.map(c => c.color),
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Posts per Week' }
+                    }
+                }
+            }
+        });
+    }
+
+    generateSWOTData() {
+        const seed = this.getBrandSeed(this.currentBrand);
+        const yourBrand = this.competitors[0];
+        const others = this.competitors.slice(1);
+
+        if (!yourBrand || others.length === 0) {
+            return { strengths: [], weaknesses: [], opportunities: [], threats: [] };
+        }
+
+        const avgSentiment = others.reduce((s, c) => s + c.sentiment, 0) / others.length;
+        const avgEngagement = others.reduce((s, c) => s + c.engagement, 0) / others.length;
+        const avgGrowth = others.reduce((s, c) => s + c.growth, 0) / others.length;
+
+        const strengths = [];
+        const weaknesses = [];
+
+        if (yourBrand.sentiment > avgSentiment) {
+            strengths.push({
+                title: 'Superior Brand Sentiment',
+                description: `${(yourBrand.sentiment - avgSentiment).toFixed(1)}% above competitor average`,
+                impact: 'high',
+                icon: 'fa-smile'
+            });
+        } else {
+            weaknesses.push({
+                title: 'Lower Brand Sentiment',
+                description: `${(avgSentiment - yourBrand.sentiment).toFixed(1)}% below competitor average`,
+                impact: 'high',
+                icon: 'fa-frown'
+            });
+        }
+
+        if (yourBrand.engagement > avgEngagement) {
+            strengths.push({
+                title: 'Higher Engagement Rate',
+                description: `${(yourBrand.engagement - avgEngagement).toFixed(1)}% more audience interaction`,
+                impact: 'high',
+                icon: 'fa-heart'
+            });
+        } else {
+            weaknesses.push({
+                title: 'Engagement Gap',
+                description: `${(avgEngagement - yourBrand.engagement).toFixed(1)}% less interaction`,
+                impact: 'medium',
+                icon: 'fa-chart-bar'
+            });
+        }
+
+        if (yourBrand.growth > avgGrowth) {
+            strengths.push({
+                title: 'Faster Growth Rate',
+                description: `Growing ${(yourBrand.growth - avgGrowth).toFixed(1)}% faster`,
+                impact: 'medium',
+                icon: 'fa-rocket'
+            });
+        }
+
+        strengths.push({
+            title: 'Strong Market Presence',
+            description: 'Established brand recognition',
+            impact: 'medium',
+            icon: 'fa-building'
+        });
+
+        if (weaknesses.length < 2) {
+            weaknesses.push({
+                title: 'Limited Video Content',
+                description: 'Competitors produce more video content',
+                impact: 'medium',
+                icon: 'fa-video'
+            });
+        }
+
+        const opportunities = [
+            {
+                title: 'Emerging Markets',
+                description: 'Low competitor presence in new segments',
+                potential: 'high',
+                icon: 'fa-globe'
+            },
+            {
+                title: 'Content Diversification',
+                description: 'Expand into underutilized content types',
+                potential: 'medium',
+                icon: 'fa-th-large'
+            },
+            {
+                title: 'Influencer Partnerships',
+                description: 'Untapped micro-influencer opportunities',
+                potential: 'medium',
+                icon: 'fa-users'
+            }
+        ];
+
+        const fastestGrowing = others.reduce((a, b) => a.growth > b.growth ? a : b, others[0]);
+        const threats = [
+            {
+                title: `${fastestGrowing.name} Rapid Growth`,
+                description: `Growing at +${fastestGrowing.growth}% - monitoring needed`,
+                severity: 'high',
+                icon: 'fa-exclamation-triangle'
+            },
+            {
+                title: 'Market Saturation',
+                description: 'Share of voice becoming fragmented',
+                severity: 'medium',
+                icon: 'fa-chart-pie'
+            },
+            {
+                title: 'Algorithm Changes',
+                description: 'Platform reach may decline',
+                severity: 'low',
+                icon: 'fa-code-branch'
+            }
+        ];
+
+        return { strengths: strengths.slice(0, 3), weaknesses: weaknesses.slice(0, 3), opportunities, threats };
+    }
+
+    loadSWOTAnalysis() {
+        const grid = document.getElementById('swotGrid');
+        if (!grid) return;
+
+        const swot = this.generateSWOTData();
+
+        grid.innerHTML = `
+            <div class="swot-card swot-strengths">
+                <div class="swot-header">
+                    <i class="fas fa-plus-circle"></i>
+                    <h4>Strengths</h4>
+                </div>
+                <div class="swot-items">
+                    ${swot.strengths.map(item => `
+                        <div class="swot-item">
+                            <div class="swot-item-icon" style="background: rgba(16, 185, 129, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #10b981; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="swot-card swot-weaknesses">
+                <div class="swot-header">
+                    <i class="fas fa-minus-circle"></i>
+                    <h4>Weaknesses</h4>
+                </div>
+                <div class="swot-items">
+                    ${swot.weaknesses.map(item => `
+                        <div class="swot-item">
+                            <div class="swot-item-icon" style="background: rgba(239, 68, 68, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #ef4444; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="swot-card swot-opportunities">
+                <div class="swot-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>Opportunities</h4>
+                </div>
+                <div class="swot-items">
+                    ${swot.opportunities.map(item => `
+                        <div class="swot-item">
+                            <div class="swot-item-icon" style="background: rgba(59, 130, 246, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #3b82f6; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="swot-card swot-threats">
+                <div class="swot-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>Threats</h4>
+                </div>
+                <div class="swot-items">
+                    ${swot.threats.map(item => `
+                        <div class="swot-item">
+                            <div class="swot-item-icon" style="background: rgba(245, 158, 11, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #f59e0b; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    generateActivityData() {
+        const seed = this.getBrandSeed(this.currentBrand);
+        const activityTypes = [
+            { type: 'product_launch', icon: 'fa-rocket', color: '#8b5cf6', label: 'Product Launch' },
+            { type: 'campaign', icon: 'fa-bullhorn', color: '#3b82f6', label: 'Campaign' },
+            { type: 'viral_content', icon: 'fa-fire', color: '#f97316', label: 'Viral Content' },
+            { type: 'partnership', icon: 'fa-handshake', color: '#10b981', label: 'Partnership' },
+            { type: 'announcement', icon: 'fa-megaphone', color: '#06b6d4', label: 'Announcement' }
+        ];
+
+        const activities = [];
+        for (let i = 0; i < 8; i++) {
+            const compIdx = Math.floor(this.seededRandom(seed + i * 100) * this.competitors.length);
+            const comp = this.competitors[compIdx];
+            const typeIdx = Math.floor(this.seededRandom(seed + i * 101) * activityTypes.length);
+            const actType = activityTypes[typeIdx];
+            const daysAgo = Math.floor(this.seededRandom(seed + i * 102) * 21);
+
+            activities.push({
+                id: `act_${i}`,
+                brand: comp.name,
+                brandColor: comp.color || '#8b5cf6',
+                type: actType.type,
+                typeLabel: actType.label,
+                icon: actType.icon,
+                color: actType.color,
+                title: this.generateActivityTitle(actType.type, comp.name, seed + i),
+                engagement: Math.round(1000 + this.seededRandom(seed + i * 103) * 50000),
+                reach: Math.round(50000 + this.seededRandom(seed + i * 104) * 500000),
+                daysAgo: daysAgo
+            });
+        }
+
+        return activities.sort((a, b) => a.daysAgo - b.daysAgo);
+    }
+
+    generateActivityTitle(type, brandName, seed) {
+        const titles = {
+            product_launch: [`${brandName} launches new product line`, `${brandName} unveils latest innovation`],
+            campaign: [`${brandName} kicks off marketing campaign`, `${brandName} starts seasonal promotion`],
+            viral_content: [`${brandName} post goes viral`, `${brandName} content trends on social`],
+            partnership: [`${brandName} announces strategic partnership`, `${brandName} teams up with industry leader`],
+            announcement: [`${brandName} shares quarterly update`, `${brandName} reveals product roadmap`]
+        };
+        const options = titles[type] || [`${brandName} activity detected`];
+        return options[Math.floor(this.seededRandom(seed) * options.length)];
+    }
+
+    formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toString();
+    }
+
+    loadActivityTimeline(filterType = 'all') {
+        const container = document.getElementById('activityTimeline');
+        if (!container) return;
+
+        let activities = this.generateActivityData();
+
+        if (filterType !== 'all') {
+            activities = activities.filter(a => a.type === filterType);
+        }
+
+        container.innerHTML = activities.map(activity => `
+            <div class="timeline-item" style="--timeline-color: ${activity.color}">
+                <div class="timeline-header">
+                    <div class="timeline-brand">
+                        <span class="timeline-brand-dot" style="background: ${activity.brandColor};"></span>
+                        <span class="timeline-brand-name">${activity.brand}</span>
+                    </div>
+                    <span class="timeline-type-badge" style="background: ${activity.color}20; color: ${activity.color};">
+                        <i class="fas ${activity.icon}"></i> ${activity.typeLabel}
+                    </span>
+                </div>
+                <div class="timeline-title">${activity.title}</div>
+                <div class="timeline-metrics">
+                    <div class="timeline-metric">
+                        <span class="timeline-metric-value">${this.formatNumber(activity.engagement)}</span>
+                        <span class="timeline-metric-label">Engagement</span>
+                    </div>
+                    <div class="timeline-metric">
+                        <span class="timeline-metric-value">${this.formatNumber(activity.reach)}</span>
+                        <span class="timeline-metric-label">Reach</span>
+                    </div>
+                    <span class="timeline-time">${activity.daysAgo === 0 ? 'Today' : activity.daysAgo === 1 ? 'Yesterday' : activity.daysAgo + ' days ago'}</span>
+                </div>
+            </div>
+        `).join('');
+
+        // Add filter event listener
+        const filterSelect = document.getElementById('timelineTypeFilter');
+        if (filterSelect && !filterSelect.dataset.listenerAdded) {
+            filterSelect.addEventListener('change', (e) => {
+                this.loadActivityTimeline(e.target.value);
+            });
+            filterSelect.dataset.listenerAdded = 'true';
+        }
+
+        // Add SWOT refresh button listener
+        const refreshBtn = document.getElementById('refreshSwotBtn');
+        if (refreshBtn && !refreshBtn.dataset.listenerAdded) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadSWOTAnalysis();
+                if (window.notificationManager) {
+                    window.notificationManager.show('SWOT Analysis refreshed', 'success');
+                }
+            });
+            refreshBtn.dataset.listenerAdded = 'true';
+        }
+    }
+
     destroy() {
         // Cleanup
+        if (this.marketPositionChart) this.marketPositionChart.destroy();
+        if (this.contentTypeChart) this.contentTypeChart.destroy();
+        if (this.postingFrequencyChart) this.postingFrequencyChart.destroy();
     }
 }
 
