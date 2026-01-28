@@ -323,34 +323,186 @@ class SettingsPage {
     }
 
     renderIntegrationsSettings() {
+        // Check current API key status
+        const hasYouTubeKey = typeof APIService !== 'undefined' && APIService.config.youtube.apiKey;
+        const hasNewsKey = typeof APIService !== 'undefined' && APIService.config.news.apiKey;
+
         return `
             <div class="settings-section">
                 <h2 class="settings-section-title">Integrations</h2>
-                <p class="settings-section-description">Connect with third-party services</p>
+                <p class="settings-section-description">Connect with third-party services and configure API keys</p>
 
-                <div class="integrations-grid">
-                    ${[
-                        { name: 'Slack', icon: 'fab fa-slack', connected: true },
-                        { name: 'Microsoft Teams', icon: 'fab fa-microsoft', connected: false },
-                        { name: 'Google Analytics', icon: 'fab fa-google', connected: true },
-                        { name: 'Salesforce', icon: 'fas fa-cloud', connected: false },
-                        { name: 'HubSpot', icon: 'fab fa-hubspot', connected: false },
-                        { name: 'Zapier', icon: 'fas fa-bolt', connected: true }
-                    ].map(integration => `
-                        <div class="integration-card ${integration.connected ? 'connected' : ''}">
-                            <div class="integration-icon">
-                                <i class="${integration.icon}"></i>
+                <!-- Free API Configuration -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="material-icons" style="color: #10b981; vertical-align: middle; margin-right: 8px;">api</span>
+                            Free API Configuration
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Configure API keys to enable live data from external platforms.
+                            <strong>Reddit works without a key.</strong>
+                        </p>
+
+                        <!-- Reddit Status -->
+                        <div class="api-config-item" style="display: flex; align-items: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="width: 40px; height: 40px; background: #FF4500; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                                <i class="fab fa-reddit-alien" style="color: white; font-size: 1.25rem;"></i>
                             </div>
-                            <h4>${integration.name}</h4>
-                            <p>${integration.connected ? 'Connected' : 'Not connected'}</p>
-                            <button class="btn btn-sm ${integration.connected ? 'btn-danger' : 'btn-primary'}">
-                                ${integration.connected ? 'Disconnect' : 'Connect'}
-                            </button>
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0; font-size: 0.9375rem;">Reddit API</h4>
+                                <p style="margin: 0; font-size: 0.8125rem; color: #6b7280;">No API key required - Ready to use</p>
+                            </div>
+                            <span class="badge badge-success">Active</span>
                         </div>
-                    `).join('')}
+
+                        <!-- YouTube API Key -->
+                        <div class="api-config-item" style="padding: 1rem; background: rgba(255, 0, 0, 0.05); border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: #FF0000; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                                    <i class="fab fa-youtube" style="color: white; font-size: 1.25rem;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0; font-size: 0.9375rem;">YouTube Data API</h4>
+                                    <p style="margin: 0; font-size: 0.8125rem; color: #6b7280;">
+                                        <a href="https://console.developers.google.com" target="_blank" style="color: #3b82f6;">Get API Key</a> - 10,000 units/day free
+                                    </p>
+                                </div>
+                                <span class="badge ${hasYouTubeKey ? 'badge-success' : 'badge-warning'}">${hasYouTubeKey ? 'Configured' : 'Not Set'}</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="password" id="youtubeApiKey" class="form-input" placeholder="Enter YouTube API Key"
+                                    value="${hasYouTubeKey ? '••••••••••••••••' : ''}" style="flex: 1;">
+                                <button class="btn btn-primary btn-sm" id="saveYouTubeKey">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- NewsAPI Key -->
+                        <div class="api-config-item" style="padding: 1rem; background: rgba(59, 130, 246, 0.05); border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                                    <i class="fas fa-newspaper" style="color: white; font-size: 1.25rem;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0; font-size: 0.9375rem;">NewsAPI</h4>
+                                    <p style="margin: 0; font-size: 0.8125rem; color: #6b7280;">
+                                        <a href="https://newsapi.org/register" target="_blank" style="color: #3b82f6;">Get API Key</a> - 500 requests/day free
+                                    </p>
+                                </div>
+                                <span class="badge ${hasNewsKey ? 'badge-success' : 'badge-warning'}">${hasNewsKey ? 'Configured' : 'Not Set'}</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="password" id="newsApiKey" class="form-input" placeholder="Enter NewsAPI Key"
+                                    value="${hasNewsKey ? '••••••••••••••••' : ''}" style="flex: 1;">
+                                <button class="btn btn-primary btn-sm" id="saveNewsKey">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Test APIs Button -->
+                        <button class="btn btn-secondary" id="testAPIsBtn" style="width: 100%;">
+                            <i class="fas fa-vial"></i> Test API Connections
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Third-Party Integrations -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Third-Party Services</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="integrations-grid">
+                            ${[
+                                { name: 'Slack', icon: 'fab fa-slack', connected: true },
+                                { name: 'Microsoft Teams', icon: 'fab fa-microsoft', connected: false },
+                                { name: 'Google Analytics', icon: 'fab fa-google', connected: true },
+                                { name: 'Salesforce', icon: 'fas fa-cloud', connected: false },
+                                { name: 'HubSpot', icon: 'fab fa-hubspot', connected: false },
+                                { name: 'Zapier', icon: 'fas fa-bolt', connected: true }
+                            ].map(integration => `
+                                <div class="integration-card ${integration.connected ? 'connected' : ''}">
+                                    <div class="integration-icon">
+                                        <i class="${integration.icon}"></i>
+                                    </div>
+                                    <h4>${integration.name}</h4>
+                                    <p>${integration.connected ? 'Connected' : 'Not connected'}</p>
+                                    <button class="btn btn-sm ${integration.connected ? 'btn-danger' : 'btn-primary'}">
+                                        ${integration.connected ? 'Disconnect' : 'Connect'}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
+    }
+
+    setupAPIKeyListeners() {
+        // YouTube API Key Save
+        const saveYouTubeBtn = document.getElementById('saveYouTubeKey');
+        if (saveYouTubeBtn) {
+            saveYouTubeBtn.addEventListener('click', () => {
+                const input = document.getElementById('youtubeApiKey');
+                const key = input.value.trim();
+                if (key && !key.includes('•')) {
+                    if (typeof APIService !== 'undefined') {
+                        APIService.setYouTubeKey(key);
+                        input.value = '••••••••••••••••';
+                        Notifications.success('YouTube API key saved successfully');
+                    }
+                }
+            });
+        }
+
+        // NewsAPI Key Save
+        const saveNewsBtn = document.getElementById('saveNewsKey');
+        if (saveNewsBtn) {
+            saveNewsBtn.addEventListener('click', () => {
+                const input = document.getElementById('newsApiKey');
+                const key = input.value.trim();
+                if (key && !key.includes('•')) {
+                    if (typeof APIService !== 'undefined') {
+                        APIService.setNewsAPIKey(key);
+                        input.value = '••••••••••••••••';
+                        Notifications.success('NewsAPI key saved successfully');
+                    }
+                }
+            });
+        }
+
+        // Test APIs Button
+        const testBtn = document.getElementById('testAPIsBtn');
+        if (testBtn) {
+            testBtn.addEventListener('click', async () => {
+                testBtn.disabled = true;
+                testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+
+                try {
+                    if (typeof APIService !== 'undefined') {
+                        const results = await APIService.searchAll('technology', { reddit: { limit: 1 }, youtube: { maxResults: 1 }, news: { pageSize: 1 } });
+
+                        let message = 'API Test Results:\n';
+                        message += `Reddit: ${results.reddit.length > 0 ? 'Working' : 'Failed'}\n`;
+                        message += `YouTube: ${results.youtube.length > 0 ? 'Working' : 'No key or failed'}\n`;
+                        message += `News: ${results.news.length > 0 ? 'Working' : 'No key or failed'}`;
+
+                        Notifications.info(message, 'API Test', 5000);
+                    }
+                } catch (error) {
+                    Notifications.error('API test failed: ' + error.message);
+                }
+
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<i class="fas fa-vial"></i> Test API Connections';
+            });
+        }
     }
 
     renderTeamSettings() {
@@ -524,6 +676,10 @@ class SettingsPage {
                     Notifications.success('Primary color updated');
                 });
             }
+        }
+
+        if (section === 'integrations') {
+            this.setupAPIKeyListeners();
         }
     }
 

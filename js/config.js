@@ -17,7 +17,7 @@ const VoxlyConfig = {
         baseUrl: 'https://api.voxlypro.com/v1',
         timeout: 30000,
         retryAttempts: 3,
-        
+
         endpoints: {
             twitter: 'https://api.twitter.com/2/',
             reddit: 'https://oauth.reddit.com/',
@@ -27,7 +27,38 @@ const VoxlyConfig = {
             instagram: 'https://graph.instagram.com/v18.0/',
             news: 'https://newsapi.org/v2/',
             reviews: 'https://api.reviewsapi.com/v1/'
-        }
+        },
+
+        // Free API Configuration
+        // Get your API keys from:
+        // - YouTube: https://console.developers.google.com (YouTube Data API v3)
+        // - NewsAPI: https://newsapi.org/register
+        // - Reddit: No key needed for public read-only access
+        freeAPIs: {
+            reddit: {
+                enabled: true,
+                baseUrl: 'https://www.reddit.com',
+                rateLimit: 100, // requests per minute
+                requiresKey: false
+            },
+            youtube: {
+                enabled: true,
+                baseUrl: 'https://www.googleapis.com/youtube/v3',
+                dailyQuota: 10000, // units per day
+                requiresKey: true,
+                keyStorageKey: 'voxly_youtube_api_key'
+            },
+            news: {
+                enabled: true,
+                baseUrl: 'https://newsapi.org/v2',
+                dailyLimit: 500, // requests per day (free tier)
+                requiresKey: true,
+                keyStorageKey: 'voxly_news_api_key'
+            }
+        },
+
+        // Use mock data when APIs unavailable
+        fallbackToMock: true
     },
 
     // Platform Configuration
