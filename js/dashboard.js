@@ -94,6 +94,9 @@ class DashboardPage {
                     </div>
                 </div>
 
+                <!-- API Data Source Status -->
+                ${typeof APIService !== 'undefined' ? APIService.getStatusIndicatorHTML() : ''}
+
                 <!-- Stats Overview -->
                 <div class="stats-grid animated-fade-in">
                     <div class="stat-card primary interactive" data-stat="sentiment">

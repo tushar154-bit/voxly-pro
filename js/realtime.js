@@ -46,6 +46,9 @@ class RealtimePage {
                     </div>
                 </div>
 
+                <!-- API Data Source Status -->
+                ${typeof APIService !== 'undefined' ? APIService.getStatusIndicatorHTML() : ''}
+
                 <!-- Live Stats -->
                 <div class="stats-grid realtime-stats-grid">
                     <div class="stat-card realtime-card live-card">

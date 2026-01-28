@@ -35,6 +35,49 @@ const APIService = {
     cache: new Map(),
     cacheTimeout: 5 * 60 * 1000, // 5 minutes
 
+    // Data source tracking - helps identify real vs mock data
+    dataSourceStatus: {
+        reddit: { isLive: false, lastFetch: null, source: 'none' },
+        youtube: { isLive: false, lastFetch: null, source: 'none' },
+        news: { isLive: false, lastFetch: null, source: 'none' }
+    },
+
+    // Event listeners for status updates
+    statusListeners: [],
+
+    // Register a listener for data source status changes
+    onStatusChange(callback) {
+        this.statusListeners.push(callback);
+    },
+
+    // Notify all listeners of status change
+    notifyStatusChange(platform, status) {
+        this.dataSourceStatus[platform] = {
+            ...status,
+            lastFetch: new Date()
+        };
+        this.statusListeners.forEach(cb => cb(platform, this.dataSourceStatus[platform]));
+        this.logDataSource(platform, status);
+    },
+
+    // Console log with styling to show data source
+    logDataSource(platform, status) {
+        const icon = status.isLive ? '🟢' : '🟡';
+        const sourceText = status.isLive ? 'LIVE API' : 'MOCK DATA';
+        const color = status.isLive ? 'color: #10b981; font-weight: bold;' : 'color: #f59e0b; font-weight: bold;';
+
+        console.log(
+            `%c${icon} ${platform.toUpperCase()}: ${sourceText}`,
+            color,
+            status.isLive ? `(${status.count} results from API)` : '(Using fallback data)'
+        );
+    },
+
+    // Get current data source status for all platforms
+    getDataSourceStatus() {
+        return { ...this.dataSourceStatus };
+    },
+
     // ========================================
     // CONFIGURATION METHODS
     // ========================================
@@ -130,12 +173,19 @@ const APIService = {
             const data = await response.json();
             const posts = this.transformRedditPosts(data.data.children);
 
+            // Mark data as from live API
+            posts.forEach(p => p.dataSource = 'live-api');
+            this.notifyStatusChange('reddit', { isLive: true, source: 'reddit-api', count: posts.length });
+
             this.setCache(cacheKey, posts);
             return posts;
 
         } catch (error) {
             console.error('Reddit API error:', error);
-            return this.getMockRedditData(query);
+            const mockData = this.getMockRedditData(query);
+            mockData.forEach(p => p.dataSource = 'mock');
+            this.notifyStatusChange('reddit', { isLive: false, source: 'mock-fallback', count: mockData.length });
+            return mockData;
         }
     },
 
@@ -240,7 +290,10 @@ const APIService = {
 
         if (!this.config.youtube.apiKey) {
             console.warn('YouTube API key not configured, using mock data');
-            return this.getMockYouTubeData(query);
+            const mockData = this.getMockYouTubeData(query);
+            mockData.forEach(p => p.dataSource = 'mock');
+            this.notifyStatusChange('youtube', { isLive: false, source: 'no-api-key', count: mockData.length });
+            return mockData;
         }
 
         const cacheKey = `youtube_${query}_${order}_${maxResults}`;
@@ -273,12 +326,19 @@ const APIService = {
             const data = await response.json();
             const videos = await this.enrichYouTubeResults(data.items);
 
+            // Mark data as from live API
+            videos.forEach(v => v.dataSource = 'live-api');
+            this.notifyStatusChange('youtube', { isLive: true, source: 'youtube-api', count: videos.length });
+
             this.setCache(cacheKey, videos);
             return videos;
 
         } catch (error) {
             console.error('YouTube API error:', error);
-            return this.getMockYouTubeData(query);
+            const mockData = this.getMockYouTubeData(query);
+            mockData.forEach(v => v.dataSource = 'mock');
+            this.notifyStatusChange('youtube', { isLive: false, source: 'api-error', count: mockData.length });
+            return mockData;
         }
     },
 
@@ -398,7 +458,10 @@ const APIService = {
 
         if (!this.config.news.apiKey) {
             console.warn('NewsAPI key not configured, using mock data');
-            return this.getMockNewsData(query);
+            const mockData = this.getMockNewsData(query);
+            mockData.forEach(a => a.dataSource = 'mock');
+            this.notifyStatusChange('news', { isLive: false, source: 'no-api-key', count: mockData.length });
+            return mockData;
         }
 
         const cacheKey = `news_${query}_${sortBy}_${pageSize}`;
@@ -431,12 +494,19 @@ const APIService = {
             const data = await response.json();
             const articles = this.transformNewsArticles(data.articles);
 
+            // Mark data as from live API
+            articles.forEach(a => a.dataSource = 'live-api');
+            this.notifyStatusChange('news', { isLive: true, source: 'newsapi', count: articles.length });
+
             this.setCache(cacheKey, articles);
             return articles;
 
         } catch (error) {
             console.error('NewsAPI error:', error);
-            return this.getMockNewsData(query);
+            const mockData = this.getMockNewsData(query);
+            mockData.forEach(a => a.dataSource = 'mock');
+            this.notifyStatusChange('news', { isLive: false, source: 'api-error', count: mockData.length });
+            return mockData;
         }
     },
 
@@ -503,6 +573,9 @@ const APIService = {
     // ========================================
 
     async searchAll(query, options = {}) {
+        console.log('%c📊 VOXLY PRO - Fetching Data for: ' + query, 'color: #6366f1; font-weight: bold; font-size: 14px;');
+        console.log('─'.repeat(50));
+
         const results = {
             reddit: [],
             youtube: [],
@@ -512,7 +585,8 @@ const APIService = {
                 total: 0,
                 byPlatform: {},
                 avgSentiment: 0,
-                totalEngagement: 0
+                totalEngagement: 0,
+                dataSources: {} // Track which data is live vs mock
             }
         };
 
@@ -545,6 +619,32 @@ const APIService = {
             results.stats.totalEngagement = results.combined.reduce((sum, item) =>
                 sum + item.engagement, 0);
         }
+
+        // Add data source summary
+        results.stats.dataSources = {
+            reddit: this.dataSourceStatus.reddit,
+            youtube: this.dataSourceStatus.youtube,
+            news: this.dataSourceStatus.news
+        };
+
+        // Log summary
+        console.log('─'.repeat(50));
+        console.log('%c📊 DATA SOURCE SUMMARY:', 'color: #6366f1; font-weight: bold;');
+        console.table({
+            Reddit: {
+                Status: this.dataSourceStatus.reddit.isLive ? '🟢 LIVE' : '🟡 MOCK',
+                Results: redditResults.length
+            },
+            YouTube: {
+                Status: this.dataSourceStatus.youtube.isLive ? '🟢 LIVE' : '🟡 MOCK',
+                Results: youtubeResults.length
+            },
+            News: {
+                Status: this.dataSourceStatus.news.isLive ? '🟢 LIVE' : '🟡 MOCK',
+                Results: newsResults.length
+            }
+        });
+        console.log('─'.repeat(50));
 
         return results;
     },
@@ -690,6 +790,52 @@ const APIService = {
     },
 
     // ========================================
+    // UI STATUS INDICATOR
+    // ========================================
+
+    // Generate HTML for data source status indicator
+    getStatusIndicatorHTML() {
+        const status = this.getDataSourceStatus();
+
+        const getStatusBadge = (platform, name) => {
+            const isLive = status[platform].isLive;
+            const statusClass = isLive ? 'live' : 'mock';
+            const statusIcon = isLive ? '🟢' : '🟡';
+            const statusText = isLive ? 'LIVE' : 'MOCK';
+
+            return `
+                <div class="api-status-badge api-status-${statusClass}" title="${name}: ${isLive ? 'Real-time API data' : 'Using demo/mock data'}">
+                    <span class="api-status-icon">${statusIcon}</span>
+                    <span class="api-status-name">${name}</span>
+                    <span class="api-status-text">${statusText}</span>
+                </div>
+            `;
+        };
+
+        return `
+            <div class="api-status-container" id="api-status-indicator">
+                <div class="api-status-header">
+                    <i class="material-icons">sensors</i>
+                    <span>Data Sources</span>
+                </div>
+                <div class="api-status-badges">
+                    ${getStatusBadge('reddit', 'Reddit')}
+                    ${getStatusBadge('youtube', 'YouTube')}
+                    ${getStatusBadge('news', 'News')}
+                </div>
+            </div>
+        `;
+    },
+
+    // Update the status indicator in the DOM
+    updateStatusIndicator() {
+        const indicator = document.getElementById('api-status-indicator');
+        if (indicator) {
+            indicator.outerHTML = this.getStatusIndicatorHTML();
+        }
+    },
+
+    // ========================================
     // UTILITY METHODS
     // ========================================
 
@@ -717,7 +863,75 @@ const APIService = {
 // Initialize saved API keys on load
 APIService.loadSavedKeys();
 
+// Set default YouTube API key if not already configured
+if (!APIService.config.youtube.apiKey) {
+    APIService.setYouTubeKey('AIzaSyC1gmMqRxRcSPCbBoYHBaz73N7PVKlUicQ');
+}
+
+// Set default NewsAPI key if not already configured
+if (!APIService.config.news.apiKey) {
+    APIService.setNewsAPIKey('99cdf5b2c0e04a67a2d9d8121eee9a29');
+}
+
+// Auto-update UI when status changes
+APIService.onStatusChange(() => {
+    APIService.updateStatusIndicator();
+});
+
 // Make available globally
 window.APIService = APIService;
 
-console.log('API Service loaded - Reddit, YouTube, NewsAPI integrations ready');
+// Log startup info with API key status
+console.log('%c🚀 API Service Initialized', 'color: #6366f1; font-weight: bold; font-size: 12px;');
+console.log('─'.repeat(40));
+const keys = APIService.hasRequiredKeys();
+console.log('📡 Reddit API:', keys.reddit ? '✅ Ready (no key required)' : '❌ Not available');
+console.log('📺 YouTube API:', keys.youtube ? '✅ API key configured' : '⚠️ No API key - will use mock data');
+console.log('📰 NewsAPI:', keys.news ? '✅ API key configured' : '⚠️ No API key - will use mock data');
+console.log('─'.repeat(40));
+console.log('💡 Tip: Check browser console during searches to see data source status');
+console.log('💡 Add API keys in Settings > Integrations to enable live data');
+
+// Auto-test API connectivity on load
+(async function testAPIConnectivity() {
+    console.log('%c🔍 Testing API connectivity...', 'color: #6366f1;');
+
+    // Test Reddit (quick search)
+    try {
+        const redditTest = await fetch('https://www.reddit.com/search.json?q=test&limit=1', {
+            headers: { 'User-Agent': 'VoxlyPro/2.0.0' }
+        });
+        if (redditTest.ok) {
+            APIService.notifyStatusChange('reddit', { isLive: true, source: 'connectivity-test', count: 1 });
+        }
+    } catch (e) {
+        APIService.notifyStatusChange('reddit', { isLive: false, source: 'connectivity-failed', count: 0 });
+    }
+
+    // Test YouTube (only if key exists)
+    if (APIService.config.youtube.apiKey) {
+        try {
+            const ytTest = await fetch(
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&q=test&maxResults=1&key=${APIService.config.youtube.apiKey}`
+            );
+            if (ytTest.ok) {
+                APIService.notifyStatusChange('youtube', { isLive: true, source: 'connectivity-test', count: 1 });
+            } else {
+                const error = await ytTest.json();
+                console.warn('YouTube API test failed:', error.error?.message);
+                APIService.notifyStatusChange('youtube', { isLive: false, source: 'api-error', count: 0 });
+            }
+        } catch (e) {
+            APIService.notifyStatusChange('youtube', { isLive: false, source: 'connectivity-failed', count: 0 });
+        }
+    } else {
+        APIService.notifyStatusChange('youtube', { isLive: false, source: 'no-api-key', count: 0 });
+    }
+
+    // NewsAPI - mark as mock (no key or key needs testing)
+    if (!APIService.config.news.apiKey) {
+        APIService.notifyStatusChange('news', { isLive: false, source: 'no-api-key', count: 0 });
+    }
+
+    console.log('%c✅ API connectivity test complete', 'color: #10b981;');
+})();
