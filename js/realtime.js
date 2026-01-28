@@ -224,8 +224,11 @@ class RealtimePage {
         `;
     }
 
-    init() {
+    async init() {
         this.currentBrand = typeof APIData !== 'undefined' ? APIData.currentBrand : 'apple';
+
+        // Fetch real-time API data first
+        await this.fetchRealTimeAPIData();
 
         // Initialize real-time updates
         this.startLiveUpdates();
@@ -248,6 +251,165 @@ class RealtimePage {
             }
         } catch (e) {
             console.warn('Notification failed:', e);
+        }
+    }
+
+    /**
+     * Fetch real-time data from APIs and populate the feed
+     */
+    async fetchRealTimeAPIData() {
+        if (typeof APIService === 'undefined') {
+            console.warn('APIService not available');
+            return;
+        }
+
+        const brand = typeof APIData !== 'undefined' ? APIData.brands[this.currentBrand] : null;
+        const searchQuery = brand ? brand.name : this.currentBrand;
+
+        console.log(`📡 Real-time monitor fetching data for: ${searchQuery}`);
+
+        try {
+            const apiResults = await APIService.searchAll(searchQuery, {
+                reddit: { sort: 'new', time: 'day', limit: 15 },
+                youtube: { order: 'date', maxResults: 15 },
+                news: { sortBy: 'publishedAt', pageSize: 15 }
+            });
+
+            // Store for later use
+            this.apiResults = apiResults;
+
+            // Update the API status indicator
+            APIService.updateStatusIndicator();
+
+            // Populate the live feed with real data
+            this.populateFeedWithAPIData(apiResults);
+
+            // Update stats from real data
+            this.updateStatsFromAPIData(apiResults);
+
+        } catch (error) {
+            console.error('Failed to fetch real-time API data:', error);
+        }
+    }
+
+    /**
+     * Populate the live feed with real API data
+     */
+    populateFeedWithAPIData(apiResults) {
+        if (!apiResults || !apiResults.combined || apiResults.combined.length === 0) {
+            return;
+        }
+
+        const liveFeed = document.getElementById('liveFeed');
+        if (!liveFeed) return;
+
+        // Sort by recency
+        const sortedPosts = [...apiResults.combined]
+            .sort((a, b) => new Date(b.created) - new Date(a.created))
+            .slice(0, 10);
+
+        // Convert API data to mention format and add to feed
+        sortedPosts.forEach((post, index) => {
+            const mention = this.convertAPIPostToMention(post);
+
+            // Track sentiment
+            this.totalMentions++;
+            const sentimentLabel = mention.sentiment;
+            if (this.sentimentCounts[sentimentLabel] !== undefined) {
+                this.sentimentCounts[sentimentLabel]++;
+            }
+
+            // Create and add element with staggered animation
+            setTimeout(() => {
+                const mentionElement = this.createMentionElement(mention);
+                mentionElement.classList.add('api-data');
+                liveFeed.appendChild(mentionElement);
+                setTimeout(() => mentionElement.classList.add('show'), 10);
+            }, index * 200);
+        });
+
+        // Update counter
+        const counter = document.getElementById('liveMentionsCount');
+        if (counter) {
+            counter.textContent = sortedPosts.length;
+        }
+
+        // Update synced cards
+        setTimeout(() => this.updateSyncedCards(), sortedPosts.length * 200 + 100);
+    }
+
+    /**
+     * Convert API post to mention format
+     */
+    convertAPIPostToMention(post) {
+        const sentimentValue = post.sentiment || 50;
+        const sentimentLabel = sentimentValue >= 60 ? 'positive' :
+            sentimentValue <= 40 ? 'negative' : 'neutral';
+
+        // Calculate engagement based on platform
+        let engagement = post.engagement || 0;
+        if (post.platform === 'reddit') {
+            engagement = (post.score || 0) + (post.numComments || 0);
+        } else if (post.platform === 'youtube') {
+            engagement = (post.likes || 0) + (post.comments || 0);
+        }
+
+        // Map platform names
+        const platformMap = {
+            'reddit': 'Reddit',
+            'youtube': 'YouTube',
+            'news': 'News'
+        };
+
+        return {
+            id: post.id || Date.now(),
+            platform: platformMap[post.platform] || post.platform,
+            author: post.author || 'Unknown',
+            content: post.title || post.content || '',
+            sentiment: sentimentLabel,
+            sentimentScore: sentimentValue,
+            timestamp: post.created || new Date(),
+            engagement: engagement,
+            url: post.url,
+            dataSource: post.dataSource
+        };
+    }
+
+    /**
+     * Update stats from real API data
+     */
+    updateStatsFromAPIData(apiResults) {
+        if (!apiResults || !apiResults.combined || apiResults.combined.length === 0) {
+            return;
+        }
+
+        const combined = apiResults.combined;
+
+        // Calculate live counts from API data
+        let liveDataSources = 0;
+        Object.values(apiResults.stats.dataSources || {}).forEach(source => {
+            if (source.isLive) liveDataSources++;
+        });
+
+        // Update volume spike based on real data volume
+        const volumeSpikeEl = document.getElementById('volumeSpikeValue');
+        const volumeStatusEl = document.getElementById('volumeSpikeStatus');
+        if (volumeSpikeEl) {
+            const volumeChange = Math.round(((combined.length - this.baselineVolume) / this.baselineVolume) * 100);
+            volumeSpikeEl.textContent = (volumeChange >= 0 ? '+' : '') + volumeChange + '%';
+
+            if (volumeStatusEl) {
+                if (liveDataSources >= 2) {
+                    volumeStatusEl.innerHTML = '<span><span class="flat-icon icon-trending xs"></span> Live API data active</span>';
+                    volumeStatusEl.className = 'stat-change positive';
+                } else if (volumeChange > 50) {
+                    volumeStatusEl.innerHTML = '<span><span class="flat-icon icon-trending xs"></span> High activity detected</span>';
+                    volumeStatusEl.className = 'stat-change warning';
+                } else {
+                    volumeStatusEl.innerHTML = '<span><span class="flat-icon icon-trending xs"></span> Monitoring activity</span>';
+                    volumeStatusEl.className = 'stat-change';
+                }
+            }
         }
     }
 
@@ -547,9 +709,10 @@ class RealtimePage {
 
     createMentionElement(mention) {
         const div = document.createElement('div');
-        div.className = `mention-item mention-${mention.sentiment}`;
+        div.className = `mention-item mention-${mention.sentiment} ${mention.dataSource === 'live-api' ? 'live-api-mention' : ''}`;
         const platformIcon = this.getPlatformIcon(mention.platform);
         const platformColor = this.getPlatformColor(mention.platform);
+        const isLiveData = mention.dataSource === 'live-api';
         div.innerHTML = `
             <div class="mention-header">
                 <div class="mention-platform">
@@ -557,6 +720,7 @@ class RealtimePage {
                         <i class="${platformIcon}"></i>
                     </span>
                     <strong>${mention.author}</strong>
+                    ${isLiveData ? '<span class="live-data-badge" title="Real-time API data">LIVE</span>' : ''}
                 </div>
                 <div class="mention-time">${Utils.formatDate(mention.timestamp, 'relative')}</div>
             </div>
