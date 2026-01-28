@@ -421,6 +421,27 @@ class AnalyticsPage {
                     </div>
                 </div>
 
+                <!-- SWOT Analysis -->
+                <div class="card swot-analysis-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="material-icons" style="color: #8b5cf6; vertical-align: middle; margin-right: 8px;">grid_view</span>
+                            SWOT Analysis - <span id="swotBrandName">${brandName}</span>
+                        </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-sm btn-secondary" id="refreshSWOTBtn">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="swot-grid" id="swotGrid">
+                            <!-- SWOT cards populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Detailed Table -->
                 <div class="card detailed-metrics-card">
                     <div class="card-header">
@@ -484,6 +505,7 @@ class AnalyticsPage {
         this.initializeCharts();
         this.loadKeywordsWithData();
         this.loadMetricsTableWithData();
+        this.loadSWOTAnalysis();
         this.setupEventListeners();
         this.updateStatsCardsWithData();
     }
@@ -550,6 +572,7 @@ class AnalyticsPage {
         this.initializeCharts();
         this.loadKeywords();
         this.loadMetricsTable();
+        this.loadSWOTAnalysis();
 
         // Update subtitle
         const brand = typeof APIData !== 'undefined' ? APIData.brands[brandId] : null;
@@ -624,6 +647,17 @@ class AnalyticsPage {
         if (sentimentPeriodFilter) {
             sentimentPeriodFilter.addEventListener('change', (e) => {
                 this.updateSentimentBreakdown(e.target.value);
+            });
+        }
+
+        // SWOT refresh button
+        const refreshSWOTBtn = document.getElementById('refreshSWOTBtn');
+        if (refreshSWOTBtn) {
+            refreshSWOTBtn.addEventListener('click', () => {
+                this.loadSWOTAnalysis();
+                if (typeof Notifications !== 'undefined') {
+                    Notifications.success('SWOT Analysis refreshed');
+                }
             });
         }
     }
@@ -2658,6 +2692,409 @@ class AnalyticsPage {
         );
 
         Notifications.success('Metrics exported successfully');
+    }
+
+    // Seeded random for consistent SWOT data per brand
+    getBrandSeed(brandId) {
+        let hash = 0;
+        for (let i = 0; i < brandId.length; i++) {
+            hash = ((hash << 5) - hash) + brandId.charCodeAt(i);
+            hash |= 0;
+        }
+        return Math.abs(hash);
+    }
+
+    seededRandom(seed) {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+    }
+
+    generateSWOTData() {
+        const seed = this.getBrandSeed(this.currentBrand);
+
+        // Get brand data for comparison
+        const brand = typeof APIData !== 'undefined' ? APIData.brands[this.currentBrand] : null;
+        if (!brand) {
+            return { strengths: [], weaknesses: [], opportunities: [], threats: [] };
+        }
+
+        const metrics = brand.metrics;
+        const industry = brand.industry;
+        const products = brand.products || [];
+        const competitors = brand.competitors || [];
+
+        // Industry benchmarks
+        const industryBenchmarks = {
+            technology: { sentiment: 73, engagement: 5.0, growth: 14, reach: 300000000 },
+            automotive: { sentiment: 70, engagement: 6.5, growth: 12, reach: 400000000 },
+            it_services: { sentiment: 71, engagement: 3.8, growth: 9, reach: 60000000 },
+            retail: { sentiment: 68, engagement: 4.5, growth: 8, reach: 200000000 },
+            finance: { sentiment: 65, engagement: 3.2, growth: 7, reach: 150000000 }
+        };
+
+        const benchmark = industryBenchmarks[industry] || industryBenchmarks.technology;
+
+        const strengths = [];
+        const weaknesses = [];
+
+        // ========== DYNAMIC STRENGTHS ANALYSIS ==========
+
+        // Sentiment analysis
+        const sentimentDiff = metrics.avgSentiment - benchmark.sentiment;
+        if (sentimentDiff > 5) {
+            strengths.push({
+                title: 'Exceptional Brand Sentiment',
+                description: `${metrics.avgSentiment}% positive - ${sentimentDiff.toFixed(1)}% above ${industry} average`,
+                impact: 'high',
+                icon: 'fa-smile-beam'
+            });
+        } else if (sentimentDiff > 0) {
+            strengths.push({
+                title: 'Positive Brand Perception',
+                description: `${metrics.avgSentiment}% positive sentiment score`,
+                impact: 'medium',
+                icon: 'fa-smile'
+            });
+        }
+
+        // Engagement analysis
+        const engagementDiff = metrics.avgEngagement - benchmark.engagement;
+        if (engagementDiff > 1.5) {
+            strengths.push({
+                title: 'Outstanding Engagement',
+                description: `${metrics.avgEngagement}% engagement rate - top performer in ${industry}`,
+                impact: 'high',
+                icon: 'fa-fire'
+            });
+        } else if (engagementDiff > 0) {
+            strengths.push({
+                title: 'Strong Audience Engagement',
+                description: `${metrics.avgEngagement}% engagement rate exceeds industry norm`,
+                impact: 'medium',
+                icon: 'fa-heart'
+            });
+        }
+
+        // Growth rate analysis
+        if (metrics.growthRate > benchmark.growth * 1.5) {
+            strengths.push({
+                title: 'Rapid Growth Momentum',
+                description: `+${metrics.growthRate}% growth rate - outpacing competitors`,
+                impact: 'high',
+                icon: 'fa-rocket'
+            });
+        } else if (metrics.growthRate > benchmark.growth) {
+            strengths.push({
+                title: 'Healthy Growth Trajectory',
+                description: `+${metrics.growthRate}% growth rate year-over-year`,
+                impact: 'medium',
+                icon: 'fa-chart-line'
+            });
+        }
+
+        // Reach analysis
+        if (metrics.avgReach > benchmark.reach) {
+            const reachM = (metrics.avgReach / 1000000).toFixed(0);
+            strengths.push({
+                title: 'Extensive Market Reach',
+                description: `${reachM}M+ audience reach across platforms`,
+                impact: 'high',
+                icon: 'fa-broadcast-tower'
+            });
+        }
+
+        // Follower base
+        if (metrics.baseFollowers > 20000000) {
+            strengths.push({
+                title: 'Massive Follower Base',
+                description: `${(metrics.baseFollowers / 1000000).toFixed(1)}M followers across social platforms`,
+                impact: 'high',
+                icon: 'fa-users'
+            });
+        } else if (metrics.baseFollowers > 5000000) {
+            strengths.push({
+                title: 'Strong Social Following',
+                description: `${(metrics.baseFollowers / 1000000).toFixed(1)}M dedicated followers`,
+                impact: 'medium',
+                icon: 'fa-user-friends'
+            });
+        }
+
+        // Product portfolio strength
+        if (products.length >= 4) {
+            strengths.push({
+                title: 'Diverse Product Portfolio',
+                description: `${products.length} key products: ${products.slice(0, 3).join(', ')}...`,
+                impact: 'medium',
+                icon: 'fa-boxes'
+            });
+        }
+
+        // ========== DYNAMIC WEAKNESSES ANALYSIS ==========
+
+        // Low sentiment
+        if (sentimentDiff < -3) {
+            weaknesses.push({
+                title: 'Sentiment Below Industry',
+                description: `${Math.abs(sentimentDiff).toFixed(1)}% below ${industry} average - needs attention`,
+                impact: 'high',
+                icon: 'fa-frown'
+            });
+        }
+
+        // Low engagement
+        if (engagementDiff < -1) {
+            weaknesses.push({
+                title: 'Engagement Gap',
+                description: `${metrics.avgEngagement}% engagement - ${Math.abs(engagementDiff).toFixed(1)}% below benchmark`,
+                impact: 'medium',
+                icon: 'fa-chart-bar'
+            });
+        }
+
+        // Slow growth
+        if (metrics.growthRate < benchmark.growth * 0.7) {
+            weaknesses.push({
+                title: 'Slow Growth Rate',
+                description: `+${metrics.growthRate}% growth is below industry pace`,
+                impact: 'medium',
+                icon: 'fa-turtle'
+            });
+        }
+
+        // Limited reach
+        if (metrics.avgReach < benchmark.reach * 0.5) {
+            weaknesses.push({
+                title: 'Limited Audience Reach',
+                description: `Reach is below ${industry} competitors`,
+                impact: 'medium',
+                icon: 'fa-signal'
+            });
+        }
+
+        // Add contextual weaknesses based on seed
+        const contextualWeaknesses = [
+            { title: 'Video Content Strategy', description: 'Video engagement below platform potential', impact: 'medium', icon: 'fa-video' },
+            { title: 'Platform Concentration', description: 'Heavy reliance on 2-3 primary platforms', impact: 'low', icon: 'fa-share-alt' },
+            { title: 'Response Time', description: 'Customer response times could be improved', impact: 'medium', icon: 'fa-clock' },
+            { title: 'User-Generated Content', description: 'Limited UGC engagement strategy', impact: 'low', icon: 'fa-camera' }
+        ];
+
+        // Add weaknesses to reach minimum of 3
+        let weakIdx = 0;
+        while (weaknesses.length < 3 && weakIdx < contextualWeaknesses.length) {
+            const rand = this.seededRandom(seed + weakIdx * 10);
+            if (rand > 0.3 || weaknesses.length < 2) {
+                weaknesses.push(contextualWeaknesses[weakIdx]);
+            }
+            weakIdx++;
+        }
+
+        // ========== DYNAMIC OPPORTUNITIES ==========
+        const allOpportunities = {
+            technology: [
+                { title: 'AI Integration', description: 'Leverage AI for personalized customer experiences', potential: 'high', icon: 'fa-robot' },
+                { title: 'Emerging Tech Markets', description: 'Expansion into AR/VR and IoT segments', potential: 'high', icon: 'fa-vr-cardboard' },
+                { title: 'Developer Community', description: 'Build stronger developer ecosystem', potential: 'medium', icon: 'fa-code' },
+                { title: 'Sustainability Messaging', description: 'Growing demand for eco-friendly tech', potential: 'medium', icon: 'fa-leaf' }
+            ],
+            automotive: [
+                { title: 'EV Market Growth', description: 'Electric vehicle demand continues to surge', potential: 'high', icon: 'fa-bolt' },
+                { title: 'Autonomous Features', description: 'Self-driving technology advancement', potential: 'high', icon: 'fa-car' },
+                { title: 'Fleet Services', description: 'B2B fleet management opportunities', potential: 'medium', icon: 'fa-truck' },
+                { title: 'Charging Infrastructure', description: 'Partner in charging network expansion', potential: 'medium', icon: 'fa-charging-station' }
+            ],
+            it_services: [
+                { title: 'Cloud Migration Demand', description: 'Enterprise cloud adoption accelerating', potential: 'high', icon: 'fa-cloud' },
+                { title: 'Cybersecurity Services', description: 'Growing security consulting market', potential: 'high', icon: 'fa-shield-alt' },
+                { title: 'Digital Transformation', description: 'SMB digitalization opportunities', potential: 'medium', icon: 'fa-digital-tachograph' },
+                { title: 'AI/ML Consulting', description: 'Demand for AI implementation services', potential: 'high', icon: 'fa-brain' }
+            ],
+            default: [
+                { title: 'Emerging Markets', description: 'Expansion potential in growing segments', potential: 'high', icon: 'fa-globe' },
+                { title: 'Content Diversification', description: 'Expand into video and interactive content', potential: 'medium', icon: 'fa-th-large' },
+                { title: 'Influencer Partnerships', description: 'Untapped micro-influencer opportunities', potential: 'medium', icon: 'fa-handshake' },
+                { title: 'Community Building', description: 'Develop brand ambassador programs', potential: 'medium', icon: 'fa-users' }
+            ]
+        };
+
+        const industryOpportunities = allOpportunities[industry] || allOpportunities.default;
+        const opportunities = [];
+        for (let i = 0; i < 3; i++) {
+            const idx = Math.floor(this.seededRandom(seed + i * 20) * industryOpportunities.length);
+            const opp = industryOpportunities[idx];
+            if (!opportunities.find(o => o.title === opp.title)) {
+                opportunities.push(opp);
+            } else {
+                opportunities.push(industryOpportunities[(idx + 1) % industryOpportunities.length]);
+            }
+        }
+
+        // ========== DYNAMIC THREATS ==========
+        const threats = [];
+
+        // Competitor threats
+        if (competitors.length > 0) {
+            const competitorNames = competitors.map(c => {
+                const comp = typeof APIData !== 'undefined' ? APIData.brands[c] : null;
+                return comp ? comp.name : c;
+            }).slice(0, 2);
+
+            threats.push({
+                title: 'Competitive Pressure',
+                description: `Active competition from ${competitorNames.join(' & ')}`,
+                severity: 'high',
+                icon: 'fa-chess'
+            });
+        }
+
+        // Industry-specific threats
+        const industryThreats = {
+            technology: [
+                { title: 'Rapid Tech Evolution', description: 'Fast-changing technology landscape', severity: 'medium', icon: 'fa-sync-alt' },
+                { title: 'Regulatory Scrutiny', description: 'Increasing data privacy regulations', severity: 'high', icon: 'fa-gavel' }
+            ],
+            automotive: [
+                { title: 'Supply Chain Risks', description: 'Component shortage vulnerabilities', severity: 'high', icon: 'fa-link' },
+                { title: 'Regulatory Changes', description: 'Evolving emissions and safety standards', severity: 'medium', icon: 'fa-balance-scale' }
+            ],
+            it_services: [
+                { title: 'Talent Competition', description: 'Intense competition for skilled professionals', severity: 'high', icon: 'fa-user-tie' },
+                { title: 'Price Pressure', description: 'Clients demanding lower project costs', severity: 'medium', icon: 'fa-dollar-sign' }
+            ],
+            default: [
+                { title: 'Market Saturation', description: 'Share of voice becoming fragmented', severity: 'medium', icon: 'fa-chart-pie' },
+                { title: 'Algorithm Changes', description: 'Platform reach may decline with updates', severity: 'medium', icon: 'fa-code-branch' }
+            ]
+        };
+
+        const industryThreatList = industryThreats[industry] || industryThreats.default;
+        threats.push(...industryThreatList.slice(0, 2));
+
+        // Add common threat
+        threats.push({
+            title: 'Economic Uncertainty',
+            description: 'Market volatility affecting consumer spending',
+            severity: 'low',
+            icon: 'fa-exclamation-circle'
+        });
+
+        return {
+            strengths: strengths.slice(0, 3),
+            weaknesses: weaknesses.slice(0, 3),
+            opportunities: opportunities.slice(0, 3),
+            threats: threats.slice(0, 3)
+        };
+    }
+
+    loadSWOTAnalysis() {
+        const grid = document.getElementById('swotGrid');
+        if (!grid) return;
+
+        // Update brand name in title
+        const brandNameEl = document.getElementById('swotBrandName');
+        const brand = typeof APIData !== 'undefined' ? APIData.brands[this.currentBrand] : null;
+        if (brandNameEl) {
+            brandNameEl.textContent = brand ? brand.name : 'Your Brand';
+        }
+
+        // Get industry for header badge
+        const industryLabel = brand ? (brand.industry || 'technology').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Technology';
+
+        const swot = this.generateSWOTData();
+
+        // Helper to render impact/severity badges
+        const renderBadge = (level, type) => {
+            const colors = {
+                high: type === 'positive' ? '#10b981' : '#ef4444',
+                medium: '#f59e0b',
+                low: '#6b7280'
+            };
+            return `<span class="swot-badge" style="background: ${colors[level]}20; color: ${colors[level]}; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">${level}</span>`;
+        };
+
+        grid.innerHTML = `
+            <div class="swot-card swot-strengths" style="animation: fadeInUp 0.4s ease-out forwards;">
+                <div class="swot-header">
+                    <i class="fas fa-plus-circle"></i>
+                    <h4>Strengths</h4>
+                    <span class="swot-count">${swot.strengths.length}</span>
+                </div>
+                <div class="swot-items">
+                    ${swot.strengths.map((item, idx) => `
+                        <div class="swot-item" style="animation: fadeInUp 0.3s ease-out ${0.1 + idx * 0.1}s forwards; opacity: 0;">
+                            <div class="swot-item-icon" style="background: rgba(16, 185, 129, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #10b981; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title} ${renderBadge(item.impact, 'positive')}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="swot-card swot-weaknesses" style="animation: fadeInUp 0.4s ease-out 0.1s forwards;">
+                <div class="swot-header">
+                    <i class="fas fa-minus-circle"></i>
+                    <h4>Weaknesses</h4>
+                    <span class="swot-count">${swot.weaknesses.length}</span>
+                </div>
+                <div class="swot-items">
+                    ${swot.weaknesses.map((item, idx) => `
+                        <div class="swot-item" style="animation: fadeInUp 0.3s ease-out ${0.2 + idx * 0.1}s forwards; opacity: 0;">
+                            <div class="swot-item-icon" style="background: rgba(239, 68, 68, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #ef4444; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title} ${renderBadge(item.impact, 'negative')}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="swot-card swot-opportunities" style="animation: fadeInUp 0.4s ease-out 0.2s forwards;">
+                <div class="swot-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>Opportunities</h4>
+                    <span class="swot-count">${swot.opportunities.length}</span>
+                </div>
+                <div class="swot-items">
+                    ${swot.opportunities.map((item, idx) => `
+                        <div class="swot-item" style="animation: fadeInUp 0.3s ease-out ${0.3 + idx * 0.1}s forwards; opacity: 0;">
+                            <div class="swot-item-icon" style="background: rgba(59, 130, 246, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #3b82f6; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title} ${renderBadge(item.potential, 'positive')}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="swot-card swot-threats" style="animation: fadeInUp 0.4s ease-out 0.3s forwards;">
+                <div class="swot-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>Threats</h4>
+                    <span class="swot-count">${swot.threats.length}</span>
+                </div>
+                <div class="swot-items">
+                    ${swot.threats.map((item, idx) => `
+                        <div class="swot-item" style="animation: fadeInUp 0.3s ease-out ${0.4 + idx * 0.1}s forwards; opacity: 0;">
+                            <div class="swot-item-icon" style="background: rgba(245, 158, 11, 0.15);">
+                                <i class="fas ${item.icon}" style="color: #f59e0b; font-size: 0.875rem;"></i>
+                            </div>
+                            <div class="swot-item-content">
+                                <div class="swot-item-title">${item.title} ${renderBadge(item.severity, 'negative')}</div>
+                                <div class="swot-item-desc">${item.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
     }
 
     destroy() {
