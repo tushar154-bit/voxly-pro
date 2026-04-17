@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: voxly_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: voxly
+      POSTGRES_PASSWORD: voxly_dev
+      POSTGRES_DB: voxly_pro
+    ports:
+      - "5432:5432"
+    volumes:
+      - voxly_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voxly -d voxly_pro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  voxly_pg_data:

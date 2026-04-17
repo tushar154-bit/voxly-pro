@@ -1,0 +1,240 @@
+// Voxly Pro — Prisma schema
+// Phase 1 + 2: auth + core social-listening domain.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================
+// Users & auth
+// =============================================================
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         String   @default("user") // 'user' | 'admin'
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pinnedInfluencers PinnedInfluencer[]
+  reports           Report[]
+  settings          UserSettings?
+
+  @@index([email])
+}
+
+model UserSettings {
+  userId         String   @id
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme          String   @default("light") // 'light' | 'dark'
+  language       String   @default("en")
+  timezone       String   @default("UTC")
+  emailAlerts    Boolean  @default(true)
+  pushAlerts     Boolean  @default(false)
+  defaultBrandId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// =============================================================
+// Brands & competitors
+// =============================================================
+model Brand {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  industry      String
+  country       String?
+  description   String?
+  logoUrl       String?
+  color         String?
+  baseFollowers Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  mentions        Mention[]
+  keywords        Keyword[]
+  influencerLinks BrandInfluencer[]
+  competitorsOf   CompetitorRelation[] @relation("BrandToCompetitors")
+  asCompetitorFor CompetitorRelation[] @relation("CompetitorBrands")
+  journeyStages   JourneyStage[]
+  alerts          Alert[]
+  reports         Report[]
+
+  @@index([slug])
+  @@index([industry])
+}
+
+model CompetitorRelation {
+  id                String   @id @default(cuid())
+  brandId           String
+  competitorBrandId String
+  createdAt         DateTime @default(now())
+
+  brand           Brand @relation("BrandToCompetitors", fields: [brandId], references: [id], onDelete: Cascade)
+  competitorBrand Brand @relation("CompetitorBrands", fields: [competitorBrandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, competitorBrandId])
+  @@index([brandId])
+}
+
+// =============================================================
+// Mentions, keywords, alerts
+// =============================================================
+model Mention {
+  id             String   @id @default(cuid())
+  brandId        String
+  platform       String // 'twitter' | 'instagram' | 'facebook' | 'linkedin' | 'youtube' | 'reddit' | 'tiktok'
+  authorName     String
+  authorHandle   String
+  authorAvatar   String?
+  content        String
+  sentiment      Int // 0-100
+  sentimentLabel String // 'positive' | 'neutral' | 'negative'
+  likes          Int      @default(0)
+  shares         Int      @default(0)
+  comments       Int      @default(0)
+  reach          Int      @default(0)
+  engagement     Float    @default(0) // percentage
+  url            String?
+  postedAt       DateTime
+  createdAt      DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, postedAt])
+  @@index([platform])
+  @@index([sentimentLabel])
+}
+
+model Keyword {
+  id        String   @id @default(cuid())
+  brandId   String
+  term      String
+  kind      String // 'word' | 'hashtag'
+  count     Int
+  sentiment Int // 0-100
+  growth    Float // percentage change
+  periodAt  DateTime
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, periodAt])
+  @@index([brandId, kind])
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  brandId     String
+  type        String // 'mention-spike' | 'sentiment-drop' | 'influencer-mention' | 'keyword-trend'
+  severity    String // 'low' | 'medium' | 'high' | 'critical'
+  title       String
+  description String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, createdAt])
+  @@index([severity])
+}
+
+// =============================================================
+// Influencers
+// =============================================================
+model Influencer {
+  id            String    @id @default(cuid())
+  name          String
+  handle        String
+  platform      String
+  tier          String // 'tier1' | 'tier2' | 'tier3'
+  followers     Int
+  engagement    Float
+  reach         Int
+  mentions      Int
+  sentiment     Int
+  influence     Int
+  avatarUrl     String?
+  verified      Boolean   @default(false)
+  topics        String[] // Postgres string[]
+  lastMentionAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  brandLinks BrandInfluencer[]
+  pinnedBy   PinnedInfluencer[]
+
+  @@index([handle])
+  @@index([tier])
+  @@index([platform])
+}
+
+model BrandInfluencer {
+  brandId      String
+  influencerId String
+
+  brand      Brand      @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  influencer Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@id([brandId, influencerId])
+  @@index([influencerId])
+}
+
+model PinnedInfluencer {
+  id           String   @id @default(cuid())
+  userId       String
+  influencerId String
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  influencer Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, influencerId])
+  @@index([userId])
+}
+
+// =============================================================
+// Customer journey
+// =============================================================
+model JourneyStage {
+  id             String @id @default(cuid())
+  brandId        String
+  stage          String // 'awareness' | 'consideration' | 'purchase' | 'retention' | 'advocacy'
+  order          Int
+  customers      Int
+  conversionRate Float
+  dropoffRate    Float
+  sentiment      Int
+  avgDays        Float
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, stage])
+  @@index([brandId, order])
+}
+
+// =============================================================
+// Reports
+// =============================================================
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  brandId   String?
+  name      String
+  type      String // 'weekly' | 'monthly' | 'custom'
+  format    String // 'pdf' | 'csv' | 'xlsx'
+  status    String   @default("ready") // 'generating' | 'ready' | 'failed'
+  url       String?
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brand Brand? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}

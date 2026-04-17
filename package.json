@@ -2,12 +2,20 @@
   "name": "voxly-pro",
   "version": "2.0.0",
   "description": "Advanced Social Listening & Analytics Platform",
-  "main": "index.html",
+  "private": true,
   "scripts": {
-    "start": "python -m http.server 8000",
-    "serve": "npx serve .",
-    "test": "echo \"No tests yet\" && exit 0",
-    "lint": "echo \"No linter configured\" && exit 0"
+    "dev": "npm --prefix server run dev",
+    "start": "npm --prefix server run start",
+    "install:all": "npm --prefix server install",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "db:migrate": "npm --prefix server run db:migrate",
+    "db:generate": "npm --prefix server run db:generate",
+    "db:reset": "npm --prefix server run db:reset",
+    "db:studio": "npm --prefix server run db:studio",
+    "seed": "npm --prefix server run seed",
+    "setup": "docker-compose up -d && npm --prefix server install && npm --prefix server run db:migrate && npm --prefix server run seed",
+    "test": "npm --prefix server test"
   },
   "keywords": [
     "social-listening",
@@ -21,19 +29,7 @@
   ],
   "author": "Voxly Pro Team",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/voxly-pro.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/voxly-pro/issues"
-  },
-  "homepage": "https://voxlypro.com",
-  "dependencies": {},
-  "devDependencies": {
-    "serve": "^14.2.0"
-  },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.18.0"
   }
 }

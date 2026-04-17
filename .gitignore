@@ -1,0 +1,19 @@
+# Editor / IDE / tooling
+.claude/
+.vscode/
+.idea/
+.DS_Store
+
+# Node / build artefacts
+node_modules/
+dist/
+coverage/
+*.log
+
+# Local env files (the authoritative copies live under server/)
+.env
+.env.local
+.env.*.local
+
+# OS / temp
+Thumbs.db

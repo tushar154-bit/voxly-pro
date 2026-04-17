@@ -3,8 +3,148 @@
 > A comprehensive, multi-page social listening and analytics platform built with modern web technologies.
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
-![Status](https://img.shields.io/badge/status-production-success)
+![Status](https://img.shields.io/badge/status-in--development-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+---
+
+## 🚀 Local development
+
+Voxly Pro is now a full-stack app: a Node.js + Express API backed by PostgreSQL, serving the `client/` frontend.
+
+### Prerequisites
+- **Node.js ≥ 18.18**
+- **Docker Desktop** (used to run a local Postgres) — or a local Postgres if you prefer.
+
+### First-time setup
+```bash
+# 1. Start Postgres
+docker-compose up -d
+
+# 2. Install backend deps
+cd server
+npm install
+
+# 3. Configure env
+cp .env.example .env
+# (optional) edit .env and replace JWT_SECRET with the output of:
+#   openssl rand -base64 32
+
+# 4. Apply the schema & seed demo users
+npm run db:migrate
+npm run seed
+```
+
+One-shot alternative from the repo root:
+```bash
+npm run setup      # db:up + install + migrate + seed
+```
+
+### Run
+```bash
+npm run dev        # from repo root — starts the API + serves the frontend
+# open http://localhost:3000
+```
+
+### Demo credentials
+| email | password | role |
+|---|---|---|
+| `demo@voxly.pro`  | `demo1234`  | user |
+| `admin@voxly.pro` | `admin1234` | admin |
+
+### Useful commands (from repo root)
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the server in watch mode |
+| `npm run db:up` / `npm run db:down` | Start / stop Postgres |
+| `npm run db:migrate` | Apply pending migrations |
+| `npm run db:studio` | Open Prisma Studio (DB browser) |
+| `npm run db:reset` | **Destructive** — drops & reseeds the DB |
+| `npm run seed` | Re-run seed script |
+| `npm test` | Run backend tests |
+
+### Project layout
+```
+voxly-pro/
+├─ client/              Static frontend (HTML / CSS / vanilla JS)
+├─ server/
+│  ├─ src/              Express app (routes, controllers, middleware, utils)
+│  ├─ prisma/           schema.prisma + seed.js
+│  └─ package.json
+├─ docker-compose.yml   Local Postgres
+└─ package.json         Orchestration scripts
+```
+
+### Phase status
+- [x] **Phase 1** — Auth foundation (signup / login / logout / me, demo seed users)
+- [x] **Phase 2** — Core data models + realistic seed data
+- [x] **Phase 3** — Dashboard / Realtime / Analytics APIs + frontend wiring
+- [x] **Phase 4** — Competitors / Influencers / Journey APIs + pinned-influencers persisted to DB
+- [x] **Phase 5** — Reports / Settings / Trends APIs + frontend wiring
+- [ ] Phase 6 — Production polish (rate-limit, CI, Docker, observability)
+
+### What Phase 2 adds
+- **Schema** — `Brand`, `Mention`, `Keyword`, `Influencer`, `BrandInfluencer`, `CompetitorRelation`, `PinnedInfluencer`, `JourneyStage`, `Alert`, `Report`, `UserSettings` (in addition to Phase 1's `User`).
+- **Seed** — 10 brands (Apple, Google, Microsoft, Nvidia, Samsung, Amazon, Tesla, Ford, BMW, Mercedes), ~5,000 mentions, ~300 keywords, 25 influencers (linked to brands), competitor relations, 50 journey stages, 80 alerts. Deterministic (seeded RNG) — the same seed produces the same data each run.
+
+### What Phase 3 adds
+All endpoints below require an authenticated session cookie (set by `/api/auth/login`). `:slug` is a brand slug or id (e.g. `apple`, `tesla`).
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/brands` | List all brands with aggregate counts |
+| `GET /api/brands/:slug` | Full brand detail + competitors + journey stages |
+| `GET /api/dashboard/:slug/stats?period=` | Mentions / sentiment / engagement / reach / authors with Δ vs prev period |
+| `GET /api/dashboard/:slug/posts?period=&platform=&limit=` | Top posts ordered by reach |
+| `GET /api/dashboard/:slug/activity?limit=` | Recent mentions + latest alerts |
+| `GET /api/dashboard/:slug/platforms?period=` | Platform-level mention breakdown |
+| `GET /api/analytics/:slug/overview?period=` | Awareness score, totals, deltas |
+| `GET /api/analytics/:slug/keywords?kind=word\|hashtag&limit=` | Top keywords or hashtags |
+| `GET /api/analytics/:slug/platforms?period=` | Detailed per-platform metrics |
+| `GET /api/analytics/:slug/sentiment?period=&granularity=day\|week` | Sentiment time-series |
+| `GET /api/analytics/:slug/swot` | Auto-computed SWOT from 30d metrics |
+| `GET /api/realtime/:slug/feed?since=&limit=` | Polling-based live mention feed |
+| `GET /api/realtime/:slug/pulse` | Mentions/min + current sentiment summary |
+
+**Frontend**: `client/js/services/api.js` exposes `window.API.*`. Both `dashboard.js` and `analytics.js` now hydrate from live data on init and fall back silently to mock data if the backend is unreachable.
+
+**Period syntax**: pass `?period=7d|30d|90d|thismonth|lastmonth` OR `?from=ISO&to=ISO` for a custom range. All endpoints that accept `period` compare against the previous equivalent window for deltas.
+
+### What Phase 4 adds
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/competitors/:slug?period=` | Focus brand + competitors with side-by-side metrics (mentions, sentiment, engagement, reach, authors) for current and previous period |
+| `GET /api/competitors/:slug/compare?metric=mentions\|sentiment\|engagement\|reach&period=` | Single-metric comparison across focus + competitors, ranked high-to-low |
+| `GET /api/influencers?brand=&tier=&platform=&sort=&limit=` | Influencer list. `sort` = `followers\|engagement\|influence\|mentions\|sentiment`. Response includes `isPinned` for the current user. |
+| `GET /api/influencers/:id` | Full influencer detail + linked brands + `isPinned` |
+| `GET /api/influencers/pinned` | Current user's pinned influencers |
+| `POST /api/influencers/:id/pin` | Pin to current user's dashboard |
+| `DELETE /api/influencers/:id/pin` | Unpin |
+| `GET /api/journey/:slug` | Customer-journey funnel (5 stages) + summary metrics |
+
+**Frontend**:
+- `window.PinnedInfluencers` is now backed by `/api/influencers/pinned` with a synchronous cache — existing UI code keeps working, pins survive across browsers/devices. Legacy `localStorage` pins are read once for migration.
+- `competitors.js`, `influencers.js`, `journey.js` each call their API on init and fall back silently to mock data if the backend is unreachable.
+
+### What Phase 5 adds
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/reports` | Current user's reports (with brand join) |
+| `POST /api/reports` | Create a new report (metadata only — file generated on download) |
+| `GET /api/reports/:id` | Report detail |
+| `DELETE /api/reports/:id` | Delete |
+| `GET /api/reports/:id/download` | Streams a CSV or JSON of the brand's last-30-day keywords + mentions |
+| `GET /api/settings` | Current user's settings (auto-provisions defaults on first request) |
+| `PATCH /api/settings` | Update theme / language / timezone / alert prefs / default brand (Zod-validated, brand id verified to exist) |
+| `GET /api/trends?brand=&kind=word\|hashtag&sort=count\|growth&limit=` | Trending keywords for one brand or all |
+| `GET /api/trends/hashtags?brand=&limit=` | Trending hashtags shortcut |
+| `GET /api/trends/rising?brand=&limit=` | Fastest-growing keywords (sorted by growth %) |
+| `GET /api/trends/topics?kind=&limit=` | Cross-brand topic aggregation (same term summed across all brands) |
+
+**Frontend**:
+- `reports.js` lists live reports, exposes `Reports.createLive(form)` / `Reports.deleteLive(id)`, and renders a download button that points at `/api/reports/:id/download`.
+- `settings.js` hydrates form fields from `/api/settings` on load and persists changes via `PATCH /api/settings` (mirrors to `localStorage` for offline resilience).
+- `trends.js` populates the trending-hashtags and rising-trends panels from `/api/trends/*`.
 
 ---
 
