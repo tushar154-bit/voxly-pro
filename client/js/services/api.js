@@ -89,6 +89,8 @@ window.API = (() => {
       get:         (id)    => request(`/reports/${id}`),
       create:      (body)  => request('/reports', { method: 'POST', body }),
       remove:      (id)    => request(`/reports/${id}`, { method: 'DELETE' }),
+      preview:     (id)    => request(`/reports/${id}/preview`),
+      previewForBrand: (params) => request('/reports/preview', { params }),
       downloadUrl: (id)    => `${BASE}/reports/${id}/download`,
     },
 

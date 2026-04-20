@@ -7,6 +7,7 @@ const Reports = {
     name: 'Reports',
     currentTab: 'create', // create, scheduled, history
     currentBrand: null,
+    selectedSubtype: 'summary', // reflects which Report Type card is selected
     isAnimating: false,
     
     // Mock saved reports
@@ -142,38 +143,169 @@ const Reports = {
         try {
             const { reports } = await window.API.reports.list();
             this.liveReports = reports || [];
-            this.renderLiveReports();
+            // Merge live reports into the History tab list so the existing UI picks them up.
+            this.reportHistory = this.liveReports.map((r) => ({
+                id: r.id,
+                name: r.name,
+                type: r.type,
+                format: r.format,
+                generatedDate: r.createdAt,
+                generatedBy: 'You',
+                size: '—',
+                downloads: 0,
+                isLive: true,
+            }));
+            if (this.currentTab === 'history' || !this.currentTab) {
+                this.loadTabContent();
+            }
             console.log(`✓ Reports hydrated from API (${this.liveReports.length})`);
         } catch (err) {
             console.warn('Reports live data unavailable, using mock fallback:', err.message);
         }
     },
 
-    renderLiveReports() {
-        const container = document.getElementById('reportsList') ||
-                          document.querySelector('.reports-table tbody') ||
-                          document.querySelector('.reports-list');
-        if (!container || !this.liveReports?.length) return;
+    async previewLive(id) {
+        if (typeof window.API === 'undefined') return;
+        try {
+            const data = await window.API.reports.preview(id);
+            this.openPreviewModal(data);
+        } catch (err) {
+            if (typeof Notifications !== 'undefined') {
+                Notifications.error(`Preview unavailable: ${err.message}`);
+            }
+        }
+    },
 
+    openPreviewModal(data) {
+        const { report, period, summary, keywords, mentions } = data;
+        const fmtNum = (n) => {
+            if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+            if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+            return String(n);
+        };
         const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-        container.innerHTML = this.liveReports.map((r) => `
-            <tr data-id="${r.id}">
-                <td>${r.name}</td>
-                <td>${r.brand?.name || '—'}</td>
-                <td><span class="report-type-tag">${r.type}</span></td>
-                <td><span class="report-format-tag">${r.format.toUpperCase()}</span></td>
-                <td>${fmtDate(r.createdAt)}</td>
-                <td>
-                    <a class="btn-secondary btn-sm" href="${window.API.reports.downloadUrl(r.id)}" download>
-                        <span class="material-icons" style="font-size:16px;">download</span>
-                        Download
-                    </a>
-                    <button class="btn-danger btn-sm" onclick="Reports.deleteLive('${r.id}')">
-                        <span class="material-icons" style="font-size:16px;">delete</span>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
+        const fmtDateTime = (d) => new Date(d).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const sentimentTag = (label) => {
+            const map = { positive: '#10b981', neutral: '#64748b', negative: '#ef4444' };
+            return `<span style="color:${map[label] || '#64748b'};font-weight:600;text-transform:capitalize;">${label}</span>`;
+        };
+
+        const mix = summary.sentimentMix;
+        const mixTotal = Math.max(1, mix.positive + mix.neutral + mix.negative);
+        const mixPct = (n) => Math.round((n / mixTotal) * 100);
+
+        const downloadHref = window.API.reports.downloadUrl(report.id);
+
+        const existing = document.getElementById('reportPreviewModal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'reportPreviewModal';
+        modal.innerHTML = `
+            <div class="rp-backdrop" onclick="Reports.closePreview()"></div>
+            <div class="rp-modal" role="dialog" aria-modal="true">
+                <div class="rp-header">
+                    <div>
+                        <div class="rp-title">${report.name}</div>
+                        <div class="rp-meta">
+                            ${report.brand ? `<span>${report.brand.name}</span><span>·</span>` : ''}
+                            <span style="text-transform:capitalize;">${report.type}</span>
+                            <span>·</span>
+                            <span>${report.format.toUpperCase()}</span>
+                            <span>·</span>
+                            <span>Generated ${fmtDate(report.createdAt)}</span>
+                        </div>
+                        <div class="rp-period">Period: ${fmtDate(period.from)} → ${fmtDate(period.to)} (${period.days} days)</div>
+                    </div>
+                    <div class="rp-actions">
+                        <a class="rp-btn primary" href="${downloadHref}" download>
+                            <span class="material-icons" style="font-size:18px;">download</span>
+                            Download ${report.format.toUpperCase()}
+                        </a>
+                        <button class="rp-btn" onclick="Reports.closePreview()">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rp-body">
+                    <div class="rp-stats-grid">
+                        <div class="rp-stat"><div class="rp-stat-label">Total Mentions</div><div class="rp-stat-value">${fmtNum(summary.totalMentions)}</div></div>
+                        <div class="rp-stat"><div class="rp-stat-label">Unique Authors</div><div class="rp-stat-value">${fmtNum(summary.uniqueAuthors)}</div></div>
+                        <div class="rp-stat"><div class="rp-stat-label">Avg Sentiment</div><div class="rp-stat-value">${summary.avgSentiment}/100</div></div>
+                        <div class="rp-stat"><div class="rp-stat-label">Avg Engagement</div><div class="rp-stat-value">${summary.avgEngagement}%</div></div>
+                        <div class="rp-stat"><div class="rp-stat-label">Total Reach</div><div class="rp-stat-value">${fmtNum(summary.totalReach)}</div></div>
+                        <div class="rp-stat"><div class="rp-stat-label">Engagement Volume</div><div class="rp-stat-value">${fmtNum(summary.totalLikes + summary.totalShares + summary.totalComments)}</div></div>
+                    </div>
+
+                    <div class="rp-sentiment-bar">
+                        <div class="rp-sentiment-bar-row">
+                            <span class="rp-sb-label">Sentiment Breakdown</span>
+                            <div class="rp-sb-track">
+                                <div style="width:${mixPct(mix.positive)}%;background:#10b981;"></div>
+                                <div style="width:${mixPct(mix.neutral)}%;background:#94a3b8;"></div>
+                                <div style="width:${mixPct(mix.negative)}%;background:#ef4444;"></div>
+                            </div>
+                        </div>
+                        <div class="rp-sb-legend">
+                            <span><span class="rp-sb-dot" style="background:#10b981;"></span>Positive ${mixPct(mix.positive)}%</span>
+                            <span><span class="rp-sb-dot" style="background:#94a3b8;"></span>Neutral ${mixPct(mix.neutral)}%</span>
+                            <span><span class="rp-sb-dot" style="background:#ef4444;"></span>Negative ${mixPct(mix.negative)}%</span>
+                        </div>
+                    </div>
+
+                    <div class="rp-section">
+                        <h4>Top Keywords</h4>
+                        <table class="rp-table">
+                            <thead><tr><th>Term</th><th>Kind</th><th>Count</th><th>Sentiment</th><th>Growth</th></tr></thead>
+                            <tbody>
+                                ${keywords.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:1rem;">No keywords in this period.</td></tr>' : keywords.map((k) => `
+                                    <tr>
+                                        <td><strong>${k.term}</strong></td>
+                                        <td><span class="rp-kind-tag">${k.kind}</span></td>
+                                        <td>${fmtNum(k.count)}</td>
+                                        <td>${k.sentiment}/100</td>
+                                        <td style="color:${k.growth >= 0 ? '#10b981' : '#ef4444'};">${k.growth >= 0 ? '+' : ''}${k.growth}%</td>
+                                    </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="rp-section">
+                        <h4>Recent Mentions (${mentions.length})</h4>
+                        <div class="rp-mentions">
+                            ${mentions.length === 0 ? '<div style="text-align:center;color:#64748b;padding:1rem;">No mentions in this period.</div>' : mentions.map((m) => `
+                                <div class="rp-mention">
+                                    <div class="rp-mention-head">
+                                        <div>
+                                            <strong>${m.authorName}</strong>
+                                            <span style="color:#64748b;">${m.authorHandle}</span>
+                                            <span class="rp-platform-tag">${m.platform}</span>
+                                            ${sentimentTag(m.sentimentLabel)}
+                                        </div>
+                                        <div style="color:#94a3b8;font-size:0.75rem;">${fmtDateTime(m.postedAt)}</div>
+                                    </div>
+                                    <div class="rp-mention-body">${m.content}</div>
+                                    <div class="rp-mention-footer">
+                                        <span>❤ ${fmtNum(m.likes)}</span>
+                                        <span>↻ ${fmtNum(m.shares)}</span>
+                                        <span>💬 ${fmtNum(m.comments)}</span>
+                                        <span>👁 ${fmtNum(m.reach)}</span>
+                                    </div>
+                                </div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden';
+    },
+
+    closePreview() {
+        const modal = document.getElementById('reportPreviewModal');
+        if (modal) modal.remove();
+        document.body.style.overflow = '';
     },
 
     async createLive(form) {
@@ -186,7 +318,7 @@ const Reports = {
                 brandSlug: form.brandSlug || this.currentBrand,
             });
             this.liveReports = [report, ...(this.liveReports || [])];
-            this.renderLiveReports();
+            this.loadLiveData();
             if (typeof Notifications !== 'undefined') {
                 Notifications.success('Report generated');
             }
@@ -204,7 +336,7 @@ const Reports = {
         try {
             await window.API.reports.remove(id);
             this.liveReports = (this.liveReports || []).filter((r) => r.id !== id);
-            this.renderLiveReports();
+            this.loadLiveData();
             if (typeof Notifications !== 'undefined') Notifications.success('Report deleted');
         } catch (err) {
             if (typeof Notifications !== 'undefined') Notifications.error(err.message);
@@ -404,32 +536,29 @@ const Reports = {
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>Include Sections</label>
+                            <div class="form-group" id="customSectionsGroup">
+                                <label>
+                                    Include Sections
+                                    <span id="customSectionsHint" style="margin-left:8px;color:#94a3b8;font-size:0.75rem;font-weight:normal;">(applies only to Custom Report — other types include their default sections automatically)</span>
+                                </label>
                                 <div class="checkbox-grid">
                                     <label class="checkbox-label">
-                                        <input type="checkbox" checked> Executive Summary
+                                        <input type="checkbox" class="report-section" data-section="summary" checked> Top Mentions &amp; Keywords
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" checked> Key Metrics
+                                        <input type="checkbox" class="report-section" data-section="analytics" checked> Platform Analytics
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" checked> Sentiment Analysis
+                                        <input type="checkbox" class="report-section" data-section="sentiment" checked> Sentiment Analysis
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" checked> Platform Breakdown
+                                        <input type="checkbox" class="report-section" data-section="competitors"> Competitor Comparison
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox"> Competitor Comparison
+                                        <input type="checkbox" class="report-section" data-section="influencers"> Top Influencers
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox"> Top Influencers
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox"> Trending Topics
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox"> Charts & Graphs
+                                        <input type="checkbox" class="report-section" data-section="trends"> Trends &amp; Hashtags
                                     </label>
                                 </div>
                             </div>
@@ -612,6 +741,21 @@ const Reports = {
     },
 
     renderHistoryRow(report) {
+        // Wrap the id in quotes so string CUIDs (live reports) don't become invalid JS identifiers in inline onclick.
+        const quotedId = `'${String(report.id).replace(/'/g, "\\'")}'`;
+
+        const previewAttr = report.isLive
+            ? `onclick="Reports.previewLive(${quotedId})"`
+            : `onclick="Notifications.info('Preview available for generated reports only')"`;
+
+        const downloadAttr = report.isLive
+            ? `href="${window.API?.reports ? window.API.reports.downloadUrl(report.id) : '#'}" download`
+            : `href="#" onclick="event.preventDefault(); Reports.downloadReport(${quotedId});"`;
+
+        const deleteAttr = report.isLive
+            ? `onclick="Reports.deleteLive(${quotedId})"`
+            : `onclick="Reports.deleteReport(${quotedId})"`;
+
         return `
             <tr>
                 <td><strong>${report.name}</strong></td>
@@ -623,13 +767,16 @@ const Reports = {
                 <td>${report.downloads}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="action-btn" title="Download" onclick="Reports.downloadReport(${report.id})">
-                            <span class="material-icons">download</span>
+                        <button class="action-btn" title="Preview" ${previewAttr}>
+                            <span class="material-icons">visibility</span>
                         </button>
-                        <button class="action-btn" title="Share" onclick="Reports.shareReport(${report.id})">
+                        <a class="action-btn" title="Download" ${downloadAttr}>
+                            <span class="material-icons">download</span>
+                        </a>
+                        <button class="action-btn" title="Share" onclick="Reports.shareReport(${quotedId})">
                             <span class="material-icons">share</span>
                         </button>
-                        <button class="action-btn danger" title="Delete" onclick="Reports.deleteReport(${report.id})">
+                        <button class="action-btn danger" title="Delete" ${deleteAttr}>
                             <span class="material-icons">delete</span>
                         </button>
                     </div>
@@ -639,11 +786,16 @@ const Reports = {
     },
 
     attachCreateTabEvents() {
-        // Report type selection
+        // Report type selection — remember which subtype the user picked.
+        // data-type values come from the HTML template; we map a couple to the
+        // API's enum so they stay in sync with backend REPORT_SUBTYPES.
+        const SUBTYPE_ALIASES = { summary: 'summary' };
         document.querySelectorAll('.report-type-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 document.querySelectorAll('.report-type-card').forEach(c => c.classList.remove('selected'));
                 e.currentTarget.classList.add('selected');
+                const raw = e.currentTarget.dataset.type;
+                this.selectedSubtype = SUBTYPE_ALIASES[raw] || raw || 'summary';
             });
         });
 
@@ -666,44 +818,214 @@ const Reports = {
         // Events are attached via onclick in the HTML
     },
 
-    previewReport() {
+    async previewReport() {
         const preview = document.getElementById('reportPreview');
-        if (preview) {
-            preview.style.display = 'block';
-            preview.querySelector('.preview-content').innerHTML = `
+        const content = preview?.querySelector('.preview-content');
+        if (!preview || !content) return;
+
+        preview.style.display = 'block';
+        content.innerHTML = `
+            <div class="preview-message">
+                <span class="material-icons" style="animation: spin 1s linear infinite;">autorenew</span>
+                <h4>Generating preview…</h4>
+            </div>`;
+
+        if (typeof window.API === 'undefined') {
+            content.innerHTML = `
                 <div class="preview-message">
-                    <span class="material-icons">visibility</span>
-                    <h4>Report Preview</h4>
-                    <p>Preview functionality coming soon. The report will include all selected sections with real-time data.</p>
-                </div>
-            `;
+                    <span class="material-icons">error_outline</span>
+                    <h4>Preview unavailable</h4>
+                    <p>API client not loaded. Please refresh.</p>
+                </div>`;
+            return;
         }
-        Notifications.info('Preview feature coming soon');
+
+        const brandSlug = document.getElementById('reportBrand')?.value
+                       || this.currentBrand
+                       || (typeof APIData !== 'undefined' ? APIData.currentBrand : 'apple');
+
+        try {
+            const data = await window.API.reports.previewForBrand({
+                brandSlug,
+                period: '30d',
+            });
+            this.renderCreatePreview(content, data, brandSlug);
+        } catch (err) {
+            content.innerHTML = `
+                <div class="preview-message">
+                    <span class="material-icons">error_outline</span>
+                    <h4>Preview unavailable</h4>
+                    <p>${err.message}</p>
+                </div>`;
+        }
     },
 
-    generateReport() {
-        const reportName = document.getElementById('reportName')?.value || 'Untitled Report';
-        const format = document.getElementById('reportFormat')?.value || 'pdf';
-        
-        Notifications.info('Generating report... This may take a moment');
-        
-        setTimeout(() => {
-            // Simulate report generation
-            const mockData = {
-                reportName: reportName,
-                generatedDate: new Date().toISOString(),
-                format: format,
-                sections: ['Executive Summary', 'Key Metrics', 'Sentiment Analysis', 'Platform Breakdown']
-            };
+    renderCreatePreview(container, data, brandSlug) {
+        const fmtNum = (n) => {
+            if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+            if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+            return String(n);
+        };
+        const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        const brandName = data.brand?.name || brandSlug;
+        const mix = data.summary.sentimentMix;
+        const total = Math.max(1, mix.positive + mix.neutral + mix.negative);
+        const pct = (n) => Math.round((n / total) * 100);
 
-            Utils.downloadFile(
-                JSON.stringify(mockData, null, 2),
-                `${reportName.replace(/\s+/g, '-').toLowerCase()}.${format}`,
-                format === 'json' ? 'application/json' : 'application/octet-stream'
-            );
+        container.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+                <div>
+                    <h3 style="margin:0 0 4px;">${brandName} — Report Preview</h3>
+                    <div style="color:#64748b;font-size:0.85rem;">
+                        ${fmtDate(data.period.from)} → ${fmtDate(data.period.to)} · ${data.period.days} days · real-time data
+                    </div>
+                </div>
+            </div>
 
-            Notifications.success('Report generated successfully!');
-        }, 2000);
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;margin-bottom:1rem;">
+                <div class="preview-stat"><div class="preview-stat-label">Total Mentions</div><div class="preview-stat-value">${fmtNum(data.summary.totalMentions)}</div></div>
+                <div class="preview-stat"><div class="preview-stat-label">Unique Authors</div><div class="preview-stat-value">${fmtNum(data.summary.uniqueAuthors)}</div></div>
+                <div class="preview-stat"><div class="preview-stat-label">Avg Sentiment</div><div class="preview-stat-value">${data.summary.avgSentiment}/100</div></div>
+                <div class="preview-stat"><div class="preview-stat-label">Avg Engagement</div><div class="preview-stat-value">${data.summary.avgEngagement}%</div></div>
+                <div class="preview-stat"><div class="preview-stat-label">Total Reach</div><div class="preview-stat-value">${fmtNum(data.summary.totalReach)}</div></div>
+                <div class="preview-stat"><div class="preview-stat-label">Engagement Volume</div><div class="preview-stat-value">${fmtNum(data.summary.totalLikes + data.summary.totalShares + data.summary.totalComments)}</div></div>
+            </div>
+
+            <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;">
+                <div style="display:flex;align-items:center;gap:0.9rem;">
+                    <span style="font-weight:600;color:#334155;font-size:0.85rem;flex-shrink:0;">Sentiment</span>
+                    <div style="flex:1;display:flex;height:10px;border-radius:999px;overflow:hidden;background:#e2e8f0;">
+                        <div style="width:${pct(mix.positive)}%;background:#10b981;"></div>
+                        <div style="width:${pct(mix.neutral)}%;background:#94a3b8;"></div>
+                        <div style="width:${pct(mix.negative)}%;background:#ef4444;"></div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:1.25rem;margin-top:0.5rem;font-size:0.8125rem;color:#475569;">
+                    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#10b981;margin-right:5px;"></span>Positive ${pct(mix.positive)}%</span>
+                    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#94a3b8;margin-right:5px;"></span>Neutral ${pct(mix.neutral)}%</span>
+                    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ef4444;margin-right:5px;"></span>Negative ${pct(mix.negative)}%</span>
+                </div>
+            </div>
+
+            <h4 style="margin:0 0 0.5rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.4px;color:#0f172a;">Top Keywords</h4>
+            <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:1rem;">
+                <thead><tr style="background:#f8fafc;">
+                    <th style="text-align:left;padding:0.5rem 0.6rem;border-bottom:1px solid #e5e7eb;">Term</th>
+                    <th style="text-align:left;padding:0.5rem 0.6rem;border-bottom:1px solid #e5e7eb;">Kind</th>
+                    <th style="text-align:left;padding:0.5rem 0.6rem;border-bottom:1px solid #e5e7eb;">Count</th>
+                    <th style="text-align:left;padding:0.5rem 0.6rem;border-bottom:1px solid #e5e7eb;">Growth</th>
+                </tr></thead>
+                <tbody>
+                    ${data.keywords.length === 0
+                        ? '<tr><td colspan="4" style="text-align:center;padding:0.75rem;color:#64748b;">No keywords</td></tr>'
+                        : data.keywords.slice(0, 8).map((k) => `
+                        <tr>
+                            <td style="padding:0.45rem 0.6rem;border-bottom:1px solid #f1f5f9;"><strong>${k.term}</strong></td>
+                            <td style="padding:0.45rem 0.6rem;border-bottom:1px solid #f1f5f9;text-transform:capitalize;">${k.kind}</td>
+                            <td style="padding:0.45rem 0.6rem;border-bottom:1px solid #f1f5f9;">${fmtNum(k.count)}</td>
+                            <td style="padding:0.45rem 0.6rem;border-bottom:1px solid #f1f5f9;color:${k.growth >= 0 ? '#10b981' : '#ef4444'};">${k.growth >= 0 ? '+' : ''}${k.growth}%</td>
+                        </tr>`).join('')}
+                </tbody>
+            </table>
+
+            <h4 style="margin:0 0 0.5rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.4px;color:#0f172a;">Recent Mentions (sample)</h4>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                ${data.mentions.slice(0, 5).map((m) => `
+                    <div style="background:#fafbff;border:1px solid #e5e7eb;border-radius:8px;padding:0.6rem 0.8rem;">
+                        <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:#64748b;margin-bottom:4px;">
+                            <div>
+                                <strong style="color:#0f172a;">${m.authorName}</strong>
+                                <span style="text-transform:capitalize;margin-left:8px;">${m.platform}</span>
+                            </div>
+                            <div>${new Date(m.postedAt).toLocaleDateString()}</div>
+                        </div>
+                        <div style="color:#1f2937;font-size:0.875rem;line-height:1.5;">${m.content}</div>
+                    </div>`).join('')}
+            </div>
+
+            <style>@keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+                   .preview-stat{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:0.6rem 0.8rem;}
+                   .preview-stat-label{font-size:0.7rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+                   .preview-stat-value{font-size:1.2rem;font-weight:700;color:#0f172a;margin-top:2px;}
+            </style>
+        `;
+
+        if (typeof Notifications !== 'undefined') {
+            Notifications.success(`Preview ready for ${brandName}`);
+        }
+    },
+
+    async generateReport() {
+        const subtype = this.selectedSubtype || 'summary';
+        const subtypeLabel = {
+            summary: 'Brand Summary',
+            analytics: 'Analytics Deep Dive',
+            sentiment: 'Sentiment Analysis',
+            competitors: 'Competitor Analysis',
+            influencers: 'Influencer Report',
+            trends: 'Trends Report',
+            comprehensive: 'Comprehensive Report',
+            custom: 'Custom Report',
+        }[subtype] || 'Report';
+
+        const userName = document.getElementById('reportName')?.value?.trim();
+        const reportName = userName || `${subtypeLabel} — ${new Date().toLocaleDateString()}`;
+        const format = (document.getElementById('reportFormat')?.value || 'pdf').toLowerCase();
+        const brandSlug = document.getElementById('reportBrand')?.value
+                       || this.currentBrand
+                       || (typeof APIData !== 'undefined' ? APIData.currentBrand : 'apple');
+        const typeSelect = document.getElementById('reportType');
+        const type = ['weekly', 'monthly', 'custom'].includes(typeSelect?.value) ? typeSelect.value : 'custom';
+
+        if (!['pdf', 'csv', 'json'].includes(format)) {
+            Notifications.error(`Unsupported format: ${format}`);
+            return;
+        }
+        if (typeof window.API === 'undefined') {
+            Notifications.error('API client not loaded');
+            return;
+        }
+
+        // For Custom Report, collect the checked sections from the UI.
+        let sections;
+        if (subtype === 'custom') {
+            sections = Array.from(document.querySelectorAll('.report-section:checked'))
+                .map((el) => el.dataset.section)
+                .filter(Boolean);
+            if (sections.length === 0) {
+                Notifications.error('Select at least one section for Custom Report');
+                return;
+            }
+        }
+
+        Notifications.info(`Generating ${subtypeLabel}...`);
+
+        try {
+            const { report } = await window.API.reports.create({
+                name: reportName,
+                type,
+                subtype,
+                format,
+                brandSlug,
+                ...(sections ? { sections } : {}),
+            });
+
+            // Trigger the browser download of the just-created report.
+            const url = window.API.reports.downloadUrl(report.id);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${reportName.replace(/\s+/g, '-').toLowerCase()}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            // Refresh the history tab so the new report appears there.
+            if (typeof this.loadLiveData === 'function') this.loadLiveData();
+
+            Notifications.success('Report generated — check your downloads folder');
+        } catch (err) {
+            Notifications.error(`Report generation failed: ${err.message}`);
+        }
     },
 
     editScheduledReport(id) {

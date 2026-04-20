@@ -1518,6 +1518,9 @@ const Influencers = {
                     <div class="influencer-handle">
                         <i class="${platformIcons[influencer.platform]}"></i>
                         ${influencer.handle}
+                        <span class="platform-badge" style="display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:2px 8px;border-radius:10px;background:rgba(99,102,241,0.08);color:#6366f1;font-size:0.7rem;font-weight:600;text-transform:capitalize;">
+                            ${influencer.platform === 'twitter' ? 'X' : influencer.platform}
+                        </span>
                     </div>
                 </div>
 
@@ -1531,8 +1534,8 @@ const Influencers = {
                         <div class="stat-value">${influencer.engagement}%</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Mentions</div>
-                        <div class="stat-value">${influencer.mentions}</div>
+                        <div class="stat-label">Avg Reach</div>
+                        <div class="stat-value">${Utils.formatNumber(influencer.reach || 0)}</div>
                     </div>
                 </div>
 
@@ -1541,16 +1544,22 @@ const Influencers = {
                         <span class="metric-label">Influence Score</span>
                         <div class="metric-bar">
                             <div class="metric-fill" style="width: ${influencer.influence}%; background: linear-gradient(90deg, #6366f1, #8b5cf6);"></div>
-                            <span class="metric-value">${influencer.influence}</span>
+                            <span class="metric-value">${(influencer.influence / 10).toFixed(1)}/10</span>
                         </div>
                     </div>
+                    ${(() => {
+                        const fit = this.brandFitScore(influencer);
+                        const color = fit >= 7 ? '#10b981'
+                                    : fit >= 4 ? '#f59e0b' : '#ef4444';
+                        return `
                     <div class="metric-row">
-                        <span class="metric-label">Sentiment</span>
+                        <span class="metric-label">Brand Fit</span>
                         <div class="metric-bar">
-                            <div class="metric-fill" style="width: ${influencer.sentiment}%; background: ${Utils.getSentimentColor(influencer.sentiment)};"></div>
-                            <span class="metric-value">${influencer.sentiment}%</span>
+                            <div class="metric-fill" style="width: ${fit * 10}%; background: ${color};"></div>
+                            <span class="metric-value">${fit.toFixed(1)}/10</span>
                         </div>
-                    </div>
+                    </div>`;
+                    })()}
                 </div>
 
                 <div class="influencer-topics">
@@ -1681,22 +1690,28 @@ const Influencers = {
             </div>
 
             <div class="detail-section">
-                <h4>Influence & Sentiment</h4>
+                <h4>Influence & Brand Fit</h4>
                 <div class="detail-bars">
                     <div class="detail-bar-item">
                         <label>Influence Score</label>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${influencer.influence}%; background: linear-gradient(90deg, #6366f1, #8b5cf6);"></div>
                         </div>
-                        <span class="bar-value">${influencer.influence}/100</span>
+                        <span class="bar-value">${(influencer.influence / 10).toFixed(1)}/10</span>
                     </div>
+                    ${(() => {
+                        const fit = this.brandFitScore(influencer);
+                        const color = fit >= 7 ? '#10b981'
+                                    : fit >= 4 ? '#f59e0b' : '#ef4444';
+                        return `
                     <div class="detail-bar-item">
-                        <label>Sentiment Score</label>
+                        <label>Brand Fit</label>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${influencer.sentiment}%; background: ${Utils.getSentimentColor(influencer.sentiment)};"></div>
+                            <div class="progress-fill" style="width: ${fit * 10}%; background: ${color};"></div>
                         </div>
-                        <span class="bar-value">${influencer.sentiment}%</span>
-                    </div>
+                        <span class="bar-value">${fit.toFixed(1)}/10</span>
+                    </div>`;
+                    })()}
                 </div>
             </div>
 
@@ -1816,7 +1831,37 @@ const Influencers = {
 
     getColorHash(id) {
         const colors = ['6366f1', '8b5cf6', '10b981', 'f59e0b', 'ec4899', '06b6d4', 'ef4444'];
-        return colors[id % colors.length];
+        // id may be a CUID string (live) or int (mock); hash digits if string
+        const n = typeof id === 'number' ? id : [...String(id)].reduce((s, c) => s + c.charCodeAt(0), 0);
+        return colors[n % colors.length];
+    },
+
+    // Keyword buckets per industry — used to compute Brand Fit Score.
+    INDUSTRY_TOPICS: {
+        Technology: ['Technology', 'Innovation', 'AI', 'Cloud', 'Startups', 'Mobile', 'Gaming',
+                     'Hardware', 'Software', 'Developer Tools', 'Open Source', 'Security',
+                     'Data Science', 'Machine Learning', 'Consumer Tech', 'Future Tech',
+                     'Productivity', 'Remote Work'],
+        Automotive: ['Automotive', 'Electric Vehicles', 'Design', 'Sustainability', 'Innovation',
+                     'Hardware', 'Consumer Tech'],
+        Retail:     ['Business', 'Marketing', 'Finance', 'Leadership', 'Innovation',
+                     'Consumer Tech', 'Sustainability'],
+    },
+
+    // Compute how well an influencer's topics align with the current brand's industry.
+    // Returns 0-10 score. Unknown industry → middling 5.0 so nothing visually breaks.
+    brandFitScore(influencer) {
+        const brandId = this.currentBrand || (typeof APIData !== 'undefined' ? APIData.currentBrand : null);
+        const brand   = typeof APIData !== 'undefined' && brandId ? APIData.brands[brandId] : null;
+        const industry = brand?.industry;
+        const keywords = this.INDUSTRY_TOPICS[industry];
+        if (!keywords || !Array.isArray(influencer.topics) || influencer.topics.length === 0) return 5.0;
+
+        const topicSet = new Set(keywords.map((t) => t.toLowerCase()));
+        const overlap = influencer.topics.filter((t) => topicSet.has(String(t).toLowerCase())).length;
+        // 3 topics per influencer — scale so 3/3 overlap → 10, 2/3 → ~7, 1/3 → ~4, 0/3 → 1.
+        const pct = overlap / Math.max(1, influencer.topics.length);
+        return Math.max(1, Math.min(10, 1 + pct * 9));
     },
 
     exportData() {

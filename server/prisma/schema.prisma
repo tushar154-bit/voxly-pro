@@ -228,7 +228,9 @@ model Report {
   brandId   String?
   name      String
   type      String // 'weekly' | 'monthly' | 'custom'
-  format    String // 'pdf' | 'csv' | 'xlsx'
+  subtype   String?  @default("summary") // 'summary' | 'analytics' | 'sentiment' | 'competitors' | 'influencers' | 'trends' | 'comprehensive' | 'custom'
+  sections  String[] @default([]) // section keys when subtype='custom'
+  format    String // 'pdf' | 'csv' | 'json'
   status    String   @default("ready") // 'generating' | 'ready' | 'failed'
   url       String?
   createdAt DateTime @default(now())

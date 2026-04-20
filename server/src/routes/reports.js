@@ -5,6 +5,8 @@ import {
   createReport,
   deleteReport,
   downloadReport,
+  previewReport,
+  previewForBrand,
   createReportSchema,
 } from '../controllers/reportsController.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -18,9 +20,11 @@ const asyncHandler = (fn) => (req, res, next) =>
 router.use(requireAuth);
 
 router.get('/',                  asyncHandler(listReports));
+router.get('/preview',           asyncHandler(previewForBrand));
 router.post('/',                 validate(createReportSchema), asyncHandler(createReport));
 router.get('/:id',               asyncHandler(getReport));
 router.delete('/:id',            asyncHandler(deleteReport));
+router.get('/:id/preview',       asyncHandler(previewReport));
 router.get('/:id/download',      asyncHandler(downloadReport));
 
 export default router;
