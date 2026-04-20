@@ -216,9 +216,37 @@
                     </button>
 
                     <!-- User Menu -->
-                    <button class="icon-btn" id="userMenuBtn">
-                        <div class="user-avatar-small">TP</div>
-                    </button>
+                    <div class="user-menu-wrapper" style="position: relative;">
+                        <button class="icon-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">
+                            <div class="user-avatar-small">TP</div>
+                        </button>
+                        <div id="userMenuDropdown" class="user-menu-dropdown" hidden>
+                            <div class="user-menu-header">
+                                <div class="user-menu-avatar">TP</div>
+                                <div class="user-menu-identity">
+                                    <div class="user-menu-name" id="userMenuName">User</div>
+                                    <div class="user-menu-email" id="userMenuEmail">email@example.com</div>
+                                    <span class="user-menu-role" id="userMenuRole">Member</span>
+                                </div>
+                            </div>
+                            <div class="user-menu-body">
+                                <button class="user-menu-item" data-action="settings">
+                                    <span class="material-icons">settings</span>
+                                    <span>Account settings</span>
+                                </button>
+                                <button class="user-menu-item" data-action="copy-email">
+                                    <span class="material-icons">content_copy</span>
+                                    <span>Copy email</span>
+                                </button>
+                            </div>
+                            <div class="user-menu-footer">
+                                <button class="user-menu-item danger" data-action="logout">
+                                    <span class="material-icons">logout</span>
+                                    <span>Sign out</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -244,20 +272,20 @@
     <script src="js/api-service.js"></script>
 
     <!-- Backend API client (Phase 3) -->
-    <script src="js/services/api.js?v=20260420-p17"></script>
+    <script src="js/services/api.js?v=20260420-p23"></script>
 
     <!-- Global brand switcher (Phase 3b) -->
-    <script src="js/services/brand-switcher.js?v=20260420-p17"></script>
+    <script src="js/services/brand-switcher.js?v=20260420-p23"></script>
 
     <!-- Page Modules -->
     <script src="js/dashboard.js?v=20260122"></script>
     <script src="js/realtime.js"></script>
     <script src="js/analytics.js"></script>
-    <script src="js/competitors.js?v=20260420-p17"></script>
-    <script src="js/influencers.js?v=20260420-p17"></script>
+    <script src="js/competitors.js?v=20260420-p23"></script>
+    <script src="js/influencers.js?v=20260420-p23"></script>
     <script src="js/journey.js"></script>
     <script src="js/trends.js"></script>
-    <script src="js/reports.js?v=20260420-p17"></script>
+    <script src="js/reports.js?v=20260420-p23"></script>
     <script src="js/settings.js"></script>
 
     <!-- Main App -->

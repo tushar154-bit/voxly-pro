@@ -114,6 +114,47 @@ class SettingsPage {
         set('emailAlerts',    s.emailAlerts);
         set('pushAlerts',     s.pushAlerts);
         set('defaultBrandId', s.defaultBrandId);
+
+        // Populate Display Name from saved override or the authenticated user.
+        const appNameEl = document.getElementById('appName');
+        if (appNameEl) {
+            const override = localStorage.getItem('voxly_display_name');
+            const user = (window.Auth && window.Auth.getUser && window.Auth.getUser()) || {};
+            appNameEl.value = override || user.name || (user.email ? user.email.split('@')[0] : '');
+        }
+    }
+
+    // Propagate a new display name to every avatar/label in the UI.
+    applyDisplayName(name) {
+        if (!name) return;
+        const initials = name
+            .split(/\s+/)
+            .map((p) => p[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase();
+
+        // Sidebar footer
+        const sidebarAvatar = document.querySelector('.sidebar-footer .user-avatar');
+        const sidebarName   = document.querySelector('.sidebar-footer .user-name');
+        if (sidebarAvatar) sidebarAvatar.textContent = initials;
+        if (sidebarName)   sidebarName.textContent   = name;
+
+        // Top-right header avatar
+        const headerAvatar = document.querySelector('.user-avatar-small');
+        if (headerAvatar) headerAvatar.textContent = initials;
+
+        // Profile dropdown (if visible)
+        const ddAvatar = document.querySelector('#userMenuDropdown .user-menu-avatar');
+        const ddName   = document.getElementById('userMenuName');
+        if (ddAvatar) ddAvatar.textContent = initials;
+        if (ddName)   ddName.textContent   = name;
+
+        // Live Auth cache so re-renders elsewhere pick it up
+        if (window.Auth && window.Auth.getUser) {
+            const current = window.Auth.getUser();
+            if (current) current.name = name;
+        }
     }
 
     setupEventListeners() {
@@ -150,6 +191,7 @@ class SettingsPage {
                 break;
             case 'brands':
                 contentArea.innerHTML = this.renderBrandsSettings();
+                this.loadLiveBrands();
                 break;
             case 'platforms':
                 contentArea.innerHTML = this.renderPlatformsSettings();
@@ -183,9 +225,9 @@ class SettingsPage {
                 <div class="card">
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="form-label">Application Name</label>
-                            <input type="text" class="form-input" value="VoxlyPro" id="appName">
-                            <small class="form-helper">Customize your application name</small>
+                            <label class="form-label">Display Name</label>
+                            <input type="text" class="form-input" id="appName" placeholder="Your name">
+                            <small class="form-helper">Shown on your profile, sidebar, and reports</small>
                         </div>
 
                         <div class="form-group">
@@ -202,9 +244,15 @@ class SettingsPage {
                             <label class="form-label">Timezone</label>
                             <select class="form-select" id="timezone">
                                 <option value="UTC">UTC</option>
-                                <option value="America/New_York" selected>Eastern Time</option>
-                                <option value="America/Los_Angeles">Pacific Time</option>
-                                <option value="Europe/London">London</option>
+                                <option value="Asia/Kolkata">IST — India Standard Time (UTC+5:30)</option>
+                                <option value="America/New_York" selected>Eastern Time (UTC-5)</option>
+                                <option value="America/Los_Angeles">Pacific Time (UTC-8)</option>
+                                <option value="Europe/London">London (GMT / UTC+0)</option>
+                                <option value="Europe/Paris">Paris / Berlin (CET)</option>
+                                <option value="Asia/Dubai">Dubai (UTC+4)</option>
+                                <option value="Asia/Singapore">Singapore (UTC+8)</option>
+                                <option value="Asia/Tokyo">Tokyo (UTC+9)</option>
+                                <option value="Australia/Sydney">Sydney (UTC+10/11)</option>
                             </select>
                         </div>
 
@@ -240,41 +288,84 @@ class SettingsPage {
         return `
             <div class="settings-section">
                 <h2 class="settings-section-title">Brand Management</h2>
-                <p class="settings-section-description">Add and manage brands to monitor</p>
+                <p class="settings-section-description">Brands currently being tracked in your workspace</p>
 
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Active Brands</h3>
+                        <h3 class="card-title">Tracked Brands</h3>
                         <button class="btn btn-sm btn-primary" id="addBrandBtn">
                             <i class="fas fa-plus"></i> Add Brand
                         </button>
                     </div>
                     <div class="card-body">
-                        <div class="brands-list">
-                            <div class="brand-item">
-                                <div class="brand-info">
-                                    <h4>TechCorp</h4>
-                                    <p>Technology Industry</p>
-                                    <div class="brand-keywords">
-                                        <span class="badge badge-primary">techcorp</span>
-                                        <span class="badge badge-primary">@techcorp</span>
-                                        <span class="badge badge-primary">#techcorp</span>
-                                    </div>
-                                </div>
-                                <div class="brand-actions">
-                                    <button class="btn btn-sm btn-secondary">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
+                        <div class="brands-list" id="brandsList">
+                            <div style="padding:1rem;text-align:center;color:#64748b;font-size:0.875rem;">
+                                Loading brands…
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    async loadLiveBrands() {
+        const list = document.getElementById('brandsList');
+        if (!list) return;
+        if (typeof window.API === 'undefined') {
+            list.innerHTML = `<div style="padding:1rem;text-align:center;color:#64748b;">API not available.</div>`;
+            return;
+        }
+        try {
+            const { brands } = await window.API.brands.list();
+            if (!Array.isArray(brands) || brands.length === 0) {
+                list.innerHTML = `<div style="padding:1rem;text-align:center;color:#64748b;">No brands tracked yet. Click "Add Brand" to start.</div>`;
+                return;
+            }
+            const fmt = (n) => {
+                if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+                if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+                return String(n);
+            };
+            list.innerHTML = brands.map((b) => {
+                const slugTag  = b.slug;
+                const atTag    = '@' + b.slug;
+                const hashTag  = '#' + (b.name || b.slug).replace(/\s+/g, '');
+                return `
+                    <div class="brand-item" data-slug="${b.slug}">
+                        <div class="brand-info" style="display:flex;align-items:center;gap:0.9rem;">
+                            <span style="width:10px;height:10px;border-radius:50%;background:${b.color || '#6366f1'};flex-shrink:0;"></span>
+                            <div style="flex:1;min-width:0;">
+                                <h4>${b.name}</h4>
+                                <p>${b.industry || '—'}${b.country ? ' · ' + b.country : ''} · ${fmt(b.mentionCount || 0)} mentions · ${b.influencerCount || 0} influencers</p>
+                                <div class="brand-keywords">
+                                    <span class="badge badge-primary">${slugTag}</span>
+                                    <span class="badge badge-primary">${atTag}</span>
+                                    <span class="badge badge-primary">${hashTag}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="brand-actions">
+                            <button class="btn btn-sm btn-secondary" title="Switch to this brand" onclick="Settings.instance.switchToBrand('${b.slug}')">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" title="Remove (coming soon)" onclick="Notifications.info('Brand removal requires admin approval')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            list.innerHTML = `<div style="padding:1rem;text-align:center;color:#dc2626;">Failed to load brands: ${err.message}</div>`;
+        }
+    }
+
+    switchToBrand(slug) {
+        if (typeof APIData !== 'undefined') {
+            APIData.setActiveBrand(slug);
+            if (typeof Notifications !== 'undefined') Notifications.success(`Switched to ${slug}`);
+        }
     }
 
     renderPlatformsSettings() {
@@ -739,6 +830,17 @@ class SettingsPage {
         // Mirror to localStorage for offline resilience
         const snapshot = { ...payload, savedAt: new Date().toISOString() };
         localStorage.setItem('voxly_settings', JSON.stringify(snapshot));
+
+        // Display name is a local preference (no API persistence for now).
+        // Store + push it into every avatar/label in the UI immediately.
+        const rawName = valueOf(read('appName'));
+        const displayName = typeof rawName === 'string' ? rawName.trim() : '';
+        if (displayName) {
+            localStorage.setItem('voxly_display_name', displayName);
+            this.applyDisplayName(displayName);
+        } else {
+            localStorage.removeItem('voxly_display_name');
+        }
 
         if (typeof window.API === 'undefined') {
             Notifications.success('Settings saved locally');

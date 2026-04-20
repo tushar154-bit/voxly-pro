@@ -497,8 +497,80 @@ class VoxlyApp {
     }
 
     showUserMenu() {
-        console.log('👤 Showing user menu');
-        // Implement user menu
+        const btn = document.getElementById('userMenuBtn');
+        const dropdown = document.getElementById('userMenuDropdown');
+        if (!btn || !dropdown) return;
+
+        const isOpen = !dropdown.hidden;
+        if (isOpen) {
+            this._closeUserMenu();
+            return;
+        }
+
+        // Populate from the authenticated user (falls back if unauthenticated)
+        const user = (window.Auth && window.Auth.getUser && window.Auth.getUser()) || {};
+        const displayName = user.name || (user.email ? user.email.split('@')[0] : 'Demo User');
+        const initials = displayName
+            .split(/\s+/)
+            .map((p) => p[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase() || 'U';
+        const roleLabel = user.role === 'admin' ? 'Administrator' : 'Member';
+
+        const avatarEl = dropdown.querySelector('.user-menu-avatar');
+        const nameEl   = document.getElementById('userMenuName');
+        const emailEl  = document.getElementById('userMenuEmail');
+        const roleEl   = document.getElementById('userMenuRole');
+        if (avatarEl) avatarEl.textContent = initials;
+        if (nameEl)   nameEl.textContent   = displayName;
+        if (emailEl)  emailEl.textContent  = user.email || '—';
+        if (roleEl)   roleEl.textContent   = roleLabel;
+
+        dropdown.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+
+        // Wire actions once; idempotent guard.
+        if (!dropdown.dataset.wired) {
+            dropdown.dataset.wired = 'true';
+            dropdown.querySelectorAll('.user-menu-item').forEach((item) => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = item.dataset.action;
+                    this._closeUserMenu();
+                    if (action === 'settings') {
+                        this.navigateToPage('settings');
+                    } else if (action === 'logout') {
+                        if (window.Auth && window.Auth.logout) window.Auth.logout();
+                    } else if (action === 'copy-email') {
+                        const currentUser = (window.Auth && window.Auth.getUser && window.Auth.getUser()) || {};
+                        if (currentUser.email && navigator.clipboard) {
+                            navigator.clipboard.writeText(currentUser.email);
+                            if (typeof Notifications !== 'undefined') {
+                                Notifications.success(`Copied ${currentUser.email}`);
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // Close on outside click (once per open)
+        this._onDocClickForUserMenu = (e) => {
+            if (!dropdown.contains(e.target) && !btn.contains(e.target)) this._closeUserMenu();
+        };
+        setTimeout(() => document.addEventListener('click', this._onDocClickForUserMenu), 0);
+    }
+
+    _closeUserMenu() {
+        const btn = document.getElementById('userMenuBtn');
+        const dropdown = document.getElementById('userMenuDropdown');
+        if (dropdown) dropdown.hidden = true;
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+        if (this._onDocClickForUserMenu) {
+            document.removeEventListener('click', this._onDocClickForUserMenu);
+            this._onDocClickForUserMenu = null;
+        }
     }
 }
 

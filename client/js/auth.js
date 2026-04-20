@@ -79,19 +79,25 @@ window.Auth = (() => {
 
   const updateUserInSidebar = (user) => {
     if (!user) return;
+    // Local display-name override (set via Settings > General > Display Name)
+    const override = localStorage.getItem('voxly_display_name');
+    const displayName = override || user.name || user.email.split('@')[0];
+
+    // Sync back to the live user cache so other consumers see the override too.
+    if (override) user.name = override;
+
     const avatar = document.querySelector('.sidebar-footer .user-avatar');
+    const headerAvatar = document.querySelector('.user-avatar-small');
     const name = document.querySelector('.sidebar-footer .user-name');
     const role = document.querySelector('.sidebar-footer .user-role');
-    const displayName = user.name || user.email.split('@')[0];
-    if (avatar) {
-      const initials = displayName
-        .split(/\s+/)
-        .map((p) => p[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-      avatar.textContent = initials;
-    }
+    const initials = displayName
+      .split(/\s+/)
+      .map((p) => p[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+    if (avatar) avatar.textContent = initials;
+    if (headerAvatar) headerAvatar.textContent = initials;
     if (name) name.textContent = displayName;
     if (role) role.textContent = user.role === 'admin' ? 'Administrator' : 'Member';
   };

@@ -311,8 +311,26 @@ input, textarea, select {
 
 .nav-menu {
     flex: 1;
-    padding: 1rem;
+    padding: 1rem 0.75rem 1rem 1rem;
     overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.nav-menu::-webkit-scrollbar {
+    width: 6px;
+}
+.nav-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+.nav-menu::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.nav-menu::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .nav-item {
