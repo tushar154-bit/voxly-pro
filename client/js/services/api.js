@@ -64,9 +64,12 @@ window.API = (() => {
     },
 
     competitors: {
-      list:       (slug, params) => request(`/competitors/${slug}`,            { params }),
-      compare:    (slug, params) => request(`/competitors/${slug}/compare`,    { params }),
-      timeseries: (slug, params) => request(`/competitors/${slug}/timeseries`, { params }),
+      list:             (slug, params) => request(`/competitors/${slug}`,                   { params }),
+      compare:          (slug, params) => request(`/competitors/${slug}/compare`,           { params }),
+      timeseries:       (slug, params) => request(`/competitors/${slug}/timeseries`,        { params }),
+      contentMix:       (slug, params) => request(`/competitors/${slug}/content-mix`,       { params }),
+      postingFrequency: (slug, params) => request(`/competitors/${slug}/posting-frequency`, { params }),
+      activity:         (slug, params) => request(`/competitors/${slug}/activity`,          { params }),
     },
 
     influencers: {

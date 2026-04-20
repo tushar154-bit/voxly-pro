@@ -57,6 +57,16 @@ export const INFLUENCER_TEMPLATES = [
   { name: 'Kevin Park',       handle: 'kevinpark',      image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&h=150&fit=crop&crop=face' },
   { name: 'Daniel Brown',     handle: 'danielbrown',    image: 'https://images.unsplash.com/photo-1495216875107-c6c043eb703f?w=150&h=150&fit=crop&crop=face' },
   { name: 'Matthew Davis',    handle: 'matthewdavis',   image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Priya Kapoor',     handle: 'priyakapoor',    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Olivia Bennett',   handle: 'oliviabennett',  image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Hannah Carter',    handle: 'hannahcarter',   image: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Isabella Moreno',  handle: 'isabellamoreno', image: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Chloe Sullivan',   handle: 'chloesullivan',  image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Arjun Mehta',      handle: 'arjunmehta',     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Noah Williams',    handle: 'noahwilliams',   image: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Liam O\'Connor',   handle: 'liamoconnor',    image: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Ethan Patel',      handle: 'ethanpatel',     image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face' },
+  { name: 'Lucas Martinez',   handle: 'lucasmartinez',  image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face' },
 ];
 
 export const TOPIC_POOL = [

@@ -487,6 +487,7 @@ const Influencers = {
                 ...i,
                 image: i.avatarUrl ?? i.image,
                 avatar: i.avatar ?? (i.name || '?').split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase(),
+                lastMention: i.lastMentionAt ? new Date(i.lastMentionAt) : (i.lastMention ?? null),
             }));
             // Make sure the pinned cache is up to date before re-rendering.
             if (window.PinnedInfluencers && !window.PinnedInfluencers.getAll().length) {
@@ -1568,7 +1569,7 @@ const Influencers = {
                         <button class="action-btn" title="Send Message" onclick="event.stopPropagation(); Notifications.info('Message feature coming soon')">
                             <span class="material-icons">mail</span>
                         </button>
-                        <button class="action-btn pin-btn ${isPinned ? 'is-pinned' : ''}" data-influencer-id="${influencer.id}" title="${isPinned ? 'Unpin from Dashboard' : 'Pin to Dashboard'}" onclick="event.stopPropagation(); Influencers.togglePin(${influencer.id}, this)">
+                        <button class="action-btn pin-btn ${isPinned ? 'is-pinned' : ''}" data-influencer-id="${influencer.id}" title="${isPinned ? 'Unpin from Dashboard' : 'Pin to Dashboard'}" onclick="event.stopPropagation(); Influencers.togglePin('${influencer.id}', this)">
                             <span class="material-icons">push_pin</span>
                         </button>
                     </div>
@@ -1707,7 +1708,7 @@ const Influencers = {
             </div>
 
             <div class="detail-actions">
-                <button class="btn-primary pin-action-btn ${window.PinnedInfluencers.isPinned(influencer.id) ? 'is-pinned' : ''}" onclick="Influencers.togglePin(${influencer.id}, this, true)">
+                <button class="btn-primary pin-action-btn ${window.PinnedInfluencers.isPinned(influencer.id) ? 'is-pinned' : ''}" onclick="Influencers.togglePin('${influencer.id}', this, true)">
                     <span class="material-icons">push_pin</span>
                     <span class="pin-label">${window.PinnedInfluencers.isPinned(influencer.id) ? 'Pinned to Dashboard' : 'Pin to Dashboard'}</span>
                 </button>

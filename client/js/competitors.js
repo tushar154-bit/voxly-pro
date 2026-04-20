@@ -8,6 +8,7 @@ class CompetitorsPage {
         this.competitors = [];
         this.selectedCompetitors = [];
         this.currentBrand = null;
+        this.currentPeriod = '30d';
         this.isAnimating = false;
     }
 
@@ -33,6 +34,13 @@ class CompetitorsPage {
                         <p class="page-subtitle">Compare <strong>${brandName}</strong> with market competitors</p>
                     </div>
                     <div class="page-header-right">
+                        <select id="competitorPeriodSelect" class="form-select" style="background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;color:#1f2937;cursor:pointer;">
+                            <option value="7d">Last 7 days</option>
+                            <option value="30d" selected>Last 30 days</option>
+                            <option value="90d">Last 90 days</option>
+                            <option value="thismonth">This month</option>
+                            <option value="lastmonth">Last month</option>
+                        </select>
                         <button class="btn btn-secondary" id="addCompetitorBtn">
                             <i class="fas fa-plus"></i>
                             <span>Add Competitor</span>
@@ -428,9 +436,9 @@ class CompetitorsPage {
                         <div class="card-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <div class="card-header-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-photo-video" style="color: white; font-size: 1.1rem;"></i>
+                                    <i class="fas fa-hashtag" style="color: white; font-size: 1.1rem;"></i>
                                 </div>
-                                <h3 class="card-title" style="margin: 0;">Content Type Distribution</h3>
+                                <h3 class="card-title" style="margin: 0;">Platform Distribution per Brand</h3>
                             </div>
                         </div>
                         <div class="card-body">
@@ -509,21 +517,110 @@ class CompetitorsPage {
     async loadLiveData() {
         if (typeof window.API === 'undefined') return;
         const slug = this.currentBrand || 'apple';
-        try {
-            const [payload, ts] = await Promise.all([
-                window.API.competitors.list(slug, { period: '30d' }),
-                window.API.competitors.timeseries(slug, { period: '30d', granularity: 'week' }),
-            ]);
-            this.liveCompetitors = payload;
-            this.liveTimeseries = ts;
-            this.applyLiveCompetitors(payload);
-            this.applyLiveKpiCards(payload);
-            this.applyLiveSentimentChart(payload);
-            this.applyLiveSoVChart(ts);
-            console.log('✓ Competitors hydrated from API');
-        } catch (err) {
-            console.warn('Competitors live data unavailable, using mock fallback:', err.message);
+        const period = this.currentPeriod || '30d';
+        // Finer granularity for short windows so the SoV chart has enough points.
+        const granularity = (period === '7d' || period === 'last7days') ? 'day' : 'week';
+
+        // Run each request independently so one failure doesn't block the rest.
+        const safe = (label, promise, apply) =>
+            promise.then((data) => { try { apply(data); } catch (e) { console.error(`[Competitors] apply-${label} threw`, e); } })
+                   .catch((e) => console.warn(`[Competitors] ${label} failed:`, e.message));
+
+        await Promise.all([
+            safe('list', window.API.competitors.list(slug, { period }), (p) => {
+                this.liveCompetitors = p;
+                this.applyLiveCompetitors(p);
+                this.applyLiveKpiCards(p);
+                this.applyLiveSentimentChart(p);
+            }),
+            safe('timeseries', window.API.competitors.timeseries(slug, { period, granularity }), (ts) => {
+                this.liveTimeseries = ts;
+                this.applyLiveSoVChart(ts);
+            }),
+            safe('contentMix',       window.API.competitors.contentMix(slug, { period }),       (d) => this.applyLiveContentMix(d)),
+            safe('postingFrequency', window.API.competitors.postingFrequency(slug, { period }), (d) => this.applyLivePostingFrequency(d)),
+            safe('activity',         window.API.competitors.activity(slug, { limit: 12 }),      (d) => this.applyLiveActivityTimeline(d)),
+        ]);
+        console.log(`✓ Competitors hydrated from API (period=${period})`);
+    }
+
+    applyLiveContentMix(payload) {
+        console.log('[Competitors] applyLiveContentMix called, chart exists?', !!this.contentTypeChart, 'brands?', payload?.brands?.length);
+        if (!this.contentTypeChart) {
+            console.warn('[Competitors] contentTypeChart not initialised yet; skipping');
+            return;
         }
+        if (!payload?.brands?.length) {
+            console.warn('[Competitors] no brands in payload; skipping');
+            return;
+        }
+        const labels = payload.platformLabels || payload.platforms || [];
+        const colors = payload.platformColors || [];
+        this.contentTypeChart.data.labels = payload.brands.map((b) => b.name);
+        this.contentTypeChart.data.datasets = labels.map((label, i) => ({
+            label,
+            data: payload.brands.map((b) => b.values[i] ?? 0),
+            backgroundColor: colors[i] || '#64748b',
+            borderRadius: 4,
+        }));
+        if (this.contentTypeChart.options?.scales?.x?.title) {
+            this.contentTypeChart.options.scales.x.title.text = 'Platform Share (%)';
+        }
+        this.contentTypeChart.update('active');
+        console.log('[Competitors] chart updated with', labels.length, 'platforms across', payload.brands.length, 'brands');
+    }
+
+    applyLivePostingFrequency(payload) {
+        if (!this.postingFrequencyChart || !payload?.brands?.length) return;
+        const fallbackPalette = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'];
+        this.postingFrequencyChart.data.labels = payload.brands.map((b) => b.name);
+        this.postingFrequencyChart.data.datasets[0].data = payload.brands.map((b) => b.postsPerWeek);
+        this.postingFrequencyChart.data.datasets[0].backgroundColor =
+            payload.brands.map((b, i) => b.color || fallbackPalette[i % fallbackPalette.length]);
+        this.postingFrequencyChart.update('active');
+    }
+
+    applyLiveActivityTimeline(payload) {
+        const container = document.getElementById('activityTimeline');
+        if (!container || !payload?.activities) return;
+
+        if (payload.activities.length === 0) {
+            container.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#64748b;">No recent activity for this brand set.</div>';
+            return;
+        }
+
+        const fmtNum = (n) => {
+            if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+            if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+            return String(n);
+        };
+        const daysAgoLabel = (d) => d === 0 ? 'Today' : d === 1 ? '1 day ago' : `${d} days ago`;
+        const severityClass = (sev) => sev === 'critical' ? 'sev-critical'
+            : sev === 'high' ? 'sev-high' : sev === 'medium' ? 'sev-medium' : 'sev-low';
+
+        container.innerHTML = payload.activities.map((a) => `
+            <div class="activity-timeline-item" style="display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid #f3f4f6;">
+                <div style="width:36px;height:36px;border-radius:10px;background:${a.color}22;color:${a.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas ${a.icon}"></i>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:2px;">
+                        <div style="font-weight:600;color:#1f2937;">${a.title}</div>
+                        <div style="color:#9ca3af;font-size:0.8rem;white-space:nowrap;">${daysAgoLabel(a.daysAgo)}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#6b7280;">
+                        <span style="display:inline-flex;align-items:center;gap:6px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:${a.brandColor};"></span>
+                            ${a.brand}
+                        </span>
+                        <span>•</span>
+                        <span style="color:${a.color};font-weight:500;">${a.typeLabel}</span>
+                        <span>•</span>
+                        <span class="${severityClass(a.severity)}" style="text-transform:uppercase;font-size:0.7rem;font-weight:700;">${a.severity}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 
     applyLiveSentimentChart(payload) {
@@ -704,33 +801,84 @@ class CompetitorsPage {
     }
 
     applyLiveCompetitors(payload) {
-        if (!payload?.competitors?.length) return;
+        if (!payload?.focus) return;
         const fmt = (n) => {
             if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
             if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
             return String(Math.round(n));
         };
-        const tbody = document.querySelector('.comparison-table tbody');
-        if (!tbody) return;
+        const pctChange = (curr, prev) => {
+            if (!prev) return curr ? 100 : 0;
+            return Math.round(((curr - prev) / prev) * 1000) / 10;
+        };
 
+        const thead = document.getElementById('comparisonTableHead')
+                   || document.querySelector('.comparison-table thead');
+        const tbody = document.getElementById('comparisonTableBody')
+                   || document.querySelector('.comparison-table tbody');
+        if (!thead || !tbody) return;
+
+        // Build row data
         const rows = [
             { ...payload.focus, isFocus: true },
-            ...payload.competitors,
+            ...(payload.competitors || []),
         ];
-        tbody.innerHTML = rows.map((r) => `
-            <tr ${r.isFocus ? 'class="focus-brand-row"' : ''}>
+        const totalMentions = rows.reduce((s, r) => s + (r.metrics?.mentions || 0), 0) || 1;
+
+        const enriched = rows.map((r) => {
+            const m = r.metrics || {};
+            const p = r.prevMetrics || {};
+            return {
+                id: r.id,
+                name: r.name,
+                color: r.color,
+                isFocus: !!r.isFocus,
+                mentions:   m.mentions   || 0,
+                sentiment:  m.sentiment  || 0,
+                sov:        ((m.mentions || 0) / totalMentions) * 100,
+                reach:      m.reach      || 0,
+                growth:     pctChange(m.mentions || 0, p.mentions || 0),
+            };
+        });
+
+        // Leaders (max per metric) so we can highlight them in green
+        const leaders = {
+            mentions:  Math.max(...enriched.map((e) => e.mentions)),
+            sentiment: Math.max(...enriched.map((e) => e.sentiment)),
+            sov:       Math.max(...enriched.map((e) => e.sov)),
+            reach:     Math.max(...enriched.map((e) => e.reach)),
+            growth:    Math.max(...enriched.map((e) => e.growth)),
+        };
+        const leaderClass = (value, key) =>
+            value === leaders[key] ? ' class="value-leader"' : '';
+
+        // Write header
+        thead.innerHTML = `
+            <tr>
+                <th style="text-align:left;">BRAND</th>
+                <th>MENTIONS</th>
+                <th>SENTIMENT</th>
+                <th>SOV</th>
+                <th>REACH</th>
+                <th>GROWTH</th>
+            </tr>
+        `;
+
+        // Write body — one row per brand, columns are metrics
+        tbody.innerHTML = enriched.map((r) => `
+            <tr${r.isFocus ? ' class="focus-brand-row"' : ''}>
                 <td>
-                    <div class="brand-cell">
-                        <span class="brand-dot" style="background:${r.color || '#6366f1'};"></span>
+                    <div class="brand-cell" style="display:flex;align-items:center;gap:10px;">
+                        <span class="brand-dot" style="width:10px;height:10px;border-radius:50%;background:${r.color || '#6366f1'};display:inline-block;"></span>
                         <strong>${r.name}</strong>
-                        ${r.isFocus ? '<span class="focus-tag">(You)</span>' : ''}
+                        ${r.isFocus ? '<span class="focus-tag" style="color:#6366f1;font-weight:500;margin-left:4px;">(You)</span>' : ''}
                     </div>
                 </td>
-                <td>${fmt(r.metrics.mentions)}</td>
-                <td>${r.metrics.sentiment.toFixed(1)}</td>
-                <td>${r.metrics.engagement.toFixed(1)}%</td>
-                <td>${fmt(r.metrics.reach)}</td>
-                <td>${fmt(r.metrics.authors)}</td>
+                <td${leaderClass(r.mentions, 'mentions')}>${fmt(r.mentions)}</td>
+                <td${leaderClass(r.sentiment, 'sentiment')}>${r.sentiment.toFixed(1)}</td>
+                <td${leaderClass(r.sov, 'sov')}>${r.sov.toFixed(1)}%</td>
+                <td${leaderClass(r.reach, 'reach')}>${fmt(r.reach)}</td>
+                <td${leaderClass(r.growth, 'growth')}>${r.growth >= 0 ? '+' : ''}${r.growth.toFixed(1)}%</td>
             </tr>
         `).join('');
     }
@@ -881,6 +1029,19 @@ class CompetitorsPage {
         const exportBtn = document.getElementById('exportCompetitorBtn');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.showExportOptions());
+        }
+
+        // Time period filter — re-fetch everything on change
+        const periodSelect = document.getElementById('competitorPeriodSelect');
+        if (periodSelect) {
+            periodSelect.value = this.currentPeriod || '30d';
+            periodSelect.addEventListener('change', (e) => {
+                this.currentPeriod = e.target.value;
+                this.loadLiveData();
+                if (typeof Notifications !== 'undefined') {
+                    Notifications.info(`Period updated to ${e.target.options[e.target.selectedIndex].text}`);
+                }
+            });
         }
 
         // Close modal on outside click
