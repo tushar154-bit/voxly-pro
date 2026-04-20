@@ -67,7 +67,7 @@ class CompetitorsPage {
                 <!-- Comparison Overview - Vibrant Hero Cards -->
                 <div class="stats-grid stats-grid-4 competitor-hero-stats">
                     <!-- Share of Voice Card - Purple -->
-                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                    <div id="compCardSov" class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
                         <div class="competitor-card-bg">
                             <div class="competitor-circle circle-1"></div>
                             <div class="competitor-circle circle-2"></div>
@@ -83,16 +83,16 @@ class CompetitorsPage {
                             </div>
                         </div>
                         <div class="competitor-card-label">SHARE OF VOICE</div>
-                        <div class="competitor-card-value">36.7%</div>
-                        <div class="competitor-card-badge positive">
+                        <div class="competitor-card-value">—</div>
+                        <div class="competitor-card-badge neutral">
                             <i class="fas fa-arrow-up"></i>
-                            <span>+13.6% Market Share</span>
+                            <span>Loading...</span>
                         </div>
-                        <div class="competitor-card-rank">#1 in category</div>
+                        <div class="competitor-card-rank">—</div>
                     </div>
 
-                    <!-- Product Launches Card - Blue -->
-                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                    <!-- Sentiment Score Card - Blue -->
+                    <div id="compCardSentiment" class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
                         <div class="competitor-card-bg">
                             <div class="competitor-circle circle-1"></div>
                             <div class="competitor-circle circle-2"></div>
@@ -104,20 +104,20 @@ class CompetitorsPage {
                             <div class="competitor-pulse-ring"></div>
                             <div class="competitor-pulse-ring ring-2"></div>
                             <div class="competitor-card-icon">
-                                <i class="fas fa-rocket"></i>
+                                <i class="fas fa-smile"></i>
                             </div>
                         </div>
-                        <div class="competitor-card-label">PRODUCT LAUNCHES</div>
-                        <div class="competitor-card-value">12</div>
-                        <div class="competitor-card-badge positive">
+                        <div class="competitor-card-label">SENTIMENT SCORE</div>
+                        <div class="competitor-card-value">—</div>
+                        <div class="competitor-card-badge neutral">
                             <i class="fas fa-arrow-up"></i>
-                            <span>+3 vs last quarter</span>
+                            <span>Loading...</span>
                         </div>
-                        <div class="competitor-card-rank">You: 5 | Competitors: 7</div>
+                        <div class="competitor-card-rank">—</div>
                     </div>
 
                     <!-- Engagement Rate Card - Emerald -->
-                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                    <div id="compCardEngagement" class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
                         <div class="competitor-card-bg">
                             <div class="competitor-circle circle-1"></div>
                             <div class="competitor-circle circle-2"></div>
@@ -133,16 +133,16 @@ class CompetitorsPage {
                             </div>
                         </div>
                         <div class="competitor-card-label">ENGAGEMENT RATE</div>
-                        <div class="competitor-card-value">5%</div>
-                        <div class="competitor-card-badge negative">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>Below avg (5.1%)</span>
+                        <div class="competitor-card-value">—</div>
+                        <div class="competitor-card-badge neutral">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Loading...</span>
                         </div>
-                        <div class="competitor-card-rank">#2 in category</div>
+                        <div class="competitor-card-rank">—</div>
                     </div>
 
                     <!-- Growth Rate Card - Orange -->
-                    <div class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #f97316 0%, #fb923c 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
+                    <div id="compCardGrowth" class="stat-card hero-card-vibrant competitor-vibrant-card" style="background: linear-gradient(135deg, #f97316 0%, #fb923c 100%); color: white; position: relative; overflow: hidden; border: none; border-radius: 20px; padding: 1.5rem;">
                         <div class="competitor-card-bg">
                             <div class="competitor-circle circle-1"></div>
                             <div class="competitor-circle circle-2"></div>
@@ -154,16 +154,16 @@ class CompetitorsPage {
                             <div class="competitor-pulse-ring"></div>
                             <div class="competitor-pulse-ring ring-2"></div>
                             <div class="competitor-card-icon">
-                                <i class="fas fa-rocket"></i>
+                                <i class="fas fa-chart-line"></i>
                             </div>
                         </div>
                         <div class="competitor-card-label">GROWTH RATE</div>
-                        <div class="competitor-card-value">+13.6%</div>
+                        <div class="competitor-card-value">—</div>
                         <div class="competitor-card-badge neutral">
                             <i class="fas fa-chart-line"></i>
-                            <span>Steady growth</span>
+                            <span>Loading...</span>
                         </div>
-                        <div class="competitor-card-rank">#2 in category</div>
+                        <div class="competitor-card-rank">—</div>
                     </div>
                 </div>
 
@@ -510,13 +510,197 @@ class CompetitorsPage {
         if (typeof window.API === 'undefined') return;
         const slug = this.currentBrand || 'apple';
         try {
-            const payload = await window.API.competitors.list(slug, { period: '30d' });
+            const [payload, ts] = await Promise.all([
+                window.API.competitors.list(slug, { period: '30d' }),
+                window.API.competitors.timeseries(slug, { period: '30d', granularity: 'week' }),
+            ]);
             this.liveCompetitors = payload;
+            this.liveTimeseries = ts;
             this.applyLiveCompetitors(payload);
+            this.applyLiveKpiCards(payload);
+            this.applyLiveSentimentChart(payload);
+            this.applyLiveSoVChart(ts);
             console.log('✓ Competitors hydrated from API');
         } catch (err) {
             console.warn('Competitors live data unavailable, using mock fallback:', err.message);
         }
+    }
+
+    applyLiveSentimentChart(payload) {
+        if (!this.sentimentChart || !payload?.focus) return;
+        const rows = [
+            { name: payload.focus.name, value: payload.focus.metrics.sentiment, color: payload.focus.color },
+            ...(payload.competitors || []).map((c) => ({
+                name: c.name,
+                value: c.metrics.sentiment,
+                color: c.color,
+            })),
+        ].sort((a, b) => b.value - a.value);
+
+        const fallbackPurples = ['#6d28d9', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'];
+        this.sentimentChart.data.labels = rows.map((r) => r.name);
+        this.sentimentChart.data.datasets[0].data = rows.map((r) => r.value);
+        this.sentimentChart.data.datasets[0].backgroundColor = rows.map(
+            (r, i) => r.color || fallbackPurples[i % fallbackPurples.length]
+        );
+        this.sentimentChart.update('active');
+    }
+
+    applyLiveSoVChart(ts) {
+        if (!this.shareOfVoiceChart || !ts?.brands?.length) return;
+
+        const fallbackPalette = ['#6366f1', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+        const datasets = ts.brands.map((b, i) => {
+            const color = b.color || fallbackPalette[i % fallbackPalette.length];
+            return {
+                label: b.name,
+                data: b.sov,
+                borderColor: color,
+                backgroundColor: color + '22', // low-alpha fill
+                borderWidth: 2.5,
+                tension: 0.35,
+                pointRadius: 3,
+                pointBackgroundColor: color,
+                fill: false,
+            };
+        });
+
+        this.shareOfVoiceChart.data.labels = ts.labels;
+        this.shareOfVoiceChart.data.datasets = datasets;
+        // Y axis should express percentage 0..100 with % ticks.
+        if (this.shareOfVoiceChart.options?.scales?.y) {
+            this.shareOfVoiceChart.options.scales.y.min = 0;
+            this.shareOfVoiceChart.options.scales.y.max = 100;
+            this.shareOfVoiceChart.options.scales.y.ticks = this.shareOfVoiceChart.options.scales.y.ticks || {};
+            this.shareOfVoiceChart.options.scales.y.ticks.callback = (v) => v + '%';
+        }
+        this.shareOfVoiceChart.update('active');
+    }
+
+    applyLiveKpiCards(payload) {
+        if (!payload?.focus) return;
+        const focus = payload.focus;
+        const competitors = payload.competitors || [];
+        const total = 1 + competitors.length; // focus + competitors
+
+        // ----- helpers ---------------------------------------------------------
+        const fmt = (n) => {
+            if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+            if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+            return String(Math.round(n));
+        };
+        const pctChange = (curr, prev) => {
+            if (!prev) return curr ? 100 : 0;
+            return Math.round(((curr - prev) / prev) * 1000) / 10;
+        };
+        const setCard = (cardId, { value, badgeText, badgeClass, badgeIcon, rank }) => {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const v = card.querySelector('.competitor-card-value');
+            const badge = card.querySelector('.competitor-card-badge');
+            const badgeSpan = badge?.querySelector('span');
+            const badgeIconEl = badge?.querySelector('i');
+            const rankEl = card.querySelector('.competitor-card-rank');
+            if (v)         v.textContent = value;
+            if (badge)     badge.className = `competitor-card-badge ${badgeClass}`;
+            if (badgeSpan) badgeSpan.textContent = badgeText;
+            if (badgeIconEl && badgeIcon) badgeIconEl.className = badgeIcon;
+            if (rankEl)    rankEl.textContent = rank;
+        };
+        const rankOf = (rows, focusId, metricKey, { descending = true } = {}) => {
+            const sorted = [...rows].sort((a, b) =>
+                descending ? b[metricKey] - a[metricKey] : a[metricKey] - b[metricKey]);
+            return sorted.findIndex((r) => r.id === focusId) + 1;
+        };
+        const rankText = (rank) => `#${rank} of ${total}`;
+        const rankBadgeClass = (rank) =>
+            rank === 1 ? 'positive' : rank <= Math.ceil(total / 2) ? 'neutral' : 'negative';
+
+        // ----- Share of Voice --------------------------------------------------
+        const totalMentions = focus.metrics.mentions + competitors.reduce((s, c) => s + c.metrics.mentions, 0);
+        const sov = totalMentions > 0 ? (focus.metrics.mentions / totalMentions) * 100 : 0;
+        const prevTotalMentions = (focus.prevMetrics?.mentions || 0)
+            + competitors.reduce((s, c) => s + (c.prevMetrics?.mentions || 0), 0);
+        const prevSov = prevTotalMentions > 0
+            ? ((focus.prevMetrics?.mentions || 0) / prevTotalMentions) * 100
+            : 0;
+        const sovDelta = Math.round((sov - prevSov) * 10) / 10;
+
+        const sovRows = [
+            { id: focus.id, value: focus.metrics.mentions },
+            ...competitors.map((c) => ({ id: c.id, value: c.metrics.mentions })),
+        ];
+        const sovRank = rankOf(sovRows, focus.id, 'value');
+
+        setCard('compCardSov', {
+            value: sov.toFixed(1) + '%',
+            badgeText: `${sovDelta >= 0 ? '+' : ''}${sovDelta}% vs prev period`,
+            badgeClass: sovDelta >= 0 ? 'positive' : 'negative',
+            badgeIcon: `fas fa-arrow-${sovDelta >= 0 ? 'up' : 'down'}`,
+            rank: rankText(sovRank),
+        });
+
+        // ----- Sentiment Score -------------------------------------------------
+        const sentRows = [
+            { id: focus.id, value: focus.metrics.sentiment },
+            ...competitors.map((c) => ({ id: c.id, value: c.metrics.sentiment })),
+        ];
+        const sentRank = rankOf(sentRows, focus.id, 'value');
+        const avgCompSent = competitors.length
+            ? competitors.reduce((s, c) => s + c.metrics.sentiment, 0) / competitors.length
+            : 0;
+        const sentDelta = Math.round((focus.metrics.sentiment - avgCompSent) * 10) / 10;
+
+        setCard('compCardSentiment', {
+            value: focus.metrics.sentiment.toFixed(1) + '/100',
+            badgeText: `${sentDelta >= 0 ? '+' : ''}${sentDelta} vs competitors avg`,
+            badgeClass: sentDelta >= 0 ? 'positive' : 'negative',
+            badgeIcon: `fas fa-arrow-${sentDelta >= 0 ? 'up' : 'down'}`,
+            rank: rankText(sentRank),
+        });
+
+        // ----- Engagement Rate -------------------------------------------------
+        const engRows = [
+            { id: focus.id, value: focus.metrics.engagement },
+            ...competitors.map((c) => ({ id: c.id, value: c.metrics.engagement })),
+        ];
+        const engRank = rankOf(engRows, focus.id, 'value');
+        const avgCompEng = competitors.length
+            ? competitors.reduce((s, c) => s + c.metrics.engagement, 0) / competitors.length
+            : 0;
+        const engDelta = Math.round((focus.metrics.engagement - avgCompEng) * 100) / 100;
+
+        setCard('compCardEngagement', {
+            value: focus.metrics.engagement.toFixed(1) + '%',
+            badgeText: `${engDelta >= 0 ? '+' : ''}${engDelta}% vs avg`,
+            badgeClass: engDelta >= 0 ? 'positive' : 'negative',
+            badgeIcon: `fas fa-arrow-${engDelta >= 0 ? 'up' : 'down'}`,
+            rank: rankText(engRank),
+        });
+
+        // ----- Growth Rate (mentions Δ vs previous period) ---------------------
+        const growth = pctChange(focus.metrics.mentions, focus.prevMetrics?.mentions || 0);
+        const growthRows = [
+            { id: focus.id, value: growth },
+            ...competitors.map((c) => ({
+                id: c.id,
+                value: pctChange(c.metrics.mentions, c.prevMetrics?.mentions || 0),
+            })),
+        ];
+        const growthRank = rankOf(growthRows, focus.id, 'value');
+        const growthLabel =
+            growth > 10 ? 'Accelerating' :
+            growth > 0  ? 'Steady growth' :
+            growth > -10 ? 'Softening' :
+            'Declining';
+
+        setCard('compCardGrowth', {
+            value: `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`,
+            badgeText: growthLabel,
+            badgeClass: growth >= 0 ? 'positive' : 'negative',
+            badgeIcon: `fas fa-arrow-${growth >= 0 ? 'up' : 'down'}`,
+            rank: rankText(growthRank),
+        });
     }
 
     applyLiveCompetitors(payload) {
@@ -956,19 +1140,10 @@ class CompetitorsPage {
             return;
         }
 
-        // Build chips HTML - Your brand first, then competitors
-        const brandLogoHtml = brand.logo
-            ? `<img src="${brand.logo}" alt="${brand.name}" onerror="this.parentElement.innerHTML='${brand.name.charAt(0)}'; this.parentElement.style.background='${brand.color}';">`
-            : brand.name.charAt(0);
+        // Only show competitor chips — the current brand is implicit and
+        // shouldn't appear in its own "Select Competitors to Compare" list.
+        let chipsHtml = '';
 
-        let chipsHtml = `
-            <button class="competitor-chip active" data-competitor="${brandId}">
-                <span class="chip-logo" style="background: ${brand.logo ? '#ffffff' : brand.color}">${brandLogoHtml}</span>
-                <span>${brand.name}</span>
-            </button>
-        `;
-
-        // Add competitor chips
         brand.competitors.forEach(compId => {
             const comp = typeof APIData !== 'undefined' ? APIData.brands[compId] : null;
             if (comp) {

@@ -46,6 +46,8 @@ window.API = (() => {
       posts:     (slug, params) => request(`/dashboard/${slug}/posts`,     { params }),
       activity:  (slug, params) => request(`/dashboard/${slug}/activity`,  { params }),
       platforms: (slug, params) => request(`/dashboard/${slug}/platforms`, { params }),
+      hourly:    (slug, params) => request(`/dashboard/${slug}/hourly`,    { params }),
+      emotions:  (slug, params) => request(`/dashboard/${slug}/emotions`,  { params }),
     },
 
     analytics: {
@@ -62,8 +64,9 @@ window.API = (() => {
     },
 
     competitors: {
-      list:    (slug, params) => request(`/competitors/${slug}`,         { params }),
-      compare: (slug, params) => request(`/competitors/${slug}/compare`, { params }),
+      list:       (slug, params) => request(`/competitors/${slug}`,            { params }),
+      compare:    (slug, params) => request(`/competitors/${slug}/compare`,    { params }),
+      timeseries: (slug, params) => request(`/competitors/${slug}/timeseries`, { params }),
     },
 
     influencers: {

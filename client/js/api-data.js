@@ -1379,13 +1379,15 @@ const APIData = {
     // Get current selected brand
     currentBrand: 'apple',
 
-    // Set active brand
+    // Set active brand (emits 'brandChanged' so pages can re-fetch from the API)
     setActiveBrand(brandId) {
-        if (this.brands[brandId]) {
-            this.currentBrand = brandId;
-            return this.brands[brandId];
-        }
-        return null;
+        if (!brandId || brandId === this.currentBrand) return this.brands[this.currentBrand];
+        const prev = this.currentBrand;
+        this.currentBrand = brandId;
+        try {
+            window.dispatchEvent(new CustomEvent('brandChanged', { detail: { brand: brandId, prev } }));
+        } catch (e) { /* CustomEvent not supported (shouldn't happen in modern browsers) */ }
+        return this.brands[brandId] || null;
     },
 
     // Get active brand data

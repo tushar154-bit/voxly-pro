@@ -1,5 +1,5 @@
 import { prisma } from '../db/prisma.js';
-import { parsePeriod, pctChange } from '../utils/period.js';
+import { parsePeriod, pctChange, DAY_MS } from '../utils/period.js';
 
 const aggregateForBrand = async (brandId, from, to) => {
   const [agg, count, authors] = await Promise.all([
@@ -74,6 +74,86 @@ export const listCompetitors = async (req, res) => {
     period: { from: period.from, to: period.to, label: period.label, days: period.days },
     focus,
     competitors,
+  });
+};
+
+// -----------------------------------------------------------------
+// GET /api/competitors/:brandSlug/timeseries?period=&granularity=week|day
+// Weekly (or daily) Share-of-Voice for focus + competitors, ready for a
+// multi-line Chart.js dataset.
+// -----------------------------------------------------------------
+export const getTimeseries = async (req, res) => {
+  const { id: brandId, slug, name, color } = req.brand;
+  const period = parsePeriod(req.query);
+  const granularity = req.query.granularity === 'day' ? 'day' : 'week';
+  const bucketMs = granularity === 'day' ? DAY_MS : 7 * DAY_MS;
+
+  // Anchor to the most recent mention across ANY of the tracked brands so the
+  // chart stays meaningful regardless of seed freshness.
+  const relations = await prisma.competitorRelation.findMany({
+    where: { brandId },
+    include: { competitorBrand: { select: { id: true, slug: true, name: true, color: true } } },
+  });
+  const brandList = [
+    { id: brandId, slug, name, color },
+    ...relations.map((r) => r.competitorBrand),
+  ];
+  const brandIds = brandList.map((b) => b.id);
+
+  const latest = await prisma.mention.findFirst({
+    where: { brandId: { in: brandIds } },
+    orderBy: { postedAt: 'desc' },
+    select: { postedAt: true },
+  });
+  const anchor = latest?.postedAt || period.to;
+  const to = anchor;
+  const from = new Date(to.getTime() - period.days * DAY_MS);
+
+  // One query for the whole window, then bucket in JS.
+  const rows = await prisma.mention.findMany({
+    where: { brandId: { in: brandIds }, postedAt: { gte: from, lte: to } },
+    select: { brandId: true, postedAt: true },
+  });
+
+  const bucketCount = Math.max(1, Math.ceil((to.getTime() - from.getTime()) / bucketMs));
+  const buckets = Array.from({ length: bucketCount }, (_, i) => ({
+    bucketStart: new Date(from.getTime() + i * bucketMs),
+    perBrand: Object.fromEntries(brandIds.map((id) => [id, 0])),
+  }));
+
+  for (const r of rows) {
+    const idx = Math.min(
+      buckets.length - 1,
+      Math.max(0, Math.floor((r.postedAt.getTime() - from.getTime()) / bucketMs))
+    );
+    buckets[idx].perBrand[r.brandId]++;
+  }
+
+  // Build per-brand sov time series (percentage of bucket total).
+  const labelForBucket = (start, idx) => {
+    if (granularity === 'week') return `Week ${idx + 1}`;
+    return start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+
+  const brands = brandList.map((b) => ({
+    id: b.id,
+    slug: b.slug,
+    name: b.name,
+    color: b.color ?? null,
+    mentions: buckets.map((bk) => bk.perBrand[b.id] || 0),
+    sov: buckets.map((bk) => {
+      const total = Object.values(bk.perBrand).reduce((s, n) => s + n, 0);
+      if (!total) return 0;
+      return Math.round(((bk.perBrand[b.id] || 0) / total) * 1000) / 10;
+    }),
+  }));
+
+  res.json({
+    period: { from, to, days: period.days, label: period.label },
+    granularity,
+    labels: buckets.map((bk, i) => labelForBucket(bk.bucketStart, i)),
+    bucketStarts: buckets.map((bk) => bk.bucketStart),
+    brands,
   });
 };
 

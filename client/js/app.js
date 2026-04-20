@@ -65,6 +65,12 @@ class VoxlyApp {
             });
         });
 
+        // Global brand switch — reload the current page so every module
+        // re-fetches with the new brand slug.
+        window.addEventListener('brandChanged', () => {
+            this.loadPage(this.currentPage);
+        });
+
         // Global search
         const searchInput = document.getElementById('globalSearch');
         if (searchInput) {

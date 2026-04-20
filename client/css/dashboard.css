@@ -446,7 +446,12 @@
 .stat-card.success .stat-value .value-number,
 .stat-card.warning .stat-value .value-number,
 .stat-card.info .stat-value .value-number,
-.stat-card.danger .stat-value .value-number {
+.stat-card.danger .stat-value .value-number,
+.stat-card.primary .stat-value,
+.stat-card.success .stat-value,
+.stat-card.warning .stat-value,
+.stat-card.info .stat-value,
+.stat-card.danger .stat-value {
     color: #ffffff;
 }
 

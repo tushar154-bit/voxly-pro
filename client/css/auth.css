@@ -206,3 +206,81 @@
 .sidebar.collapsed .logout-btn {
     display: none;
 }
+
+/* ===================================
+   Global Brand Switcher dropdown
+   =================================== */
+.search-container {
+    position: relative;
+}
+
+.brand-switch-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    max-height: 380px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+    z-index: 500;
+    padding: 4px;
+}
+
+.brand-switch-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+}
+
+.brand-switch-item:hover,
+.brand-switch-item.is-current {
+    background: #f1f5f9;
+}
+
+.brand-switch-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.brand-switch-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.brand-switch-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.brand-switch-sub {
+    font-size: 0.75rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.brand-switch-check {
+    color: #6366f1;
+    font-size: 18px !important;
+}
+
+.brand-switch-empty {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    color: #64748b;
+    text-align: center;
+}

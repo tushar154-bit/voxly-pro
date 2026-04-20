@@ -9,7 +9,7 @@ console.log('📊 Dashboard JS loaded - version 2026-01-22 16:04');
 class DashboardPage {
     constructor() {
         this.charts = {};
-        this.currentBrand = 'apple'; // Default brand from APIData
+        this.currentBrand = (typeof APIData !== 'undefined' && APIData.currentBrand) || 'apple';
         this.currentPlatform = 'all';
         this.platformData = null;
         this.refreshInterval = null;
@@ -1946,19 +1946,85 @@ class DashboardPage {
     async loadLiveData() {
         if (typeof window.API === 'undefined') return;
         const slug = this.currentBrand || 'apple';
+        const period = this.currentTimeRange || '7d';
         try {
-            const [stats, platforms, activity] = await Promise.all([
-                window.API.dashboard.stats(slug,     { period: this.currentTimeRange || '7d' }),
-                window.API.dashboard.platforms(slug, { period: this.currentTimeRange || '7d' }),
+            const [stats, platforms, activity, hourly, emotions] = await Promise.all([
+                window.API.dashboard.stats(slug,     { period }),
+                window.API.dashboard.platforms(slug, { period }),
                 window.API.dashboard.activity(slug,  { limit: 20 }),
+                window.API.dashboard.hourly(slug,    { hours: 24 }),
+                window.API.dashboard.emotions(slug,  { period: '30d' }),
             ]);
             this.applyLiveStats(stats);
             this.applyLivePlatforms(platforms);
+            this.applyLivePlatformChart(platforms);
             this.applyLiveActivity(activity);
+            this.applyLiveHourly(hourly);
+            this.applyLiveEmotions(emotions);
             console.log('✓ Dashboard hydrated from API');
         } catch (err) {
             console.warn('Dashboard live data unavailable, using mock fallback:', err.message);
         }
+    }
+
+    applyLivePlatformChart(payload) {
+        const chart = this.charts?.platform;
+        if (!chart || !payload?.platforms?.length) return;
+        // Labels nicely capitalised; dataset is the raw mention count per platform.
+        const labels  = payload.platforms.map((p) => p.platform.charAt(0).toUpperCase() + p.platform.slice(1));
+        const data    = payload.platforms.map((p) => p.mentions);
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = data;
+        chart.update('active');
+    }
+
+    applyLiveHourly(payload) {
+        // Update peak hour / avg / total meta widgets
+        const fmt = (n) => {
+            if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+            if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+            return String(n);
+        };
+        const setText = (id, v) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = v;
+        };
+        if (payload?.summary) {
+            setText('peakHour', payload.summary.peak?.hourLabel || '—');
+            setText('avgHourly', fmt(Math.round(payload.summary.avgPerHour || 0)));
+            setText('total24h', fmt(payload.summary.total || 0));
+        }
+
+        // Update the Mentions Volume line chart
+        const chart = this.charts?.mentions;
+        if (!chart || !payload?.buckets?.length) return;
+        const labels = payload.buckets.map((b) => {
+            const d = new Date(b.bucketStart);
+            return d.toLocaleTimeString(undefined, { hour: 'numeric', hour12: true }).replace(' ', '');
+        });
+        const data = payload.buckets.map((b) => b.count);
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = data;
+        chart.update('active');
+    }
+
+    applyLiveEmotions(payload) {
+        const chart = this.charts?.emotion;
+        if (!chart || !payload?.emotions?.length) return;
+        chart.data.labels = payload.emotions.map((e) => e.label);
+        chart.data.datasets[0].data = payload.emotions.map((e) => e.value);
+        chart.update('active');
+
+        // Update the two visible legend chips (Joy / Trust) below the radar
+        const chips = document.querySelectorAll('.emotion-legend .emotion-chip, .emotion-summary .emotion-chip');
+        const byLabel = Object.fromEntries(payload.emotions.map((e) => [e.label, e.value]));
+        chips.forEach((chip) => {
+            const label = chip.querySelector('.emotion-label')?.textContent?.trim();
+            const pct = chip.querySelector('.emotion-pct, .emotion-value');
+            if (label && pct && byLabel[label] !== undefined) {
+                pct.textContent = `${byLabel[label]}%`;
+            }
+        });
     }
 
     applyLiveStats(payload) {
@@ -1969,6 +2035,21 @@ class DashboardPage {
             if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
             if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
             return String(Math.round(n));
+        };
+        // Preserve the nested .value-number / .value-suffix spans so the
+        // colored-card CSS (which targets .value-number) still applies.
+        const setValue = (id, value, suffix = '') => {
+            const wrapper = document.getElementById(id);
+            if (!wrapper) return;
+            let numEl = wrapper.querySelector('.value-number');
+            let sufEl = wrapper.querySelector('.value-suffix');
+            if (!numEl) {
+                wrapper.innerHTML = '<span class="value-number"></span><span class="value-suffix"></span>';
+                numEl = wrapper.querySelector('.value-number');
+                sufEl = wrapper.querySelector('.value-suffix');
+            }
+            numEl.textContent = value;
+            if (sufEl) sufEl.textContent = suffix;
         };
         const setText = (id, value) => {
             const el = document.getElementById(id);
@@ -1982,12 +2063,12 @@ class DashboardPage {
             el.className = `stat-change ${pct >= 0 ? 'positive' : 'negative'}`;
         };
 
-        setText('mentionsValue',   fmt(m.mentions.value));
-        setText('sentimentValue',  m.sentiment.value.toFixed(1));
-        setText('engagementValue', m.engagement.value.toFixed(1) + '%');
-        setText('reachValue',      fmt(m.reach.value));
-        setText('totalLikes',      fmt(m.likes || 0));
-        setText('totalComments',   fmt(m.comments || 0));
+        setValue('mentionsValue',   fmt(m.mentions.value));
+        setValue('sentimentValue',  m.sentiment.value.toFixed(1));
+        setValue('engagementValue', m.engagement.value.toFixed(1), '%');
+        setValue('reachValue',      fmt(m.reach.value));
+        setText('totalLikes',       fmt(m.likes || 0));
+        setText('totalComments',    fmt(m.comments || 0));
 
         setChange('sentimentChange',  m.sentiment.change);
         setChange('engagementChange', m.engagement.change);
